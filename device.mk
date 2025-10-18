@@ -209,6 +209,25 @@ USE_SWIFTSHADER := false
 TARGET_USES_VULKAN = true
 HWUI_COMPILE_FOR_PERF := true
 
+
+# Always preopt extracted APKs to prevent extracting out of the APK for gms modules
+PRODUCT_ALWAYS_PREOPT_EXTRACTED_APK := true
+PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
+PRODUCT_MINIMIZE_JAVA_DEBUG_INFO := true
+
+# Optimize everything for preopt
+PRODUCT_DEX_PREOPT_DEFAULT_COMPILER_FILTER := speed-profile
+
+# Speed profile services and wifi-service to reduce RAM and storage
+PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
+
+
+# Dex
+PRODUCT_DEXPREOPT_SPEED_APPS += \
+    Launcher3QuickStep\
+    Settings \
+    SystemUI
+
 $(call soong_config_set,pixel_mali,soc,$(TARGET_BOARD_PLATFORM))
 $(call soong_config_set,arm_gralloc,soc,$(TARGET_BOARD_PLATFORM))
 
