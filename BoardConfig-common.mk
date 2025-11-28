@@ -242,7 +242,7 @@ BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
 
 # Testing related defines
-BOARD_PERFSETUP_SCRIPT := platform_testing/scripts/perf-setup/p23-setup.sh
+# BOARD_PERFSETUP_SCRIPT := platform_testing/scripts/perf-setup/p23-setup.sh
 
 #
 # AUDIO & VOICE
@@ -439,6 +439,8 @@ BOARD_KERNEL_CMDLINE += log_buf_len=1024K
 
 # Protected VM firmware
 BOARD_PVMFWIMAGE_PARTITION_SIZE := 0x00100000
+# SELINUX_IGNORE_NEVERALLOWS := true
+
 
 include device/google/zuma/BoardConfigLineage.mk
 include device/google/zuma/BoardConfigEvolution.mk

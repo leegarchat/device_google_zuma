@@ -71,19 +71,38 @@ class PlaceholderEnergyConsumer : public PowerStats::IEnergyConsumer {
     }
     std::pair<EnergyConsumerType, std::string> getInfo() override { return {kType, kName}; }
 
-    std::optional<EnergyConsumerResult> getEnergyConsumed() override {
+    // std::optional<EnergyConsumerResult> getEnergyConsumed() override {
+    //     int64_t totalEnergyUWs = 0;
+    //     int64_t timestampMs = 0;
+    //     if (mChannelId != -1) {
+    //         std::vector<EnergyMeasurement> measurements;
+    //         if (mPowerStats->readEnergyMeter({mChannelId}, &measurements).isOk()) {
+    //             for (const auto &m : measurements) {
+    //                 totalEnergyUWs += m.energyUWs;
+    //                 timestampMs = m.timestampMs;
+    //             }
+    //         } else {
+    //             LOG(ERROR) << "Failed to read energy meter";
+    //             return {};
+    //         }
+    //     }
+
+    //     return EnergyConsumerResult{.timestampMs = timestampMs,
+    //                             .energyUWs = totalEnergyUWs>>1};
+    // }
+	// My code leegar
+    std::optional<EnergyConsumerResult> getEnergyConsumed(
+            const std::vector<EnergyMeasurement>& measurements) override {
         int64_t totalEnergyUWs = 0;
         int64_t timestampMs = 0;
+
+        // Ищем данные для нашего mChannelId среди переданных измерений
         if (mChannelId != -1) {
-            std::vector<EnergyMeasurement> measurements;
-            if (mPowerStats->readEnergyMeter({mChannelId}, &measurements).isOk()) {
-                for (const auto &m : measurements) {
+            for (const auto &m : measurements) {
+                if (m.id == mChannelId) {
                     totalEnergyUWs += m.energyUWs;
                     timestampMs = m.timestampMs;
                 }
-            } else {
-                LOG(ERROR) << "Failed to read energy meter";
-                return {};
             }
         }
 
