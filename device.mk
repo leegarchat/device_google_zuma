@@ -177,12 +177,12 @@ USE_LASSEN_OEMHOOK := true
 # The "power-anomaly-sitril" is added into PRODUCT_SOONG_NAMESPACES when
 # $(USE_LASSEN_OEMHOOK) is true and $(BOARD_WITHOUT_RADIO) is not true.
 ifneq ($(BOARD_WITHOUT_RADIO),true)
-    $(call soong_config_set,sitril,use_lassen_oemhook_with_radio,true)
+    $(call soong_config_set_bool,sitril,use_lassen_oemhook_with_radio,true)
 endif
 
 # Use for GRIL
 USES_LASSEN_MODEM := true
-$(call soong_config_set, vendor_ril_google_feature, use_lassen_modem, true)
+$(call soong_config_set_bool, vendor_ril_google_feature, use_lassen_modem, true)
 ifneq ($(BOARD_WITHOUT_RADIO),true)
 $(call soong_config_set_bool,grilservice,use_google_qns,true)
 endif
@@ -212,6 +212,12 @@ $(call soong_config_set,pixel_mali,soc,$(TARGET_BOARD_PLATFORM))
 $(call soong_config_set,arm_gralloc,soc,$(TARGET_BOARD_PLATFORM))
 
 include device/google/gs-common/gpu/gpu.mk
+
+# Custom Pixel Parts
+PRODUCT_PACKAGES += \
+	init.pixelparts.rc \
+	PixelCustomParts
+
 PRODUCT_PACKAGES += \
 	csffw_image_prebuilt__firmware_prebuilt_ttux_mali_csffw.bin \
 	libGLES_mali \

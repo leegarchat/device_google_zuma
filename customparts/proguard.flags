@@ -1,0 +1,5 @@
+-keep class org.pixel.customparts.* {
+  *;
+}
+
+-keep class com.android.settingslib.widget.** { *; }

@@ -121,17 +121,17 @@ BOARD_USES_SWIFTSHADER := false
 ifeq ($(BOARD_USES_EXYNOS_GRALLOC_VERSION),4)
 ifeq ($(BOARD_USES_SWIFTSHADER),true)
 TARGET_DISABLE_TRIPLE_BUFFERING := true
-$(call soong_config_set,arm_gralloc,gralloc_arm_no_external_afbc,true)
-$(call soong_config_set,arm_gralloc,mali_gpu_support_afbc_basic,false)
-$(call soong_config_set,arm_gralloc,mali_gpu_support_afbc_wideblk,false)
-$(call soong_config_set,arm_gralloc,gralloc_init_afbc,false)
-$(call soong_config_set,arm_gralloc,dpu_support_1010102_afbc,false)
+$(call soong_config_set_bool,arm_gralloc,gralloc_arm_no_external_afbc,true)
+$(call soong_config_set_bool,arm_gralloc,mali_gpu_support_afbc_basic,false)
+$(call soong_config_set_bool,arm_gralloc,mali_gpu_support_afbc_wideblk,false)
+$(call soong_config_set_bool,arm_gralloc,gralloc_init_afbc,false)
+$(call soong_config_set_bool,arm_gralloc,dpu_support_1010102_afbc,false)
 else
-$(call soong_config_set,arm_gralloc,gralloc_arm_no_external_afbc,false)
-$(call soong_config_set,arm_gralloc,mali_gpu_support_afbc_basic,true)
-$(call soong_config_set,arm_gralloc,mali_gpu_support_afbc_wideblk,true)
-$(call soong_config_set,arm_gralloc,gralloc_init_afbc,true)
-$(call soong_config_set,arm_gralloc,dpu_support_1010102_afbc,true)
+$(call soong_config_set_bool,arm_gralloc,gralloc_arm_no_external_afbc,false)
+$(call soong_config_set_bool,arm_gralloc,mali_gpu_support_afbc_basic,true)
+$(call soong_config_set_bool,arm_gralloc,mali_gpu_support_afbc_wideblk,true)
+$(call soong_config_set_bool,arm_gralloc,gralloc_init_afbc,true)
+$(call soong_config_set_bool,arm_gralloc,dpu_support_1010102_afbc,true)
 endif # ifeq ($(BOARD_USES_SWIFTSHADER),true)
 $(call soong_config_set,arm_gralloc,gralloc_ion_sync_on_lock,$(BOARD_USES_GRALLOC_ION_SYNC))
 endif # ifeq ($(BOARD_USES_EXYNOS_GRALLOC_VERSION),4)
@@ -249,10 +249,10 @@ TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
 #
 BOARD_USES_GENERIC_AUDIO := true
 
-$(call soong_config_set,aoc_audio_func,ext_hidl,true)
+$(call soong_config_set_bool,aoc_audio_func,ext_hidl,true)
 
 ifneq (,$(filter aosp_%,$(TARGET_PRODUCT)))
-$(call soong_config_set,aoc_audio_func,aosp_build,true)
+$(call soong_config_set_bool,aoc_audio_func,aosp_build,true)
 endif
 
 # Primary AudioHAL Configuration
@@ -439,8 +439,6 @@ BOARD_KERNEL_CMDLINE += log_buf_len=1024K
 
 # Protected VM firmware
 BOARD_PVMFWIMAGE_PARTITION_SIZE := 0x00100000
-# SELINUX_IGNORE_NEVERALLOWS := true
-
 
 include device/google/zuma/BoardConfigLineage.mk
 include device/google/zuma/BoardConfigEvolution.mk

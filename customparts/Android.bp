@@ -1,0 +1,32 @@
+//
+// Copyright (C) 2017-2021 The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "PixelCustomParts",
+
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    certificate: "platform",
+    platform_apis: true,
+    system_ext_specific: true,
+    privileged: true,
+
+    static_libs: [
+        "org.lineageos.settings.resources",
+        "SettingsLib",
+    ],
+
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+}
+// Добавляем установку rc файла
+prebuilt_etc {
+    name: "init.pixelparts.rc",
+    src: "init.pixelparts.rc",
+    sub_dir: "init",
+    system_ext_specific: true,
+}

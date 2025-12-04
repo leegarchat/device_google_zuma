@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/pixel_parts_title">
+	<PreferenceCategory
+		android:key="thermal_category"
+        android:title="@string/dt2w_title">
+		<SwitchPreferenceCompat
+			android:key="doze_double_tap_hook"
+			android:defaultValue="false"
+			android:icon="@drawable/ic_tap"
+			android:title="@string/doze_double_tap_hook_title"
+			android:summary="@string/doze_double_tap_hook_summary" />
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:key="thermal_category"
+        android:title="@string/thermal_title">
+
+        <ListPreference
+            android:key="thermal_battery_mode"
+            android:title="@string/thermal_battery_title"
+            android:entries="@array/thermal_profiles_entries"
+            android:entryValues="@array/thermal_profiles_values"
+            android:defaultValue="stock"
+            android:icon="@drawable/ic_stock_arrow"
+            android:persistent="true" />
+
+        <ListPreference
+            android:key="thermal_soc_mode"
+            android:title="@string/thermal_soc_title"
+            android:entries="@array/thermal_profiles_entries"
+            android:entryValues="@array/thermal_profiles_values"
+            android:defaultValue="stock"
+            android:icon="@drawable/ic_stock_arrow"
+            android:persistent="true" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

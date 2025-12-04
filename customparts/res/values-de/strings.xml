@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pixel_parts_title">Zusätzliche Funktionen</string>
+    <string name="doze_double_tap_hook_title">Simulierte Doppeltipp-Funktion (DT2W)</string>
+    <string name="doze_double_tap_hook_summary">Programmatisch auf ein zweites Tippen im Doze/AOD-Modus warten. Verwenden Sie dies, wenn das Hardware-Doppeltippen nicht funktioniert.</string>
+	
+	<string name="dt2w_title">Doppeltippen zum Aufwecken</string>
+    <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Wärmemanagement</string>
+    <string name="thermal_title">Wärmemanagement</string>
+    <string name="thermal_battery_title">Akku-Wärmemanagement</string>
+    <string name="thermal_soc_title">SoC-Wärmemanagement</string>
+	
+	<string name="thermal_mode_stock">Standard</string>
+    <string name="thermal_mode_soft">Sanft (+5°C)</string>
+    <string name="thermal_mode_medium">Mittel (+9°C)</string>
+    <string name="thermal_mode_hard">Hart (+15°C)</string>
+    <string name="thermal_mode_off">Aus (+90°C)</string>
+
+
+	<string name="thermal_dialog_title">Einstellungen anwenden</string>
+    <string name="thermal_dialog_safe_msg">Neustart ist nicht erforderlich. Basierend auf Tests wird die Konfiguration sofort angewendet, es ist jedoch besser, das Gerät neu zu starten, um die Stabilität zu gewährleisten.</string>
+    <string name="thermal_dialog_risk_msg">Basierend auf meinen Tests ist ein Neustart des Geräts für die korrekte Anwendung dieser Konfiguration erforderlich. \n\nOhne einen Neustart kann es zu instabilen CPU-Frequenzen oder fehlerhaftem Ladeverhalten kommen.</string>
+    <string name="thermal_btn_reboot">Neu starten</string>
+    <string name="thermal_btn_ok">OK</string>
+
+	<string name="thermal_battery_summary_stock">Standard-Temperaturgrenzen des Akkus. Gewährleistet maximale Sicherheit und Langlebigkeit.</string>
+    <string name="thermal_battery_summary_soft">Geringfügige Erhöhung der Akku-Temperaturgrenzen (Schwelle um 5°C erhöht). Verbessert die Leistung bei warmen Bedingungen geringfügig unter Beibehaltung der Sicherheit.</string>
+    <string name="thermal_battery_summary_medium">Ausgewogene Erhöhung der Akku-Temperaturgrenzen (Schwelle um 9°C erhöht).</string>
+    <string name="thermal_battery_summary_hard">WARNUNG: Erhebliche Erhöhung der Akku-Temperaturgrenzen (Schwelle um 15°C erhöht). \nKann zu starker Erhitzung, verkürzter Lebensdauer und potenziellen Akkuschäden führen.</string>
+    <string name="thermal_battery_summary_off">EXTREME GEFAHR: Vollständige Deaktivierung des Akku-Thermomanagements (Schwelle um 90°C erhöht). \nVerwendung ausschließlich auf eigene Gefahr. Kann Überhitzung, irreversible Schäden verursachen und die Garantie erlöschen lassen.</string>
+
+    <string name="thermal_soc_summary_stock">Standard-SoC-Temperaturkontrolle. Starkes Throttling beim Erhitzen zur Aufrechterhaltung der optimalen Temperatur.</string>
+    <string name="thermal_soc_summary_soft">Geringfügige Reduzierung des SoC-Throttlings (Schwelle um 5°C erhöht). Steigert die Leistung auf Kosten einer geringfügigen Zunahme der Wärme.</string>
+    <string name="thermal_soc_summary_medium">Ausgewogene Reduzierung des SoC-Throttlings (Schwelle um 9°C erhöht). Ein guter Kompromiss zwischen Leistung und Wärme.</string>
+    <string name="thermal_soc_summary_hard">WARNUNG: Aggressive Reduzierung des SoC-Throttlings (Schwelle um 15°C erhöht). \nBietet maximale Leistung, kann jedoch zu sehr starker Gehäuseerhitzung und Systeminstabilität führen.</string>
+    <string name="thermal_soc_summary_off">EXTREME GEFAHR: Vollständige Deaktivierung des SoC-Thermomanagements (Schwelle um 90°C erhöht). \nFührt zu maximalem Throttling, Instabilität, potenziellen Komponentenschäden und lässt die Garantie erlöschen. Nur zum Testen verwenden.</string>
+
+</resources>

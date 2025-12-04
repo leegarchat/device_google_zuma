@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pixel_parts_title">Funciones Adicionales</string>
+    <string name="doze_double_tap_hook_title">Simulación de Doble Toque (DT2W)</string>
+    <string name="doze_double_tap_hook_summary">Esperar programáticamente un segundo toque en modo Doze/AOD. Usar si el doble toque de hardware no funciona.</string>
+	
+	<string name="dt2w_title">Doble toque para despertar</string>
+    <string name="pixel_parts_custom_summary">Ajustes de doble toque y Gestión térmica</string>
+    <string name="thermal_title">Gestión térmica</string>
+    <string name="thermal_battery_title">Gestión térmica de la batería</string>
+    <string name="thermal_soc_title">Gestión térmica de SoC</string>
+	
+	<string name="thermal_mode_stock">Estándar</string>
+    <string name="thermal_mode_soft">Suave (+5°C)</string>
+    <string name="thermal_mode_medium">Medio (+9°C)</string>
+    <string name="thermal_mode_hard">Fuerte (+15°C)</string>
+    <string name="thermal_mode_off">Apagado (+90°C)</string>
+
+	<string name="thermal_dialog_title">Aplicando ajustes</string>
+    <string name="thermal_dialog_safe_msg">No se requiere reiniciar. Según las pruebas, la configuración se aplica inmediatamente, pero es mejor reiniciar el dispositivo para garantizar la estabilidad.</string>
+    <string name="thermal_dialog_risk_msg">Según mis pruebas, se requiere reiniciar el dispositivo para la aplicación correcta de esta configuración. \n\nSin un reinicio, pueden ocurrir frecuencias inestables de la CPU o un comportamiento de carga incorrecto.</string>
+    <string name="thermal_btn_reboot">Reiniciar</string>
+    <string name="thermal_btn_ok">Aceptar</string>
+
+	<string name="thermal_battery_summary_stock">Límites térmicos estándar de la batería. Garantiza la máxima seguridad y longevidad.</string>
+    <string name="thermal_battery_summary_soft">Ligero aumento en los límites de temperatura de la batería (umbral elevado en 5°C). Mejora ligeramente el rendimiento en condiciones cálidas manteniendo la seguridad.</string>
+    <string name="thermal_battery_summary_medium">Aumento equilibrado en los límites de temperatura de la batería (umbral elevado en 9°C).</string>
+    <string name="thermal_battery_summary_hard">ADVERTENCIA: Aumento significativo en los límites de temperatura de la batería (umbral elevado en 15°C). \nPuede provocar un calentamiento severo, una reducción de la vida útil y posibles daños a la batería.</string>
+    <string name="thermal_battery_summary_off">PELIGRO EXTREMO: Desactivación completa de la gestión térmica de la batería (umbral elevado en 90°C). \nÚselo estrictamente bajo su propio riesgo. Puede causar sobrecalentamiento, daños irreversibles y anular la garantía.</string>
+
+
+
+    <string name="thermal_soc_summary_stock">Control térmico SoC estándar. Fuerte limitación al calentarse para mantener una temperatura óptima.</string>
+    <string name="thermal_soc_summary_soft">Ligera reducción en la limitación de SoC (umbral elevado en 5°C). Aumenta el rendimiento a costa de un pequeño aumento de calor.</string>
+    <string name="thermal_soc_summary_medium">Reducción equilibrada en la limitación de SoC (umbral elevado en 9°C). Un buen compromiso entre rendimiento y calor.</string>
+    <string name="thermal_soc_summary_hard">ADVERTENCIA: Reducción agresiva en la limitación de SoC (umbral elevado en 15°C). \nProporciona el máximo rendimiento, pero puede causar un calentamiento muy severo de la carcasa e inestabilidad del sistema.</string>
+    <string name="thermal_soc_summary_off">PELIGRO EXTREMO: Desactivación completa de la gestión térmica de SoC (umbral elevado en 90°C). \nConduce a una limitación máxima, inestabilidad, posible daño a los componentes y anula la garantía. Úselo solo para pruebas.</string>
+
+</resources>

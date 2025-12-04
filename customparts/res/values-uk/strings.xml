@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pixel_parts_title">Додаткові функції</string>
+    <string name="doze_double_tap_hook_title">Симуляція подвійного торкання (DT2W)</string>
+    <string name="doze_double_tap_hook_summary">Програмно очікувати друге торкання в режимі Doze/AOD. Використовуйте, якщо апаратний подвійний тап не працює.</string>
+	
+	<string name="dt2w_title">Подвійне торкання для пробудження</string>
+    <string name="pixel_parts_custom_summary">Налаштування подвійного торкання та Терморегулювання</string>
+    <string name="thermal_title">Терморегулювання</string>
+    <string name="thermal_battery_title">Терморегулювання батареї</string>
+    <string name="thermal_soc_title">Терморегулювання SoC</string>
+	
+	<string name="thermal_mode_stock">За замовчуванням</string>
+    <string name="thermal_mode_soft">М’який (+5°C)</string>
+    <string name="thermal_mode_medium">Середній (+9°C)</string>
+    <string name="thermal_mode_hard">Жорсткий (+15°C)</string>
+    <string name="thermal_mode_off">Вимкнено (+90°C)</string>
+	
+	<string name="thermal_dialog_title">Застосування налаштувань</string>
+    <string name="thermal_dialog_safe_msg">Перезавантаження не потрібне. За тестами, конфіг застосовується одразу, але краще перезапустити пристрій для гарантії стабільності.</string>
+    <string name="thermal_dialog_risk_msg">За моїми тестами, для коректного застосування цього конфігу потрібне перезавантаження пристрою. \n\nБез перезавантаження можлива нестабільна поведінка частот CPU або некоректна робота зарядки.</string>
+    <string name="thermal_btn_reboot">Перезавантажити</string>
+    <string name="thermal_btn_ok">ОК</string>
+
+	<string name="thermal_battery_summary_stock">Стандартні термальні ліміти батареї. Забезпечує максимальну безпеку та термін служби.</string>
+    <string name="thermal_battery_summary_soft">Невелике збільшення лімітів температури батареї (поріг підвищено на 5°C). Незначно покращує продуктивність у теплих умовах, зберігаючи безпеку.</string>
+    <string name="thermal_battery_summary_medium">Збалансоване збільшення лімітів температури батареї (поріг підвищено на 9°C).</string>
+    <string name="thermal_battery_summary_hard">ПОПЕРЕДЖЕННЯ: Значне збільшення лімітів температури батареї (поріг підвищено на 15°C). \nМоже призвести до сильного нагрівання, зниження терміну служби та потенційного пошкодження батареї.</string>
+    <string name="thermal_battery_summary_off">НАДЗВИЧАЙНА НЕБЕЗПЕКА: Повне відключення терморегулювання для батареї (поріг підвищено на 90°C). \nВикористовуйте тільки на свій страх і ризик. Може призвести до перегріву, незворотного пошкодження та анулювання гарантії.</string>
+    <string name="thermal_soc_summary_stock">Стандартне значення терморегулювання SoC. Сильний тротлінг при нагріванні для підтримки оптимальної температури.</string>
+    <string name="thermal_soc_summary_soft">Невелике зниження тротлінгу SoC (поріг підвищено на 5°C). Підвищує продуктивність ціною незначного збільшення нагріву.</string>
+    <string name="thermal_soc_summary_medium">Збалансоване зниження тротлінгу SoC (поріг підвищено на 9°C). Хороший компроміс між продуктивністю та нагрівом.</string>
+    <string name="thermal_soc_summary_hard">ПОПЕРЕДЖЕННЯ: Агресивне зниження тротлінгу SoC (поріг підвищено на 15°C). \nЗабезпечує максимальну продуктивність, але може викликати дуже сильне нагрівання корпусу та нестабільність системи.</string>
+    <string name="thermal_soc_summary_off">НАДЗВИЧАЙНА НЕБЕЗПЕКА: Повне відключення терморегулювання для SoC (поріг підвищено на 90°C). \nПризводить до максимального тротлінгу, нестабільності, потенційного пошкодження компонентів та анулювання гарантії. Використовуйте лише для тестування.</string>
+</resources>
