@@ -16,17 +16,19 @@
     <string name="thermal_mode_hard">Hard (+15°C)</string>
     <string name="thermal_mode_off">Off (+90°C)</string>
 
-	<string name="thermal_battery_summary_stock">Standard battery thermal limits. Ensures maximum safety and longevity.</string>
-    <string name="thermal_battery_summary_soft">Slight increase in battery temperature limits (threshold raised by 5°C). Slightly improves performance in warm conditions while maintaining safety.</string>
-    <string name="thermal_battery_summary_medium">Balanced increase in battery temperature limits (threshold raised by 9°C).</string>
-    <string name="thermal_battery_summary_hard">WARNING: Significant increase in battery temperature limits (threshold raised by 15°C). \nMay lead to severe heating, reduced lifespan, and potential battery damage.</string>
-    <string name="thermal_battery_summary_off">EXTREME DANGER: Complete disablement of battery thermal management (threshold raised by 90°C). \nUse strictly at your own risk. May cause overheating, irreversible damage, and void the warranty.</string>
+	<!-- Battery Thermal Profiles -->
+    <string name="thermal_battery_summary_stock">Standard battery thermal limits. Ensures maximum safety and longevity.</string>
+    <string name="thermal_battery_summary_soft">Slight increase in battery temperature limits (threshold raised by 5°C). Slightly improves performance in warm conditions and reduces charging slowdown.</string>
+    <string name="thermal_battery_summary_medium">Balanced increase in battery temperature limits (threshold raised by 9°C). Improves charging speed and performance while maintaining a reasonable level of safety.</string>
+    <string name="thermal_battery_summary_hard">WARNING: Significant increase in battery temperature limits (threshold raised by 15°C). \nMay lead to severe heating, accelerated wear, and potential battery damage.</string>
+    <string name="thermal_battery_summary_off">EXTREMELY DANGEROUS: Near-complete disabling of battery thermal regulation (threshold raised by 90°C). \nUse only at your own risk. May cause overheating, irreversible damage, and void your warranty.</string>
 
-    <string name="thermal_soc_summary_stock">Standard SoC thermal control. Strong throttling when heating up to maintain optimal temperature.</string>
-    <string name="thermal_soc_summary_soft">Slight reduction in SoC throttling (threshold raised by 5°C). Boosts performance at the cost of a minor increase in heat.</string>
-    <string name="thermal_soc_summary_medium">Balanced reduction in SoC throttling (threshold raised by 9°C). A good compromise between performance and heat.</string>
-    <string name="thermal_soc_summary_hard">WARNING: Aggressive reduction in SoC throttling (threshold raised by 15°C). \nProvides maximum performance but may cause very severe case heating and system instability.</string>
-    <string name="thermal_soc_summary_off">EXTREME DANGER: Complete disablement of SoC thermal management (threshold raised by 90°C). \nLeads to maximum throttling, instability, potential component damage, and voids the warranty. Use for testing only.</string>
+    <!-- SoC Thermal Profiles -->
+    <string name="thermal_soc_summary_stock">Standard value. Aggressive thermal throttling for maximum temperature control and stability.</string>
+    <string name="thermal_soc_summary_soft">Slight softening of thermal regulation (threshold raised by 5°C). Slightly increases performance at the cost of a minor heat increase.</string>
+    <string name="thermal_soc_summary_medium">Balanced softening of thermal regulation (threshold raised by 9°C). Optimal compromise between high performance and manageable heat.</string>
+    <string name="thermal_soc_summary_hard">WARNING: Aggressive softening of thermal regulation (threshold raised by 15°C). \nProvides maximum performance but may cause severe chassis heating and system instability.</string>
+    <string name="thermal_soc_summary_off">EXTREMELY DANGEROUS: Near-complete disabling of SoC thermal regulation (threshold raised by 90°C). \nLeads to extreme heating, instability, potential component damage, and voids your warranty. Use for testing only.</string>
 
 	<string name="thermal_dialog_title">Applying settings</string>
     <string name="thermal_dialog_safe_msg">Reboot is not required. Based on tests, the configuration is applied immediately, but it is better to restart the device to guarantee stability.</string>

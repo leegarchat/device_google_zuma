@@ -23,16 +23,18 @@
     <string name="thermal_btn_reboot">Neu starten</string>
     <string name="thermal_btn_ok">OK</string>
 
-	<string name="thermal_battery_summary_stock">Standard-Temperaturgrenzen des Akkus. Gewährleistet maximale Sicherheit und Langlebigkeit.</string>
-    <string name="thermal_battery_summary_soft">Geringfügige Erhöhung der Akku-Temperaturgrenzen (Schwelle um 5°C erhöht). Verbessert die Leistung bei warmen Bedingungen geringfügig unter Beibehaltung der Sicherheit.</string>
-    <string name="thermal_battery_summary_medium">Ausgewogene Erhöhung der Akku-Temperaturgrenzen (Schwelle um 9°C erhöht).</string>
-    <string name="thermal_battery_summary_hard">WARNUNG: Erhebliche Erhöhung der Akku-Temperaturgrenzen (Schwelle um 15°C erhöht). \nKann zu starker Erhitzung, verkürzter Lebensdauer und potenziellen Akkuschäden führen.</string>
-    <string name="thermal_battery_summary_off">EXTREME GEFAHR: Vollständige Deaktivierung des Akku-Thermomanagements (Schwelle um 90°C erhöht). \nVerwendung ausschließlich auf eigene Gefahr. Kann Überhitzung, irreversible Schäden verursachen und die Garantie erlöschen lassen.</string>
+	 <!-- Battery Thermal Profiles -->
+    <string name="thermal_battery_summary_stock">Standard-Temperaturgrenzen des Akkus. Gewährleistet maximale Sicherheit und Langlebigkeit.</string>
+    <string name="thermal_battery_summary_soft">Leichte Erhöhung der Akku-Temperaturgrenzen (Schwelle um 5°C angehoben). Verbessert die Leistung unter warmen Bedingungen geringfügig und reduziert die Ladeverzögerung.</string>
+    <string name="thermal_battery_summary_medium">Ausgewogene Erhöhung der Akku-Temperaturgrenzen (Schwelle um 9°C angehoben). Verbessert die Ladegeschwindigkeit und Leistung bei vernünftiger Sicherheit.</string>
+    <string name="thermal_battery_summary_hard">WARNUNG: Deutliche Erhöhung der Akku-Temperaturgrenzen (Schwelle um 15°C angehoben). \nKann zu starker Erhitzung, beschleunigtem Verschleiß und potenziellen Akkuschäden führen.</string>
+    <string name="thermal_battery_summary_off">EXTREM GEFÄHRLICH: Nahezu vollständige Deaktivierung der Akku-Temperaturregelung (Schwelle um 90°C angehoben). \nAusschließlich auf eigenes Risiko verwenden. Kann zu Überhitzung, irreversiblen Schäden und dem Erlöschen der Garantie führen.</string>
 
-    <string name="thermal_soc_summary_stock">Standard-SoC-Temperaturkontrolle. Starkes Throttling beim Erhitzen zur Aufrechterhaltung der optimalen Temperatur.</string>
-    <string name="thermal_soc_summary_soft">Geringfügige Reduzierung des SoC-Throttlings (Schwelle um 5°C erhöht). Steigert die Leistung auf Kosten einer geringfügigen Zunahme der Wärme.</string>
-    <string name="thermal_soc_summary_medium">Ausgewogene Reduzierung des SoC-Throttlings (Schwelle um 9°C erhöht). Ein guter Kompromiss zwischen Leistung und Wärme.</string>
-    <string name="thermal_soc_summary_hard">WARNUNG: Aggressive Reduzierung des SoC-Throttlings (Schwelle um 15°C erhöht). \nBietet maximale Leistung, kann jedoch zu sehr starker Gehäuseerhitzung und Systeminstabilität führen.</string>
-    <string name="thermal_soc_summary_off">EXTREME GEFAHR: Vollständige Deaktivierung des SoC-Thermomanagements (Schwelle um 90°C erhöht). \nFührt zu maximalem Throttling, Instabilität, potenziellen Komponentenschäden und lässt die Garantie erlöschen. Nur zum Testen verwenden.</string>
+    <!-- SoC Thermal Profiles -->
+    <string name="thermal_soc_summary_stock">Standardwert. Aggressive thermische Drosselung für maximale Temperaturkontrolle und Stabilität.</string>
+    <string name="thermal_soc_summary_soft">Leichte Milderung der thermischen Regelung (Schwelle um 5°C angehoben). Erhöht die Leistung leicht auf Kosten einer geringfügigen Zunahme der Wärmeentwicklung.</string>
+    <string name="thermal_soc_summary_medium">Ausgewogene Milderung der thermischen Regelung (Schwelle um 9°C angehoben). Optimaler Kompromiss zwischen hoher Leistung und kontrollierbarer Wärmeentwicklung.</string>
+    <string name="thermal_soc_summary_hard">WARNUNG: Aggressive Milderung der thermischen Regelung (Schwelle um 15°C angehoben). \nBietet maximale Leistung, kann jedoch zu starker Gehäuseerhitzung und Systeminstabilität führen.</string>
+    <string name="thermal_soc_summary_off">EXTREM GEFÄHRLICH: Nahezu vollständige Deaktivierung der SoC-Temperaturregelung (Schwelle um 90°C angehoben). \nFührt zu extremer Erhitzung, Instabilität, potenziellen Komponentenschäden und lässt die Garantie erlöschen. Nur zu Testzwecken verwenden.</string>
 
 </resources>

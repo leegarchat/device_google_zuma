@@ -22,18 +22,18 @@
     <string name="thermal_btn_reboot">Reiniciar</string>
     <string name="thermal_btn_ok">Aceptar</string>
 
-	<string name="thermal_battery_summary_stock">Límites térmicos estándar de la batería. Garantiza la máxima seguridad y longevidad.</string>
-    <string name="thermal_battery_summary_soft">Ligero aumento en los límites de temperatura de la batería (umbral elevado en 5°C). Mejora ligeramente el rendimiento en condiciones cálidas manteniendo la seguridad.</string>
-    <string name="thermal_battery_summary_medium">Aumento equilibrado en los límites de temperatura de la batería (umbral elevado en 9°C).</string>
-    <string name="thermal_battery_summary_hard">ADVERTENCIA: Aumento significativo en los límites de temperatura de la batería (umbral elevado en 15°C). \nPuede provocar un calentamiento severo, una reducción de la vida útil y posibles daños a la batería.</string>
-    <string name="thermal_battery_summary_off">PELIGRO EXTREMO: Desactivación completa de la gestión térmica de la batería (umbral elevado en 90°C). \nÚselo estrictamente bajo su propio riesgo. Puede causar sobrecalentamiento, daños irreversibles y anular la garantía.</string>
+	<!-- Battery Thermal Profiles -->
+    <string name="thermal_battery_summary_stock">Límites térmicos estándar de la batería. Garantiza la máxima seguridad y longevidad.</string>
+    <string name="thermal_battery_summary_soft">Ligero aumento en los límites de temperatura de la batería (umbral elevado 5°C). Mejora ligeramente el rendimiento en condiciones cálidas y reduce la ralentización de la carga.</string>
+    <string name="thermal_battery_summary_medium">Aumento equilibrado en los límites de temperatura de la batería (umbral elevado 9°C). Mejora la velocidad de carga y el rendimiento manteniendo un nivel de seguridad razonable.</string>
+    <string name="thermal_battery_summary_hard">ADVERTENCIA: Aumento significativo en los límites de temperatura de la batería (umbral elevado 15°C). \nPuede provocar un calentamiento severo, un desgaste acelerado y posibles daños a la batería.</string>
+    <string name="thermal_battery_summary_off">EXTREMADAMENTE PELIGROSO: Desactivación casi completa de la regulación térmica de la batería (umbral elevado 90°C). \nÚselo solo bajo su propia responsabilidad. Puede causar sobrecalentamiento, daños irreversibles y anular su garantía.</string>
 
-
-
-    <string name="thermal_soc_summary_stock">Control térmico SoC estándar. Fuerte limitación al calentarse para mantener una temperatura óptima.</string>
-    <string name="thermal_soc_summary_soft">Ligera reducción en la limitación de SoC (umbral elevado en 5°C). Aumenta el rendimiento a costa de un pequeño aumento de calor.</string>
-    <string name="thermal_soc_summary_medium">Reducción equilibrada en la limitación de SoC (umbral elevado en 9°C). Un buen compromiso entre rendimiento y calor.</string>
-    <string name="thermal_soc_summary_hard">ADVERTENCIA: Reducción agresiva en la limitación de SoC (umbral elevado en 15°C). \nProporciona el máximo rendimiento, pero puede causar un calentamiento muy severo de la carcasa e inestabilidad del sistema.</string>
-    <string name="thermal_soc_summary_off">PELIGRO EXTREMO: Desactivación completa de la gestión térmica de SoC (umbral elevado en 90°C). \nConduce a una limitación máxima, inestabilidad, posible daño a los componentes y anula la garantía. Úselo solo para pruebas.</string>
+    <!-- SoC Thermal Profiles -->
+    <string name="thermal_soc_summary_stock">Valor estándar. Estrangulamiento térmico agresivo para un control máximo de la temperatura y la estabilidad.</string>
+    <string name="thermal_soc_summary_soft">Ligero suavizado de la regulación térmica (umbral elevado 5°C). Aumenta ligeramente el rendimiento a costa de un pequeño incremento de calor.</string>
+    <string name="thermal_soc_summary_medium">Suavizado equilibrado de la regulación térmica (umbral elevado 9°C). Compromiso óptimo entre alto rendimiento y calor manejable.</string>
+    <string name="thermal_soc_summary_hard">ADVERTENCIA: Suavizado agresivo de la regulación térmica (umbral elevado 15°C). \nProporciona el máximo rendimiento, pero puede causar un calentamiento severo del chasis e inestabilidad del sistema.</string>
+    <string name="thermal_soc_summary_off">EXTREMADAMENTE PELIGROSO: Desactivación casi completa de la regulación térmica del SoC (umbral elevado 90°C). \nConduce a un calentamiento extremo, inestabilidad, posibles daños a los componentes y anula su garantía. Úselo solo para pruebas.</string>
 
 </resources>

@@ -23,16 +23,18 @@
     <string name="thermal_btn_reboot">Mulai Ulang</string>
     <string name="thermal_btn_ok">Oke</string>
 
-	<string name="thermal_battery_summary_stock">Batas termal baterai standar. Memastikan keamanan dan umur panjang maksimum.</string>
-    <string name="thermal_battery_summary_soft">Sedikit peningkatan batas suhu baterai (ambang batas dinaikkan 5°C). Sedikit meningkatkan kinerja dalam kondisi hangat sambil menjaga keamanan.</string>
-    <string name="thermal_battery_summary_medium">Peningkatan batas suhu baterai yang seimbang (ambang batas dinaikkan 9°C).</string>
-    <string name="thermal_battery_summary_hard">PERINGATAN: Peningkatan signifikan batas suhu baterai (ambang batas dinaikkan 15°C). \nDapat menyebabkan pemanasan parah, pengurangan masa pakai, dan potensi kerusakan baterai.</string>
-    <string name="thermal_battery_summary_off">BAHAYA EKSTREM: Penonaktifan total manajemen termal baterai (ambang batas dinaikkan 90°C). \nGunakan sepenuhnya atas risiko Anda sendiri. Dapat menyebabkan panas berlebih, kerusakan tak terbalikkan, dan membatalkan garansi.</string>
+	<!-- Battery Thermal Profiles -->
+    <string name="thermal_battery_summary_stock">Batas termal baterai standar. Memastikan keamanan dan masa pakai maksimum.</string>
+    <string name="thermal_battery_summary_soft">Sedikit peningkatan batas suhu baterai (ambang batas dinaikkan 5°C). Sedikit meningkatkan kinerja dalam kondisi hangat dan mengurangi perlambatan pengisian daya.</string>
+    <string name="thermal_battery_summary_medium">Peningkatan batas suhu baterai yang seimbang (ambang batas dinaikkan 9°C). Meningkatkan kecepatan pengisian daya dan kinerja sambil mempertahankan tingkat keamanan yang wajar.</string>
+    <string name="thermal_battery_summary_hard">PERINGATAN: Peningkatan signifikan batas suhu baterai (ambang batas dinaikkan 15°C). \nDapat menyebabkan pemanasan parah, keausan yang dipercepat, dan potensi kerusakan baterai.</string>
+    <string name="thermal_battery_summary_off">SANGAT BERBAHAYA: Penonaktifan praktis penuh regulasi termal baterai (ambang batas dinaikkan 90°C). \nGunakan hanya dengan risiko Anda sendiri. Dapat menyebabkan panas berlebih, kerusakan permanen, dan membatalkan garansi Anda.</string>
 
-    <string name="thermal_soc_summary_stock">Kontrol termal SoC standar. Throttling kuat saat memanas untuk menjaga suhu optimal.</string>
-    <string name="thermal_soc_summary_soft">Sedikit pengurangan throttling SoC (ambang batas dinaikkan 5°C). Meningkatkan kinerja dengan biaya peningkatan panas yang kecil.</string>
-    <string name="thermal_soc_summary_medium">Pengurangan throttling SoC yang seimbang (ambang batas dinaikkan 9°C). Kompromi yang baik antara kinerja dan panas.</string>
-    <string name="thermal_soc_summary_hard">PERINGATAN: Pengurangan throttling SoC yang agresif (ambang batas dinaikkan 15°C). \nMemberikan kinerja maksimum, tetapi dapat menyebabkan pemanasan casing yang sangat parah dan ketidakstabilan sistem.</string>
-    <string name="thermal_soc_summary_off">BAHAYA EKSTREM: Penonaktifan total manajemen termal SoC (ambang batas dinaikkan 90°C). \nMenyebabkan throttling maksimum, ketidakstabilan, potensi kerusakan komponen, dan membatalkan garansi. Gunakan hanya untuk pengujian.</string>
+    <!-- SoC Thermal Profiles -->
+    <string name="thermal_soc_summary_stock">Nilai standar. Regulasi termal agresif untuk kontrol suhu dan stabilitas maksimum.</string>
+    <string name="thermal_soc_summary_soft">Sedikit pelonggaran regulasi termal (ambang batas dinaikkan 5°C). Sedikit meningkatkan kinerja dengan biaya peningkatan panas kecil.</string>
+    <string name="thermal_soc_summary_medium">Pelonggaran regulasi termal yang seimbang (ambang batas dinaikkan 9°C). Kompromi optimal antara kinerja tinggi dan panas yang dapat dikelola.</string>
+    <string name="thermal_soc_summary_hard">PERINGATAN: Pelonggaran regulasi termal yang agresif (ambang batas dinaikkan 15°C). \nMemberikan kinerja maksimum tetapi dapat menyebabkan pemanasan sasis yang parah dan ketidakstabilan sistem.</string>
+    <string name="thermal_soc_summary_off">SANGAT BERBAHAYA: Penonaktifan praktis penuh regulasi termal SoC (ambang batas dinaikkan 90°C). \nMenyebabkan pemanasan ekstrem, ketidakstabilan, potensi kerusakan komponen, dan membatalkan garansi Anda. Gunakan hanya untuk pengujian.</string>
 
 </resources>
