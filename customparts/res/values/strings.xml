@@ -16,6 +16,13 @@
     <string name="thermal_mode_hard">Hard (+15°C)</string>
     <string name="thermal_mode_off">Off (+90°C)</string>
 
+	<!-- Новые строки для DT2S -->
+    <string name="launcher_dt2s_title">Double tap to sleep</string>
+    <string name="launcher_dt2s_summary">Turn off screen by double tapping on the launcher background</string>
+	<string name="launcher_dt2s_timeout_title">Double tap timeout</string>
+    <string name="launcher_dt2s_timeout_summary">Current delay: %1$d ms</string>
+    <string name="launcher_dt2s_error">Please enter a value between 10 and 1000</string>
+
 	<!-- Battery Thermal Profiles -->
     <string name="thermal_battery_summary_stock">Standard battery thermal limits. Ensures maximum safety and longevity.</string>
     <string name="thermal_battery_summary_soft">Slight increase in battery temperature limits (threshold raised by 5°C). Slightly improves performance in warm conditions and reduces charging slowdown.</string>

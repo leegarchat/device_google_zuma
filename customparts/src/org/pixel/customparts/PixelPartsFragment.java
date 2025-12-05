@@ -1,9 +1,9 @@
 package org.pixel.customparts;
 
-import android.app.AlertDialog; // Добавить
-import android.content.Context; // Добавить
-import android.content.DialogInterface; // Добавить
-import android.os.PowerManager; // Добавить
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface; 
+import android.os.PowerManager; 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.net.Uri;
@@ -12,19 +12,30 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 
+
+
+
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import org.pixel.customparts.R;
-
+// Dt2s
+import android.content.Intent;
+import org.pixel.customparts.dt2s.DT2SService;
+import android.widget.Toast;
+import androidx.preference.EditTextPreference;
 public class PixelPartsFragment extends PreferenceFragmentCompat 
         implements Preference.OnPreferenceChangeListener {
 
     private static final String KEY_DOZE_DOUBLE_TAP = "doze_double_tap_hook";
+	private static final String KEY_LAUNCHER_DT2S = "launcher_dt2s_enabled";
+	private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
     
     private SwitchPreferenceCompat mDoubleTapSwitch;
+	private SwitchPreferenceCompat mLauncherDt2sSwitch;
+	private EditTextPreference mDt2sTimeoutPref;
     
     // Thermal Preferences
     private ListPreference mThermalBatteryPref;
@@ -45,7 +56,31 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
             mDoubleTapSwitch.setOnPreferenceChangeListener(this);
             updateDoubleTapState();
         }
-
+		// 2. НОВЫЙ Launcher DT2S свитч
+        mLauncherDt2sSwitch = findPreference(KEY_LAUNCHER_DT2S);
+        if (mLauncherDt2sSwitch != null) {
+            mLauncherDt2sSwitch.setOnPreferenceChangeListener(this);
+            // Проверяем текущее состояние и запускаем/останавливаем сервис при входе в настройки
+            // на случай, если он упал
+            boolean enabled = Settings.Secure.getInt(requireContext().getContentResolver(),
+                    KEY_LAUNCHER_DT2S, 0) == 1;
+            mLauncherDt2sSwitch.setChecked(enabled);
+            
+            Intent serviceIntent = new Intent(requireContext(), DT2SService.class);
+            if (enabled) {
+                requireContext().startService(serviceIntent);
+            } else {
+                requireContext().stopService(serviceIntent);
+            }
+        }
+		mDt2sTimeoutPref = findPreference(KEY_DT2S_TIMEOUT);
+        if (mDt2sTimeoutPref != null) {
+            mDt2sTimeoutPref.setOnPreferenceChangeListener(this);
+            // Получаем текущее значение для отображения в Summary
+            int currentVal = Settings.Secure.getInt(requireContext().getContentResolver(),
+                    KEY_DT2S_TIMEOUT, 300);
+            mDt2sTimeoutPref.setSummary(getString(R.string.launcher_dt2s_timeout_summary, currentVal));
+        }
         // --- Thermal Init ---
         mThermalBatteryPref = findPreference(ThermalUtils.KEY_THERMAL_BATTERY);
         if (mThermalBatteryPref != null) {
@@ -141,13 +176,56 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-        
+        ContentResolver resolver = requireContext().getContentResolver();
         if (KEY_DOZE_DOUBLE_TAP.equals(key)) {
             boolean isChecked = (Boolean) newValue;
             Settings.Secure.putInt(requireContext().getContentResolver(),
                     KEY_DOZE_DOUBLE_TAP, isChecked ? 1 : 0);
             return true;
-        } 
+        }
+        else if (KEY_LAUNCHER_DT2S.equals(key)) {
+            boolean isChecked = (Boolean) newValue;
+            // 1. Сохраняем в Settings.Secure
+            Settings.Secure.putInt(requireContext().getContentResolver(),
+                    KEY_LAUNCHER_DT2S, isChecked ? 1 : 0);
+            
+            // 2. Управляем сервисом
+            Intent serviceIntent = new Intent(requireContext(), DT2SService.class);
+            if (isChecked) {
+                requireContext().startService(serviceIntent);
+            } else {
+                requireContext().stopService(serviceIntent);
+            }
+            return true;
+        }
+		else if (KEY_DT2S_TIMEOUT.equals(key)) {
+            String input = (String) newValue;
+            try {
+                int value = Integer.parseInt(input);
+                
+                // Валидация: от 10 до 1000
+                if (value < 10 || value > 1000) {
+                    Toast.makeText(requireContext(), R.string.launcher_dt2s_error, Toast.LENGTH_LONG).show();
+                    return false; // Не сохраняем
+                }
+
+                // Сохраняем в Settings.Secure
+                Settings.Secure.putInt(resolver, KEY_DT2S_TIMEOUT, value);
+                
+                // Обновляем описание
+                mDt2sTimeoutPref.setSummary(getString(R.string.launcher_dt2s_timeout_summary, value));
+
+                // Перезапускаем сервис, чтобы применилось новое время
+                Intent serviceIntent = new Intent(requireContext(), DT2SService.class);
+                requireContext().stopService(serviceIntent);
+                requireContext().startService(serviceIntent);
+                
+                return true;
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), "Invalid number", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
         else if (ThermalUtils.KEY_THERMAL_BATTERY.equals(key)) {
             String value = (String) newValue;
             updateThermalSummaryAndIcon(mThermalBatteryPref, value, true);

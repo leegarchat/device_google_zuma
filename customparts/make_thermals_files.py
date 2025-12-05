@@ -180,7 +180,7 @@ def update_common_mk():
     Добавляет мягкий инклюд в device-shusky-common.mk
     """
     common_mk_path = WORK_DIR / COMMON_MK_FILENAME
-    include_line = f"$(call inherit-product-if-exists,$(LOCAL_PATH)/thermal/{MK_FILENAME})"
+    include_line = f"inclide $(TARGET_VENDOR_THERMAL_CONFIG_PATH)/{MK_FILENAME})"
     
     if not common_mk_path.exists():
         print(f"⚠️  Файл {COMMON_MK_FILENAME} не найден по пути {common_mk_path}. Пропускаем обновление.")

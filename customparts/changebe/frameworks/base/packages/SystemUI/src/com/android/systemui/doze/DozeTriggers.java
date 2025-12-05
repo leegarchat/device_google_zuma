@@ -30,7 +30,7 @@ import android.provider.Settings;
             float screenX, float screenY, float[] rawValues) {
         // --- 2T2W PATCH LOGIC START ---
         if (pulseReason == DozeLog.REASON_SENSOR_TAP || pulseReason == DozeLog.REASON_SENSOR_DOUBLE_TAP) {
-            boolean isHookEnabled = Settings.Secure.getInt( // <-- Изменено на Settings.System
+            boolean isHookEnabled = Settings.Secure.getInt(
                     mContext.getContentResolver(), KEY_DOZE_DOUBLE_TAP_HOOK, 0) == 1;
 
             if (isHookEnabled) {
