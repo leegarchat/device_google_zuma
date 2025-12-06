@@ -1,40 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Fitur Tambahan</string>
-    <string name="doze_double_tap_hook_title">Simulasi Ketuk Ganda (DT2W)</string>
-    <string name="doze_double_tap_hook_summary">Menunggu ketukan kedua secara terprogram dalam mode Doze/AOD. Gunakan jika ketuk ganda perangkat keras tidak berfungsi.</string>
-	
-	<string name="dt2w_title">Ketuk dua kali untuk membangunkan</string>
-    <string name="pixel_parts_custom_summary">Pengaturan ketuk dua kali dan Manajemen termal</string>
-    <string name="thermal_title">Manajemen termal</string>
-    <string name="thermal_battery_title">Manajemen termal baterai</string>
-    <string name="thermal_soc_title">Manajemen termal SoC</string>
-	
-	<string name="thermal_mode_stock">Bawaan</string>
-    <string name="thermal_mode_soft">Ringan (+5°C)</string>
+    <string name="pixel_parts_custom_summary">Pengaturan ketuk ganda dan Kontrol Termal</string>
+
+    <string name="dt2w_category_title">Ketuk Ganda untuk Membangunkan (DT2W)</string>
+    <string name="doze_double_tap_hook_title">Ketuk Ganda untuk Membangunkan</string>
+    <string name="doze_double_tap_hook_summary">Gunakan jika fungsi ketuk ganda hardware tidak berfungsi.</string>
+    <string name="doze_double_tap_timeout_title">Interval Ketuk Ganda DT2W</string>
+    <string name="doze_double_tap_timeout_summary">Interval saat ini: %1$d md</string>
+    <string name="dt2w_info_text">Ini bukan integrasi kernel langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Perangkat lunak menunggu ketukan kedua dalam mode Doze/AOD.\n• Masih dapat membangunkan perangkat jika belum sepenuhnya masuk ke mode Doze.\n• Ketuk ganda akan mulai berfungsi 1–2 detik setelah penguncian jika Ambient/AOD diaktifkan. Selama 1–2 detik ini, perangkat sedang beralih ke mode Doze.</string>
+
+    <string name="dt2s_category_title">Ketuk Ganda untuk Tidur di Peluncur (DT2S)</string>
+    <string name="launcher_dt2s_title">Ketuk Ganda untuk Tidur</string>
+    <string name="launcher_dt2s_summary">Ketuk area kosong di peluncur untuk mengunci perangkat.</string>
+    <string name="launcher_dt2s_timeout_title">Interval Ketuk Ganda DT2S</string>
+    <string name="launcher_dt2s_timeout_summary">Interval saat ini: %1$d md</string>
+    <string name="launcher_dt2s_error">Rentang yang diizinkan adalah 10 hingga 1000 md.</string>
+    <string name="dt2s_info_text">Ini bukan integrasi peluncur langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Interval ketukan yang disarankan adalah 150 md untuk menghindari pemicu palsu.\n• Ditujukan untuk Pixel Launcher.\n• <b>DAPAT</b> memicu secara tidak terduga.\n• Jika Anda berada di layar beranda dan menarik panel notifikasi, DT2S juga akan memicu di sana.\n• Jika Anda membuka menu Terkini DARI layar beranda, DT2S juga akan memicu di sana.\n• DT2S akan memicu di Laci Aplikasi.\n• DT2S <b>TIDAK</b> akan memicu saat Anda membuka Laci Aplikasi dan mulai mengetik untuk mencari.\n• DT2S <b>TIDAK</b> akan memicu di Google Feed jika Anda membukanya dengan mengusap dari layar beranda.\n• Ini adalah layanan latar belakang. Area pemicu telah dikurangi sebesar 15\% dari atas dan 20\% dari bawah layar.</string>
+
+
+    <string name="thermal_title">Kontrol Termal</string>
+    <string name="thermal_battery_title">Kontrol Termal Baterai</string>
+    <string name="thermal_soc_title">Kontrol Termal SoC</string>
+    <string name="thermal_dialog_title">Menerapkan Pengaturan</string>
+    <string name="thermal_dialog_safe_msg">Reboot tidak diperlukan. Berdasarkan pengujian, konfigurasi diterapkan segera, tetapi disarankan untuk me-reboot perangkat untuk menjamin stabilitas.</string>
+    <string name="thermal_dialog_risk_msg">Reboot perangkat diperlukan agar konfigurasi ini diterapkan dengan benar. Tanpa reboot, perilaku frekuensi CPU yang tidak stabil atau perilaku pengisian daya yang salah dapat terjadi.</string>
+    <string name="thermal_btn_reboot">Reboot</string>
+    <string name="thermal_btn_ok">OK</string>
+    <string name="thermal_mode_stock">Standar (Stock)</string>
+    <string name="thermal_mode_soft">Lunak (+5°C)</string>
     <string name="thermal_mode_medium">Sedang (+9°C)</string>
     <string name="thermal_mode_hard">Keras (+15°C)</string>
-    <string name="thermal_mode_off">Mati (+90°C)</string>
-
-
-	<string name="thermal_dialog_title">Menerapkan pengaturan</string>
-    <string name="thermal_dialog_safe_msg">Mulai ulang tidak diperlukan. Berdasarkan pengujian, konfigurasi segera diterapkan, tetapi lebih baik memulai ulang perangkat untuk menjamin stabilitas.</string>
-    <string name="thermal_dialog_risk_msg">Berdasarkan pengujian saya, memulai ulang perangkat diperlukan untuk penerapan konfigurasi ini dengan benar. \n\nTanpa memulai ulang, frekuensi CPU yang tidak stabil atau perilaku pengisian daya yang salah dapat terjadi.</string>
-    <string name="thermal_btn_reboot">Mulai Ulang</string>
-    <string name="thermal_btn_ok">Oke</string>
-
-	<!-- Battery Thermal Profiles -->
-    <string name="thermal_battery_summary_stock">Batas termal baterai standar. Memastikan keamanan dan masa pakai maksimum.</string>
-    <string name="thermal_battery_summary_soft">Sedikit peningkatan batas suhu baterai (ambang batas dinaikkan 5°C). Sedikit meningkatkan kinerja dalam kondisi hangat dan mengurangi perlambatan pengisian daya.</string>
-    <string name="thermal_battery_summary_medium">Peningkatan batas suhu baterai yang seimbang (ambang batas dinaikkan 9°C). Meningkatkan kecepatan pengisian daya dan kinerja sambil mempertahankan tingkat keamanan yang wajar.</string>
-    <string name="thermal_battery_summary_hard">PERINGATAN: Peningkatan signifikan batas suhu baterai (ambang batas dinaikkan 15°C). \nDapat menyebabkan pemanasan parah, keausan yang dipercepat, dan potensi kerusakan baterai.</string>
-    <string name="thermal_battery_summary_off">SANGAT BERBAHAYA: Penonaktifan praktis penuh regulasi termal baterai (ambang batas dinaikkan 90°C). \nGunakan hanya dengan risiko Anda sendiri. Dapat menyebabkan panas berlebih, kerusakan permanen, dan membatalkan garansi Anda.</string>
-
-    <!-- SoC Thermal Profiles -->
-    <string name="thermal_soc_summary_stock">Nilai standar. Regulasi termal agresif untuk kontrol suhu dan stabilitas maksimum.</string>
-    <string name="thermal_soc_summary_soft">Sedikit pelonggaran regulasi termal (ambang batas dinaikkan 5°C). Sedikit meningkatkan kinerja dengan biaya peningkatan panas kecil.</string>
-    <string name="thermal_soc_summary_medium">Pelonggaran regulasi termal yang seimbang (ambang batas dinaikkan 9°C). Kompromi optimal antara kinerja tinggi dan panas yang dapat dikelola.</string>
-    <string name="thermal_soc_summary_hard">PERINGATAN: Pelonggaran regulasi termal yang agresif (ambang batas dinaikkan 15°C). \nMemberikan kinerja maksimum tetapi dapat menyebabkan pemanasan sasis yang parah dan ketidakstabilan sistem.</string>
-    <string name="thermal_soc_summary_off">SANGAT BERBAHAYA: Penonaktifan praktis penuh regulasi termal SoC (ambang batas dinaikkan 90°C). \nMenyebabkan pemanasan ekstrem, ketidakstabilan, potensi kerusakan komponen, dan membatalkan garansi Anda. Gunakan hanya untuk pengujian.</string>
-
+    <string name="thermal_mode_off">Nonaktif (+90°C)</string>
+    <string name="thermal_battery_summary_stock" formatted="false">
+"• Batasan termal standar untuk baterai.
+• Memastikan keamanan dan umur pakai maksimum."
+    </string>
+    <string name="thermal_battery_summary_soft" formatted="false">
+"• Sedikit peningkatan batas suhu baterai (ambang batas dinaikkan +5°C).
+• Sedikit meningkatkan kinerja dalam kondisi hangat dan mengurangi perlambatan pengisian daya."
+    </string>
+    <string name="thermal_battery_summary_medium" formatted="false">
+"• Peningkatan seimbang batas suhu baterai (ambang batas dinaikkan +9°C).
+• Meningkatkan kecepatan pengisian daya dan kinerja sambil mempertahankan tingkat keamanan yang wajar."
+    </string>
+    <string name="thermal_battery_summary_hard" formatted="false">
+"⚠️ PERINGATAN: Peningkatan signifikan batas suhu baterai (ambang batas dinaikkan +15°C).
+• Dapat menyebabkan pemanasan parah, keausan yang dipercepat, dan potensi kerusakan baterai."
+    </string>
+    <string name="thermal_battery_summary_off" formatted="false">
+"⚠️ BAHAYA EKSTREM: Nonaktifkan praktis kontrol termal baterai secara keseluruhan (ambang batas dinaikkan +90°C).
+❗ Gunakan hanya atas risiko Anda sendiri. Dapat menyebabkan panas berlebih, kerusakan permanen, dan membatalkan garansi Anda."
+    </string>
+    <string name="thermal_soc_summary_stock" formatted="false">
+"• Nilai standar.
+• Pelambatan termal agresif untuk kontrol suhu dan stabilitas maksimum."
+    </string>
+    <string name="thermal_soc_summary_soft" formatted="false">
+"• Sedikit pelonggaran pelambatan termal (ambang batas dinaikkan +5°C).
+• Sedikit meningkatkan kinerja dengan mengorbankan sedikit peningkatan panas."
+    </string>
+    <string name="thermal_soc_summary_medium" formatted="false">
+"• Pelonggaran pelambatan termal seimbang (ambang batas dinaikkan +9°C).
+• Kompromi optimal antara kinerja tinggi dan panas yang dapat dikelola."
+    </string>
+    <string name="thermal_soc_summary_hard" formatted="false">
+"⚠️ PERINGATAN: Pelonggaran pelambatan termal agresif (ambang batas dinaikkan +15°C).
+• Memberikan kinerja maksimum tetapi dapat menyebabkan pemanasan sasis parah dan ketidakstabilan sistem."
+    </string>
+    <string name="thermal_soc_summary_off" formatted="false">
+"⚠️ BAHAYA EKSTREM: Nonaktifkan praktis kontrol termal SoC secara keseluruhan (ambang batas dinaikkan +90°C).
+❗ Menyebabkan panas ekstrem, ketidakstabilan, potensi kerusakan komponen, dan pembatalan garansi. Gunakan hanya untuk tujuan pengujian."
+    </string>
 </resources>

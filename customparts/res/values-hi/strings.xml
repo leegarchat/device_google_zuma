@@ -1,38 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">अतिरिक्त सुविधाएँ</string>
-    <string name="doze_double_tap_hook_title">डबल टैप हुक सिमुलेशन (DT2W)</string>
-    <string name="doze_double_tap_hook_summary">Doze/AOD मोड में प्रोग्रामेटिक रूप से दूसरे टैप की प्रतीक्षा करें। उपयोग करें यदि हार्डवेयर डबल टैप काम नहीं करता है।</string>
-	
-	<string name="dt2w_title">वेक करने के लिए डबल-टैप करें</string>
-    <string name="pixel_parts_custom_summary">डबल-टैप सेटिंग्स और थर्मल प्रबंधन</string>
-    <string name="thermal_title">थर्मल प्रबंधन</string>
-    <string name="thermal_battery_title">बैटरी थर्मल प्रबंधन</string>
-    <string name="thermal_soc_title">SoC थर्मल प्रबंधन</string>
-	
-	<string name="thermal_mode_stock">सामान्य</string>
-    <string name="thermal_mode_soft">सॉफ्ट (+5°C)</string>
-    <string name="thermal_mode_medium">मध्यम (+9°C)</string>
-    <string name="thermal_mode_hard">हार्ड (+15°C)</string>
-    <string name="thermal_mode_off">बंद (+90°C)</string>
+    <string name="pixel_parts_custom_summary">डबल-टैप सेटिंग्स और थर्मल कंट्रोल</string>
 
-	<string name="thermal_dialog_title">सेटिंग्स लागू हो रही हैं</string>
-    <string name="thermal_dialog_safe_msg">रीबूट आवश्यक नहीं है। परीक्षणों के आधार पर, कॉन्फ़िगरेशन तुरंत लागू हो जाता है, लेकिन स्थिरता सुनिश्चित करने के लिए डिवाइस को पुनरारंभ करना बेहतर है।</string>
-    <string name="thermal_dialog_risk_msg">मेरे परीक्षणों के आधार पर, इस कॉन्फ़िगरेशन को सही ढंग से लागू करने के लिए डिवाइस को पुनरारंभ करना आवश्यक है। \n\nरीबूट के बिना, अस्थिर CPU आवृत्तियाँ या गलत चार्जिंग व्यवहार हो सकता है।</string>
+    <string name="dt2w_category_title">जागने के लिए डबल टैप (DT2W)</string>
+    <string name="doze_double_tap_hook_title">जागने के लिए डबल टैप</string>
+    <string name="doze_double_tap_hook_summary">उपयोग करें यदि हार्डवेयर डबल-टैप फ़ंक्शन काम नहीं कर रहा है।</string>
+    <string name="doze_double_tap_timeout_title">DT2W डबल टैप अंतराल</string>
+    <string name="doze_double_tap_timeout_summary">वर्तमान अंतराल: %1$d मिसे</string>
+    <string name="dt2w_info_text">यह सीधा कर्नेल इंटीग्रेशन नहीं है, बल्कि एक सॉफ्टवेयर हुक है।\n\n<b>नोट:</b>\n• सॉफ्टवेयर Doze/AOD मोड में दूसरे टैप का इंतजार करता है।\n• यदि डिवाइस पूरी तरह से Doze मोड में नहीं गया है तो यह स्क्रीन को जगा सकता है।\n• यदि Ambient/AOD सक्षम है तो लॉक होने के 1-2 सेकंड बाद डबल टैप काम करना शुरू कर देगा। इस दौरान डिवाइस Doze मोड में जा रहा होता है।</string>
+
+    <string name="dt2s_category_title">लॉन्चर पर सोने के लिए डबल टैप (DT2S)</string>
+    <string name="launcher_dt2s_title">सोने के लिए डबल टैप</string>
+    <string name="launcher_dt2s_summary">डिवाइस को लॉक करने के लिए लॉन्चर पर खाली जगह पर टैप करें।</string>
+    <string name="launcher_dt2s_timeout_title">DT2S डबल टैप अंतराल</string>
+    <string name="launcher_dt2s_timeout_summary">वर्तमान अंतराल: %1$d मिसे</string>
+    <string name="launcher_dt2s_error">अनुमत सीमा 10 से 1000 मिसे है।</string>
+    <string name="dt2s_info_text">यह सीधा लॉन्चर इंटीग्रेशन नहीं है, बल्कि एक सॉफ्टवेयर हुक है।\n\n<b>नोट:</b>\n• गलत ट्रिगर से बचने के लिए अनुशंसित टैप अंतराल 150 ms है।\n• पिक्सेल लॉन्चर के लिए है।\n• <b>अचानक</b> ट्रिगर हो सकता है।\n• यदि आप होमस्क्रीन पर हैं और नोटिफिकेशन शेड नीचे खींचते हैं, तो DT2S वहां भी ट्रिगर होगा।\n• यदि आप होमस्क्रीन से रीसेंट मेनू खोलते हैं, तो DT2S वहां भी काम करेगा।\n• DT2S ऐप ड्रॉअर में काम करेगा।\n• जब आप ऐप ड्रॉअर खोलकर सर्च टाइप करना शुरू करते हैं तो DT2S ट्रिगर <b>नहीं</b> होगा।\n• यदि आप होमस्क्रीन से स्वाइप करके Google Feed खोलते हैं तो DT2S काम <b>नहीं</b> करेगा।\n• यह एक बैकग्राउंड सर्विस है। ट्रिगर क्षेत्र को स्क्रीन के ऊपर से 15\% और नीचे से 20\% कम कर दिया गया है।</string>
+
+    <string name="thermal_title">थर्मल कंट्रोल</string>
+    <string name="thermal_battery_title">बैटरी थर्मल कंट्रोल</string>
+    <string name="thermal_soc_title">SoC थर्मल कंट्रोल</string>
+    <string name="thermal_dialog_title">सेटिंग्स लागू करना</string>
+    <string name="thermal_dialog_safe_msg">रीबूट की आवश्यकता नहीं है। परीक्षणों के आधार पर, कॉन्फ़िगरेशन तुरंत लागू हो जाता है, लेकिन स्थिरता सुनिश्चित करने के लिए डिवाइस को रीबूट करने की सलाह दी जाती है।</string>
+    <string name="thermal_dialog_risk_msg">इस कॉन्फ़िगरेशन को सही ढंग से लागू करने के लिए डिवाइस को रीबूट करना आवश्यक है। रीबूट के बिना, अस्थिर सीपीयू फ़्रीक्वेंसी व्यवहार या गलत चार्जिंग व्यवहार हो सकता है।</string>
     <string name="thermal_btn_reboot">रीबूट करें</string>
     <string name="thermal_btn_ok">ठीक है</string>
-
-	<!-- Battery Thermal Profiles -->
-    <string name="thermal_battery_summary_stock">बैटरी के लिए मानक थर्मल सीमाएँ। अधिकतम सुरक्षा और दीर्घायु सुनिश्चित करता है।</string>
-    <string name="thermal_battery_summary_soft">बैटरी तापमान सीमाओं में हल्की वृद्धि (थ्रेशोल्ड 5°C बढ़ाया गया)। गर्म परिस्थितियों में प्रदर्शन में थोड़ा सुधार करता है और चार्जिंग की गति धीमी होने को कम करता है।</string>
-    <string name="thermal_battery_summary_medium">बैटरी तापमान सीमाओं में संतुलित वृद्धि (थ्रेशोल्ड 9°C बढ़ाया गया)। सुरक्षा के उचित स्तर को बनाए रखते हुए चार्जिंग गति और प्रदर्शन में सुधार करता है।</string>
-    <string name="thermal_battery_summary_hard">चेतावनी: बैटरी तापमान सीमाओं में महत्वपूर्ण वृद्धि (थ्रेशोल्ड 15°C बढ़ाया गया)। \nइससे अत्यधिक गर्मी, तेजी से घिसाव और संभावित बैटरी क्षति हो सकती है।</string>
-    <string name="thermal_battery_summary_off">अत्यधिक खतरनाक: बैटरी थर्मल विनियमन को लगभग पूरी तरह से अक्षम करना (थ्रेशोल्ड 90°C बढ़ाया गया)। \nकेवल अपने जोखिम पर उपयोग करें। इससे ज़्यादा गरम होना, अपरिवर्तनीय क्षति हो सकती है और आपकी वारंटी रद्द हो सकती है।</string>
-
-    <!-- SoC Thermal Profiles -->
-    <string name="thermal_soc_summary_stock">मानक मान। अधिकतम तापमान नियंत्रण और स्थिरता के लिए आक्रामक थर्मल विनियमन।</string>
-    <string name="thermal_soc_summary_soft">थर्मल विनियमन में हल्की नरमी (थ्रेशोल्ड 5°C बढ़ाया गया)। मामूली गर्मी वृद्धि की कीमत पर प्रदर्शन में थोड़ा सुधार करता है।</string>
-    <string name="thermal_soc_summary_medium">थर्मल विनियमन में संतुलित नरमी (थ्रेशोल्ड 9°C बढ़ाया गया)। उच्च प्रदर्शन और प्रबंधनीय गर्मी के बीच इष्टतम समझौता।</string>
-    <string name="thermal_soc_summary_hard">चेतावनी: थर्मल विनियमन में आक्रामक नरमी (थ्रेशोल्ड 15°C बढ़ाया गया)। \nअधिकतम प्रदर्शन प्रदान करता है, लेकिन इससे चेसिस ज़्यादा गरम हो सकता है और सिस्टम अस्थिर हो सकता है।</string>
-    <string name="thermal_soc_summary_off">अत्यधिक खतरनाक: SoC थर्मल विनियमन को लगभग पूरी तरह से अक्षम करना (थ्रेशोल्ड 90°C बढ़ाया गया)। \nचरम गर्मी, अस्थिरता, संभावित घटक क्षति और आपकी वारंटी को रद्द करता है। केवल परीक्षण के लिए उपयोग करें।</string>
+    <string name="thermal_mode_stock">स्टॉक (डिफ़ॉल्ट)</string>
+    <string name="thermal_mode_soft">सॉफ्ट (+5°C)</string>
+    <string name="thermal_mode_medium">मीडियम (+9°C)</string>
+    <string name="thermal_mode_hard">हार्ड (+15°C)</string>
+    <string name="thermal_mode_off">बंद (+90°C)</string>
+    <string name="thermal_battery_summary_stock" formatted="false">
+"• बैटरी के लिए मानक थर्मल सीमाएँ।
+• अधिकतम सुरक्षा और दीर्घायु सुनिश्चित करता है।"
+    </string>
+    <string name="thermal_battery_summary_soft" formatted="false">
+"• बैटरी तापमान सीमाओं में हल्की वृद्धि (सीमा +5°C बढ़ाई गई)।
+• गर्म परिस्थितियों में प्रदर्शन को मामूली रूप से सुधारता है और चार्जिंग धीमा होने को कम करता है।"
+    </string>
+    <string name="thermal_battery_summary_medium" formatted="false">
+"• बैटरी तापमान सीमाओं में संतुलित वृद्धि (सीमा +9°C बढ़ाई गई)।
+• उचित सुरक्षा स्तर बनाए रखते हुए चार्जिंग गति और प्रदर्शन में सुधार करता है।"
+    </string>
+    <string name="thermal_battery_summary_hard" formatted="false">
+"⚠️ चेतावनी: बैटरी तापमान सीमाओं में महत्वपूर्ण वृद्धि (सीमा +15°C बढ़ाई गई)।
+• गंभीर हीटिंग, तेजी से घिसाव और संभावित बैटरी क्षति हो सकती है।"
+    </string>
+    <string name="thermal_battery_summary_off" formatted="false">
+"⚠️ अत्यधिक खतरा: बैटरी थर्मल कंट्रोल का व्यावहारिक रूप से पूर्ण निष्क्रियकरण (सीमा +90°C बढ़ाई गई)।
+❗ अपने जोखिम पर ही उपयोग करें। इससे ज़्यादा गरम होना, अपरिवर्तनीय क्षति और आपकी वारंटी रद्द हो सकती है।"
+    </string>
+    <string name="thermal_soc_summary_stock" formatted="false">
+"• मानक मान।
+• अधिकतम तापमान नियंत्रण और स्थिरता के लिए आक्रामक थर्मल थ्रॉटलिंग।"
+    </string>
+    <string name="thermal_soc_summary_soft" formatted="false">
+"• थर्मल थ्रॉटलिंग में हल्की ढील (सीमा +5°C बढ़ाई गई)।
+• हल्की गर्मी बढ़ने की कीमत पर प्रदर्शन को मामूली रूप से बढ़ाता है।"
+    </string>
+    <string name="thermal_soc_summary_medium" formatted="false">
+"• थर्मल थ्रॉटलिंग में संतुलित ढील (सीमा +9°C बढ़ाई गई)।
+• उच्च प्रदर्शन और प्रबंधनीय गर्मी के बीच इष्टतम समझौता।"
+    </string>
+    <string name="thermal_soc_summary_hard" formatted="false">
+"⚠️ चेतावनी: थर्मल थ्रॉटलिंग में आक्रामक ढील (सीमा +15°C बढ़ाई गई)।
+• अधिकतम प्रदर्शन प्रदान करता है लेकिन गंभीर चेसिस हीटिंग और सिस्टम अस्थिरता का कारण बन सकता है।"
+    </string>
+    <string name="thermal_soc_summary_off" formatted="false">
+"⚠️ अत्यधिक खतरा: SoC थर्मल कंट्रोल का व्यावहारिक रूप से पूर्ण निष्क्रियकरण (सीमा +90°C बढ़ाई गई)।
+❗ अत्यधिक गर्मी, अस्थिरता, संभावित घटक क्षति और वारंटी रद्द होने का कारण बनता है। केवल परीक्षण उद्देश्यों के लिए उपयोग करें।"
+    </string>
 </resources>

@@ -16,7 +16,7 @@ import android.provider.Settings;
 // и других переменных, добавьте переменные для логики двойного тапа:
 	// --- 2T2W PATCH VARIABLES START ---
     private static final String KEY_DOZE_DOUBLE_TAP_HOOK = "doze_double_tap_hook";
-    private static final long DOUBLE_TAP_TIMEOUT_MS = 400; // Время ожидания второго тапа
+    private static final String KEY_DOZE_DOUBLE_TAP_TIMEOUT = "doze_double_tap_timeout";
     private boolean mDoubleTapPending = false;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Runnable mDoubleTapTimeoutRunnable = () -> mDoubleTapPending = false;
@@ -36,7 +36,9 @@ import android.provider.Settings;
             if (isHookEnabled) {
                 if (!mDoubleTapPending) {
                     mDoubleTapPending = true;
-                    mHandler.postDelayed(mDoubleTapTimeoutRunnable, DOUBLE_TAP_TIMEOUT_MS);
+                    int timeout = Settings.Secure.getInt(
+                            mContext.getContentResolver(), KEY_DOZE_DOUBLE_TAP_TIMEOUT, 200);
+                    mHandler.postDelayed(mDoubleTapTimeoutRunnable, timeout);
                     mDozeSensors.reregisterTapSensor();
                     return;
                 } else {

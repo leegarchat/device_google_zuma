@@ -3,29 +3,65 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/pixel_parts_title">
 	<PreferenceCategory
-		android:key="thermal_category"
-        android:title="@string/dt2w_title">
-		<SwitchPreferenceCompat
-			android:key="doze_double_tap_hook"
-			android:defaultValue="false"
-			android:icon="@drawable/ic_tap"
-			android:title="@string/doze_double_tap_hook_title"
-			android:summary="@string/doze_double_tap_hook_summary" />
-		<!-- НОВЫЙ СВИТЧ (Launcher DT2S) -->
+        android:key="dt2w_category"
+        android:title="@string/dt2w_category_title">
+
+        <SwitchPreferenceCompat
+            android:key="doze_double_tap_hook"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_tap"
+            android:title="@string/doze_double_tap_hook_title"
+            android:summary="@string/doze_double_tap_hook_summary" />
+
+        <EditTextPreference
+            android:key="doze_double_tap_timeout"
+            android:title="@string/doze_double_tap_timeout_title"
+            android:summary="@string/doze_double_tap_timeout_summary"
+            android:defaultValue="200"
+            android:inputType="number"
+            android:icon="@drawable/ic_hourglass"
+            android:persistent="true" />
+
+        <!-- Инфо-текст (скрыт по умолчанию, не кликабельный) -->
+        <com.android.settingslib.widget.FooterPreference
+            android:key="doze_double_tap_info"
+            android:title="@string/dt2w_info_text"
+            android:icon="@drawable/ic_warning"
+            android:selectable="false" />
+
+    </PreferenceCategory>
+
+    <!-- =========================== -->
+    <!-- KATEGORY 2: DT2S (LAUNCHER) -->
+    <!-- =========================== -->
+    <PreferenceCategory
+        android:key="dt2s_category"
+        android:title="@string/dt2s_category_title">
+
         <SwitchPreferenceCompat
             android:key="launcher_dt2s_enabled"
             android:defaultValue="false"
             android:icon="@drawable/ic_tap"
             android:title="@string/launcher_dt2s_title"
             android:summary="@string/launcher_dt2s_summary" />
-		<EditTextPreference
+
+        <EditTextPreference
             android:key="launcher_dt2s_timeout"
             android:title="@string/launcher_dt2s_timeout_title"
             android:summary="@string/launcher_dt2s_timeout_summary"
-            android:defaultValue="300"
+            android:defaultValue="150"
             android:inputType="number"
+            android:icon="@drawable/ic_hourglass"
             android:persistent="true" />
-	</PreferenceCategory>
+
+        <!-- Инфо-текст (скрыт по умолчанию, не кликабельный) -->
+        <com.android.settingslib.widget.FooterPreference
+            android:key="launcher_dt2s_info"
+            android:title="@string/dt2s_info_text"
+            android:icon="@drawable/ic_warning"
+            android:selectable="false" />
+
+    </PreferenceCategory>
 	<PreferenceCategory
 		android:key="thermal_category"
         android:title="@string/thermal_title">

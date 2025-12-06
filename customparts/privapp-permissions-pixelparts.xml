@@ -9,5 +9,8 @@
         <permission name="android.permission.REAL_GET_TASKS"/>
         <permission name="android.permission.INTERACT_ACROSS_USERS_FULL"/>
 		<permission name="android.permission.STATUS_BAR"/>
+		<permission name="android.permission.STATUS_BAR_SERVICE" />
+		<permission name="android.permission.EXPAND_STATUS_BAR" />
+		<permission name="android.permission.INTERNAL_SYSTEM_WINDOW" />
     </privapp-permissions>
 </permissions>

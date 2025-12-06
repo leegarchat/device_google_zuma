@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.REAL_GET_TASKS" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 	<uses-permission android:name="android.permission.STATUS_BAR" />
+	<uses-permission android:name="android.permission.STATUS_BAR_SERVICE" />
+	<uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+	<uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
 
     <application
         android:label="@string/pixel_parts_title"
@@ -25,7 +28,8 @@
         android:defaultToDeviceProtectedStorage="true"
         android:directBootAware="true"
 		>
-		<activity
+		<!-- ОСНОВНАЯ АКТИВНОСТЬ (Для раздела Дисплей) -->
+        <activity
             android:name=".PixelPartsActivity"
             android:label="@string/pixel_parts_title"
             android:exported="true"
@@ -34,6 +38,7 @@
                 <action android:name="com.android.settings.action.IA_SETTINGS" />
             </intent-filter>
 
+            <!-- Категория: ДИСПЛЕЙ -->
             <meta-data
                 android:name="com.android.settings.category"
                 android:value="com.android.settings.category.ia.display" />
@@ -41,6 +46,48 @@
                 android:name="com.android.settings.summary"
                 android:resource="@string/pixel_parts_custom_summary" />
         </activity>
+
+        <!-- АЛИАС 1: Для раздела БАТАРЕЯ -->
+        <activity-alias
+            android:name=".PixelPartsActivityBattery"
+            android:targetActivity=".PixelPartsActivity"
+            android:label="@string/pixel_parts_title"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/Theme.SubSettingsBase">
+            <intent-filter>
+                <action android:name="com.android.settings.action.IA_SETTINGS" />
+            </intent-filter>
+            
+            <!-- Категория: БАТАРЕЯ -->
+            <meta-data
+                android:name="com.android.settings.category"
+                android:value="com.android.settings.category.ia.battery" />
+            <meta-data
+                android:name="com.android.settings.summary"
+                android:resource="@string/pixel_parts_custom_summary" />
+        </activity-alias>
+
+        <!-- АЛИАС 2: Для раздела СИСТЕМА -->
+        <activity-alias
+            android:name=".PixelPartsActivitySystem"
+            android:targetActivity=".PixelPartsActivity"
+            android:label="@string/pixel_parts_title"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/Theme.SubSettingsBase">
+            <intent-filter>
+                <action android:name="com.android.settings.action.IA_SETTINGS" />
+            </intent-filter>
+
+            <!-- Категория: СИСТЕМА -->
+            <meta-data
+                android:name="com.android.settings.category"
+                android:value="com.android.settings.category.ia.system" />
+            <meta-data
+                android:name="com.android.settings.summary"
+                android:resource="@string/pixel_parts_custom_summary" />
+        </activity-alias>
 		<!-- Регистрируем ресивер -->
         <receiver
             android:name=".BootCompletedReceiver"

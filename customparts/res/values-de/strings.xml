@@ -1,40 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Zusätzliche Funktionen</string>
-    <string name="doze_double_tap_hook_title">Simulierte Doppeltipp-Funktion (DT2W)</string>
-    <string name="doze_double_tap_hook_summary">Programmatisch auf ein zweites Tippen im Doze/AOD-Modus warten. Verwenden Sie dies, wenn das Hardware-Doppeltippen nicht funktioniert.</string>
-	
-	<string name="dt2w_title">Doppeltippen zum Aufwecken</string>
-    <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Wärmemanagement</string>
-    <string name="thermal_title">Wärmemanagement</string>
-    <string name="thermal_battery_title">Akku-Wärmemanagement</string>
-    <string name="thermal_soc_title">SoC-Wärmemanagement</string>
-	
-	<string name="thermal_mode_stock">Standard</string>
+    <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Thermoregulierung</string>
+
+    <string name="dt2w_category_title">Doppeltippen zum Aufwecken (DT2W)</string>
+    <string name="doze_double_tap_hook_title">Doppeltippen zum Aufwecken</string>
+    <string name="doze_double_tap_hook_summary">Verwenden, falls die Hardware-Doppeltippfunktion nicht funktioniert.</string>
+    <string name="doze_double_tap_timeout_title">DT2W Doppeltipp-Intervall</string>
+    <string name="doze_double_tap_timeout_summary">Aktuelles Intervall: %1$d ms</string>
+    <string name="dt2w_info_text">Dies ist keine direkte Kernel-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Die Software wartet im Doze/AOD-Modus auf ein zweites Tippen.\n• Das Gerät kann dennoch aufgeweckt werden, wenn es den Doze-Modus noch nicht vollständig aktiviert hat.\n• Doppeltippen funktioniert 1–2 Sekunden nach dem Sperren, wenn Ambient/AOD aktiviert ist. Während dieser Zeit wechselt das Gerät in den Doze-Modus.</string>
+
+    <string name="dt2s_category_title">Doppeltippen zum Schlafen auf dem Launcher (DT2S)</string>
+    <string name="launcher_dt2s_title">Doppeltippen zum Schlafen</string>
+    <string name="launcher_dt2s_summary">Tippen Sie auf eine leere Stelle des Launchers, um das Gerät zu sperren.</string>
+    <string name="launcher_dt2s_timeout_title">DT2S Doppeltipp-Intervall</string>
+    <string name="launcher_dt2s_timeout_summary">Aktuelles Intervall: %1$d ms</string>
+    <string name="launcher_dt2s_error">Der zulässige Bereich liegt zwischen 10 und 1000 ms.</string>
+    <string name="dt2s_info_text">Dies ist keine direkte Launcher-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Empfohlenes Intervall: 150 ms, um Fehler zu vermeiden.\n• Gedacht für den Pixel Launcher.\n• <b>KANN</b> unerwartet auslösen.\n• Wenn Sie die Benachrichtigungsleiste auf dem Homescreen herunterziehen, wird DT2S auch dort ausgelöst.\n• Wenn Sie das Menü "Zuletzt geöffnet" VOM Homescreen öffnen, wird DT2S auch dort ausgelöst.\n• DT2S löst auch im App-Drawer aus.\n• DT2S <b>NICHT</b> aus, wenn Sie im App-Drawer tippen, um zu suchen.\n• DT2S löst <b>NICHT</b> im Google Feed aus, wenn dieser vom Homescreen geöffnet wird.\n• Dies ist ein Hintergrunddienst. Der Auslösebereich wurde um 15\% oben und 20\% unten reduziert. In diesen Bereichen wird der Schlafmodus nicht aktiviert.</string>
+
+
+    <string name="thermal_title">Thermoregulierung</string>
+    <string name="thermal_battery_title">Batterie-Thermoregulierung</string>
+    <string name="thermal_soc_title">SoC-Thermoregulierung</string>
+    <string name="thermal_dialog_title">Einstellungen anwenden</string>
+    <string name="thermal_dialog_safe_msg">Neustart ist nicht erforderlich. Testergebnissen zufolge wird die Konfiguration sofort angewendet, es wird jedoch empfohlen, das Gerät neu zu starten, um die Stabilität zu gewährleisten.</string>
+    <string name="thermal_dialog_risk_msg">Für die korrekte Anwendung dieser Konfiguration ist ein Neustart des Geräts erforderlich. Ohne Neustart kann es zu instabilem CPU-Frequenzverhalten oder fehlerhaftem Ladeverhalten kommen.</string>
+    <string name="thermal_btn_reboot">Neu starten</string>
+    <string name="thermal_btn_ok">OK</string>
+    <string name="thermal_mode_stock">Standard</string>
     <string name="thermal_mode_soft">Sanft (+5°C)</string>
     <string name="thermal_mode_medium">Mittel (+9°C)</string>
     <string name="thermal_mode_hard">Hart (+15°C)</string>
     <string name="thermal_mode_off">Aus (+90°C)</string>
-
-
-	<string name="thermal_dialog_title">Einstellungen anwenden</string>
-    <string name="thermal_dialog_safe_msg">Neustart ist nicht erforderlich. Basierend auf Tests wird die Konfiguration sofort angewendet, es ist jedoch besser, das Gerät neu zu starten, um die Stabilität zu gewährleisten.</string>
-    <string name="thermal_dialog_risk_msg">Basierend auf meinen Tests ist ein Neustart des Geräts für die korrekte Anwendung dieser Konfiguration erforderlich. \n\nOhne einen Neustart kann es zu instabilen CPU-Frequenzen oder fehlerhaftem Ladeverhalten kommen.</string>
-    <string name="thermal_btn_reboot">Neu starten</string>
-    <string name="thermal_btn_ok">OK</string>
-
-	 <!-- Battery Thermal Profiles -->
-    <string name="thermal_battery_summary_stock">Standard-Temperaturgrenzen des Akkus. Gewährleistet maximale Sicherheit und Langlebigkeit.</string>
-    <string name="thermal_battery_summary_soft">Leichte Erhöhung der Akku-Temperaturgrenzen (Schwelle um 5°C angehoben). Verbessert die Leistung unter warmen Bedingungen geringfügig und reduziert die Ladeverzögerung.</string>
-    <string name="thermal_battery_summary_medium">Ausgewogene Erhöhung der Akku-Temperaturgrenzen (Schwelle um 9°C angehoben). Verbessert die Ladegeschwindigkeit und Leistung bei vernünftiger Sicherheit.</string>
-    <string name="thermal_battery_summary_hard">WARNUNG: Deutliche Erhöhung der Akku-Temperaturgrenzen (Schwelle um 15°C angehoben). \nKann zu starker Erhitzung, beschleunigtem Verschleiß und potenziellen Akkuschäden führen.</string>
-    <string name="thermal_battery_summary_off">EXTREM GEFÄHRLICH: Nahezu vollständige Deaktivierung der Akku-Temperaturregelung (Schwelle um 90°C angehoben). \nAusschließlich auf eigenes Risiko verwenden. Kann zu Überhitzung, irreversiblen Schäden und dem Erlöschen der Garantie führen.</string>
-
-    <!-- SoC Thermal Profiles -->
-    <string name="thermal_soc_summary_stock">Standardwert. Aggressive thermische Drosselung für maximale Temperaturkontrolle und Stabilität.</string>
-    <string name="thermal_soc_summary_soft">Leichte Milderung der thermischen Regelung (Schwelle um 5°C angehoben). Erhöht die Leistung leicht auf Kosten einer geringfügigen Zunahme der Wärmeentwicklung.</string>
-    <string name="thermal_soc_summary_medium">Ausgewogene Milderung der thermischen Regelung (Schwelle um 9°C angehoben). Optimaler Kompromiss zwischen hoher Leistung und kontrollierbarer Wärmeentwicklung.</string>
-    <string name="thermal_soc_summary_hard">WARNUNG: Aggressive Milderung der thermischen Regelung (Schwelle um 15°C angehoben). \nBietet maximale Leistung, kann jedoch zu starker Gehäuseerhitzung und Systeminstabilität führen.</string>
-    <string name="thermal_soc_summary_off">EXTREM GEFÄHRLICH: Nahezu vollständige Deaktivierung der SoC-Temperaturregelung (Schwelle um 90°C angehoben). \nFührt zu extremer Erhitzung, Instabilität, potenziellen Komponentenschäden und lässt die Garantie erlöschen. Nur zu Testzwecken verwenden.</string>
-
+    <string name="thermal_battery_summary_stock" formatted="false">
+"• Standard-Thermolimits für die Batterie.
+• Gewährleistet maximale Sicherheit und Lebensdauer."
+    </string>
+    <string name="thermal_battery_summary_soft" formatted="false">
+"• Leichte Erhöhung der Batterie-Temperaturlimits (Schwelle um +5°C erhöht).
+• Verbessert geringfügig die Leistung bei warmen Bedingungen und reduziert die Ladeverzögerung."
+    </string>
+    <string name="thermal_battery_summary_medium" formatted="false">
+"• Ausgewogene Erhöhung der Batterie-Temperaturlimits (Schwelle um +9°C erhöht).
+• Verbessert Ladegeschwindigkeit und Leistung bei vernünftigem Sicherheitsniveau."
+    </string>
+    <string name="thermal_battery_summary_hard" formatted="false">
+"⚠️ WARNUNG: Erhebliche Erhöhung der Batterie-Temperaturlimits (Schwelle um +15°C erhöht).
+• Kann zu starker Erwärmung, beschleunigtem Verschleiß und potenziellen Batterieschäden führen."
+    </string>
+    <string name="thermal_battery_summary_off" formatted="false">
+"⚠️ EXTREME GEFAHR: Praktische vollständige Deaktivierung der Batterie-Thermoregulierung (Schwelle um +90°C erhöht).
+❗ Verwendung auf eigene Gefahr. Kann zu Überhitzung, irreversiblen Schäden und dem Erlöschen der Garantie führen."
+    </string>
+    <string name="thermal_soc_summary_stock" formatted="false">
+"• Standardwert.
+• Aggressive Thermoregulierung für maximale Temperaturkontrolle und Stabilität."
+    </string>
+    <string name="thermal_soc_summary_soft" formatted="false">
+"• Leichte Lockerung der Thermoregulierung (Schwelle um +5°C erhöht).
+• Erhöht die Leistung geringfügig auf Kosten einer leichten Erhöhung der Wärmeentwicklung."
+    </string>
+    <string name="thermal_soc_summary_medium" formatted="false">
+"• Ausgewogene Lockerung der Thermoregulierung (Schwelle um +9°C erhöht).
+• Optimaler Kompromiss zwischen hoher Leistung und kontrollierter Wärmeentwicklung."
+    </string>
+    <string name="thermal_soc_summary_hard" formatted="false">
+"⚠️ WARNUNG: Aggressive Lockerung der Thermoregulierung (Schwelle um +15°C erhöht).
+• Bietet maximale Leistung, kann jedoch zu starker Gehäuseerwärmung und Systeminstabilität führen."
+    </string>
+    <string name="thermal_soc_summary_off" formatted="false">
+"⚠️ EXTREME GEFAHR: Praktische vollständige Deaktivierung der SoC-Thermoregulierung (Schwelle um +90°C erhöht).
+❗ Führt zu extremer Hitze, Instabilität, potenziellen Komponentenschäden und dem Erlöschen der Garantie. Nur zu Testzwecken verwenden."
+    </string>
 </resources>

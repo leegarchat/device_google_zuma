@@ -1,14 +1,17 @@
 package org.pixel.customparts.dt2s;
 
 import android.app.ActivityTaskManager;
+import android.app.KeyguardManager;
 import android.app.Service;
-import android.app.TaskStackListener;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Point;
 import android.hardware.input.InputManager;
-import android.os.Handler;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -23,241 +26,384 @@ import android.view.InputEventReceiver;
 import android.view.InputMonitor;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
+import android.view.WindowInsets;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
+import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DT2SService extends Service {
     private static final String TAG = "PixelPartsDT2S";
     private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
 
-    private boolean mIsMonitoring = false;
     private InputMonitor mInputMonitor;
-    private InputEventReceiver mInputEventReceiver;
+    private InputEventReceiver mInputReceiver;
+
     private PowerManager mPowerManager;
-    
+    private KeyguardManager mKeyguardManager;
+    private WindowManager mWindowManager;
+    private InputMethodManager mImm;
+
+    private boolean mIsMonitoring = false;
+
+    // --- Reflection для StatusBar (Шторка) ---
+    private Object mStatusBarService;
+    private final List<Method> mPanelExpansionMethods = new ArrayList<>();
+    // -----------------------------------------
+
     private String mLauncherPackage;
 
-    // Настройки жестов
-    private int mDoubleTapTimeout = 300;
-    private int mDoubleTapSlop; // Допустимое смещение для тапа
+    private int mDoubleTapTimeout;
+    private int mDoubleTapSlop;
 
-    // Состояние предыдущего ВАЛИДНОГО тапа
-    private long mLastValidTapTime = 0;
-    private float mLastValidTapX = 0;
-    private float mLastValidTapY = 0;
+    private long mLastTapTime = 0;
+    private float mLastTapX;
+    private float mLastTapY;
 
-    // Состояние текущего жеста
-    private float mCurrentDownX = 0;
-    private float mCurrentDownY = 0;
-    private boolean mIsCurrentGestureSwipe = false; // Флаг: превратился ли текущий жест в свайп
-
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    
-    // Рефлексия StatusBar
-    private Object mStatusBarService;
-    private Method mGetPanelExpansionMethod;
+    private float mDownX;
+    private float mDownY;
+    private boolean mIsSwipe;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        // Получаем системное значение, сколько пикселей можно сдвинуть, чтобы это все еще считалось тапом
+        mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
         mDoubleTapSlop = ViewConfiguration.get(this).getScaledDoubleTapSlop();
-        
-        resolveLauncherPackage();
-        initStatusBarReflection();
 
-        try {
-            ActivityTaskManager.getService().registerTaskStackListener(mTaskListener);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private void initStatusBarReflection() {
-        try {
-            IBinder binder = ServiceManager.getService("statusbar");
-            Class<?> stubClass = Class.forName("com.android.internal.statusbar.IStatusBarService$Stub");
-            Method asInterface = stubClass.getMethod("asInterface", IBinder.class);
-            mStatusBarService = asInterface.invoke(null, binder);
-            Class<?> serviceClass = mStatusBarService.getClass();
-            mGetPanelExpansionMethod = serviceClass.getMethod("getPanelExpansion");
-        } catch (Exception e) {
-            // Log.e(TAG, "StatusBar reflection failed", e);
-        }
-    }
+        resolveLauncher();
+        initStatusBarService(); // Подключаемся к SystemUI
 
-    private void resolveLauncherPackage() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        if (resolveInfo != null && resolveInfo.activityInfo != null) {
-            mLauncherPackage = resolveInfo.activityInfo.packageName;
-        }
+        registerScreenReceiver();
+
+        if (mPowerManager.isInteractive()) startMonitoring();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mDoubleTapTimeout = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_TIMEOUT, 300);
-        resolveLauncherPackage();
-        initStatusBarReflection();
-        checkCurrentTopApp();
+        mDoubleTapTimeout = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_TIMEOUT, 150);
+        resolveLauncher();
+        if (mPowerManager.isInteractive()) startMonitoring();
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        stopInputMonitoring();
-        try {
-            ActivityTaskManager.getService().unregisterTaskStackListener(mTaskListener);
-        } catch (Exception e) {}
+        stopMonitoring();
+        try { unregisterReceiver(mScreenReceiver); } catch (Exception ignored) {}
         super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
-    private final TaskStackListener mTaskListener = new TaskStackListener() {
-        @Override
-        public void onTaskStackChanged() {
-            mHandler.post(DT2SService.this::checkCurrentTopApp);
-        }
-    };
+    // ---------------------------------------------------------
+    // STATUS BAR REFLECTION (ШТОРКА)
+    // ---------------------------------------------------------
 
-    private boolean isLauncherTopApp() {
+    private void initStatusBarService() {
         try {
-            ActivityTaskManager.RootTaskInfo info = ActivityTaskManager.getService().getFocusedRootTaskInfo();
-            if (info != null && info.topActivity != null && mLauncherPackage != null) {
-                return mLauncherPackage.equals(info.topActivity.getPackageName());
+            mPanelExpansionMethods.clear();
+            IBinder binder = ServiceManager.getService("statusbar");
+            if (binder == null) return;
+
+            Class<?> stubClass = Class.forName("com.android.internal.statusbar.IStatusBarService$Stub");
+            Method asInterface = stubClass.getMethod("asInterface", IBinder.class);
+            mStatusBarService = asInterface.invoke(null, binder);
+
+            if (mStatusBarService != null) {
+                Class<?> cls = mStatusBarService.getClass();
+                // Методы, которые возвращают состояние панели.
+                // Порядок важен: от новых к старым.
+                String[] potentialMethods = {
+                    "isShadeExpanded",               // Android 14 QPR+
+                    "getShadeExpanded",              // Альтернатива
+                    "getPanelExpansion",             // Классика (float 0..1)
+                    "getNotificationPanelExpansion", // Часто используется
+                    "isPanelExpanded",               // Boolean
+                    "isExpanded"                     // Старый
+                };
+
+                for (String name : potentialMethods) {
+                    // Ищем методы, принимающие int (DisplayId) - ВАЖНО для A14
+                    try {
+                        Method m = cls.getMethod(name, int.class);
+                        mPanelExpansionMethods.add(m);
+                        continue; // Нашли - идем к следующему имени
+                    } catch (NoSuchMethodException ignored) {}
+
+                    // Ищем методы без аргументов (старые API)
+                    try {
+                        Method m = cls.getMethod(name);
+                        mPanelExpansionMethods.add(m);
+                    } catch (NoSuchMethodException ignored) {}
+                }
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            Log.e(TAG, "StatusBar reflection init failed", e);
+        }
+    }
+
+    private boolean isShadeExpanded() {
+        if (mStatusBarService == null || mPanelExpansionMethods.isEmpty()) {
+            initStatusBarService();
+            if (mStatusBarService == null) return false;
+        }
+
+        for (Method method : mPanelExpansionMethods) {
+            try {
+                Object result;
+                // Если метод требует int, передаем 0 (Default Display)
+                if (method.getParameterCount() == 1) {
+                    result = method.invoke(mStatusBarService, Display.DEFAULT_DISPLAY);
+                } else {
+                    result = method.invoke(mStatusBarService);
+                }
+
+                if (result instanceof Float) {
+                    // Если возвращает float (степень открытия), считаем открытым если > 0
+                    if ((Float) result > 0.01f) return true;
+                } else if (result instanceof Boolean) {
+                    if ((Boolean) result) return true;
+                }
+            } catch (Exception e) {
+                // Если произошла ошибка (SystemUI упал), сбрасываем сервис
+                mStatusBarService = null;
+            }
+        }
         return false;
     }
 
-    private void checkCurrentTopApp() {
-        if (isLauncherTopApp()) {
-            startInputMonitoring();
-        } else {
-            stopInputMonitoring();
+    // ---------------------------------------------------------
+    // MONITORING & RECEIVERS
+    // ---------------------------------------------------------
+
+    private void registerScreenReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(mScreenReceiver, filter);
+    }
+
+    private final BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctx, Intent i) {
+            if (Intent.ACTION_SCREEN_ON.equals(i.getAction())) {
+                startMonitoring();
+            } else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
+                stopMonitoring();
+            }
+        }
+    };
+
+    private void startMonitoring() {
+        if (mIsMonitoring) return;
+        try {
+            mInputMonitor = InputManager.getInstance()
+                    .monitorGestureInput("pixelparts-dt2s", Display.DEFAULT_DISPLAY);
+            mInputReceiver = new TouchReceiver(mInputMonitor.getInputChannel(), Looper.getMainLooper());
+            mIsMonitoring = true;
+        } catch (Throwable t) {
+            Log.e(TAG, "Cannot start monitoring", t);
         }
     }
 
-    private boolean isNotificationShadeExpanded() {
-        if (mStatusBarService == null || mGetPanelExpansionMethod == null) {
-            initStatusBarReflection();
-            if (mStatusBarService == null) return false;
-        }
+    private void stopMonitoring() {
+        if (!mIsMonitoring) return;
+        try { if (mInputReceiver != null) mInputReceiver.dispose(); } catch (Exception ignored) {}
+        try { if (mInputMonitor != null) mInputMonitor.dispose(); } catch (Exception ignored) {}
+        mInputReceiver = null;
+        mInputMonitor = null;
+        mIsMonitoring = false;
+    }
+
+    // ---------------------------------------------------------
+    // LOGIC & CHECKS
+    // ---------------------------------------------------------
+
+    private void resolveLauncher() {
         try {
-            float expansion = (float) mGetPanelExpansionMethod.invoke(mStatusBarService);
-            return expansion > 0.0f;
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            ResolveInfo ri = getPackageManager().resolveActivity(i, PackageManager.MATCH_DEFAULT_ONLY);
+            if (ri != null && ri.activityInfo != null)
+                mLauncherPackage = ri.activityInfo.packageName;
+        } catch (Exception ignored) {}
+    }
+
+    private boolean isLauncherOnTop() {
+        try {
+            ActivityTaskManager.RootTaskInfo info =
+                    ActivityTaskManager.getService().getFocusedRootTaskInfo();
+            return info != null &&
+                   info.topActivity != null &&
+                   info.topActivity.getPackageName().equals(mLauncherPackage);
         } catch (Exception e) {
             return false;
         }
     }
 
-    private void startInputMonitoring() {
-        if (mIsMonitoring) return;
+    // Улучшенная проверка клавиатуры
+    private boolean isKeyboardShown() {
+        // 1. Стандартная проверка менеджера ввода
+        if (mImm != null && mImm.isAcceptingText()) return true;
+        if (mImm != null && mImm.isActive()) return true; // Доп. проверка
+
+        // 2. Проверка через WindowInsets (высота IME) - работает в A11+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && mWindowManager != null) {
+            try {
+                WindowMetrics metrics = mWindowManager.getCurrentWindowMetrics();
+                WindowInsets insets = metrics.getWindowInsets();
+                boolean isImeVisible = insets.isVisible(WindowInsets.Type.ime());
+                if (isImeVisible) return true;
+            } catch (Exception ignored) {}
+        }
+        return false;
+    }
+
+    private boolean isLockscreen() {
         try {
-            mInputMonitor = InputManager.getInstance().monitorGestureInput("pixelparts-dt2s", Display.DEFAULT_DISPLAY);
-            mInputEventReceiver = new DT2SInputEventReceiver(mInputMonitor.getInputChannel(), Looper.getMainLooper());
-            mIsMonitoring = true;
-        } catch (Exception e) { }
+            return mKeyguardManager != null && mKeyguardManager.isKeyguardLocked();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    private void stopInputMonitoring() {
-        if (!mIsMonitoring) return;
-        if (mInputEventReceiver != null) {
-            mInputEventReceiver.dispose();
-            mInputEventReceiver = null;
+    private boolean isIgnoredZone(float y) {
+        if (mWindowManager == null) return false;
+        try {
+            Display display = mWindowManager.getDefaultDisplay();
+            Point p = new Point();
+            display.getRealSize(p);
+            int h = p.y;
+            
+            // Верхние 15% (статусбар + пространство под ним, чтобы не мешать свайпу шторки)
+            // Нижние 22% (док бар, место клавиатуры, жест "домой")
+            return y < h * 0.15f || y > h * 0.80f;
+        } catch (Exception e) {
+            return false;
         }
-        if (mInputMonitor != null) {
-            mInputMonitor.dispose();
-            mInputMonitor = null;
-        }
-        mIsMonitoring = false;
     }
 
-    private class DT2SInputEventReceiver extends InputEventReceiver {
-        public DT2SInputEventReceiver(InputChannel inputChannel, Looper looper) {
-            super(inputChannel, looper);
-        }
+    // ---------------------------------------------------------
+    // TOUCH HANDLER
+    // ---------------------------------------------------------
+
+    private class TouchReceiver extends InputEventReceiver {
+        TouchReceiver(InputChannel c, Looper l) { super(c, l); }
 
         @Override
-        public void onInputEvent(InputEvent event) {
+        public void onInputEvent(InputEvent e) {
             try {
-                if (event instanceof MotionEvent) {
-                    processMotionEvent((MotionEvent) event);
-                }
+                if (e instanceof MotionEvent) process((MotionEvent) e);
             } finally {
-                finishInputEvent(event, false);
+                finishInputEvent(e, false);
             }
         }
     }
 
-    // --- ОБНОВЛЕННАЯ ЛОГИКА ОБРАБОТКИ ЖЕСТОВ ---
-    private void processMotionEvent(MotionEvent event) {
-        int action = event.getActionMasked();
+    private void process(MotionEvent e) {
+        int action = e.getActionMasked();
+
+        // --- БЛОК 1: Глобальные проверки (самые дешевые и важные) ---
+        
+        // Перекрыто ли окно? (Например, диалоговым окном разрешений или шторкой, если она считается overlay)
+        int flags = e.getFlags();
+        if ((flags & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0 ||
+            (flags & MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED) != 0) {
+            invalidateGesture();
+            return;
+        }
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                // 1. Проверка условий (шторка, приложение)
-                if (isNotificationShadeExpanded() || !isLauncherTopApp()) {
-                    stopInputMonitoring();
-                    mLastValidTapTime = 0; // Сбрасываем цепочку
-                    mIsCurrentGestureSwipe = true; // Считаем этот жест невалидным
+                // --- БЛОК 2: Тяжелые проверки при нажатии ---
+
+                // 1. Шторка (через обновленную рефлексию)
+                if (isShadeExpanded()) {
+                    invalidateGesture();
                     return;
                 }
 
-                long currentTime = SystemClock.uptimeMillis();
-                mCurrentDownX = event.getX();
-                mCurrentDownY = event.getY();
-                mIsCurrentGestureSwipe = false; // Новый жест, пока еще не свайп
+                // 2. Клавиатура (ввод текста / поиск в меню приложений)
+                if (isKeyboardShown()) {
+                    invalidateGesture();
+                    return;
+                }
 
-                // 2. Проверяем, является ли ЭТОТ Down вторым тапом
-                long timeDelta = currentTime - mLastValidTapTime;
-                float distFromLastTapX = Math.abs(mCurrentDownX - mLastValidTapX);
-                float distFromLastTapY = Math.abs(mCurrentDownY - mLastValidTapY);
+                // 3. Локскрин
+                if (isLockscreen()) {
+                    invalidateGesture();
+                    return;
+                }
 
-                if (timeDelta < mDoubleTapTimeout && 
-                    distFromLastTapX < mDoubleTapSlop && 
-                    distFromLastTapY < mDoubleTapSlop) {
-                    
-                    if (mPowerManager != null && mPowerManager.isInteractive()) {
-                        mPowerManager.goToSleep(SystemClock.uptimeMillis());
-                        mLastValidTapTime = 0; // Сброс
-                        return;
+                // 4. Зоны (верх/низ)
+                if (isIgnoredZone(e.getRawY())) {
+                    invalidateGesture();
+                    return;
+                }
+
+                // 5. Лаунчер должен быть сверху
+                if (!isLauncherOnTop()) {
+                    invalidateGesture();
+                    return;
+                }
+
+                // --- БЛОК 3: Логика жеста ---
+                mDownX = e.getX();
+                mDownY = e.getY();
+                mIsSwipe = false;
+
+                long now = SystemClock.uptimeMillis();
+                float dx = Math.abs(mDownX - mLastTapX);
+                float dy = Math.abs(mDownY - mLastTapY);
+
+                if (mLastTapTime > 0 &&
+                    now - mLastTapTime < mDoubleTapTimeout &&
+                    dx < mDoubleTapSlop &&
+                    dy < mDoubleTapSlop) {
+
+                    goSleep();
+                    mLastTapTime = 0;
+                    return;
+                }
+
+                mLastTapTime = now;
+                mLastTapX = mDownX;
+                mLastTapY = mDownY;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (!mIsSwipe) {
+                    if (Math.abs(e.getX() - mDownX) > mDoubleTapSlop ||
+                        Math.abs(e.getY() - mDownY) > mDoubleTapSlop) {
+                        mIsSwipe = true;
+                        mLastTapTime = 0;
                     }
                 }
                 break;
 
-            case MotionEvent.ACTION_MOVE:
-                if (mIsCurrentGestureSwipe) return; // Уже определили, что свайп, игнорируем
-
-                float deltaX = Math.abs(event.getX() - mCurrentDownX);
-                float deltaY = Math.abs(event.getY() - mCurrentDownY);
-
-                // Если палец сдвинулся больше чем на Slop (обычно 8-16px), то это СВАЙП
-                if (deltaX > mDoubleTapSlop || deltaY > mDoubleTapSlop) {
-                    mIsCurrentGestureSwipe = true;
-                    // Так как это свайп, он "разрывает" цепочку двойного тапа.
-                    // Даже если мы поднимем палец, это не будет считаться первым тапом.
-                    mLastValidTapTime = 0; 
-                }
-                break;
-
-            case MotionEvent.ACTION_UP:
-                // Если жест завершился и это НЕ было свайпом
-                if (!mIsCurrentGestureSwipe) {
-                    // Запоминаем этот тап как "потенциальный первый тап" для следующего раза
-                    mLastValidTapTime = SystemClock.uptimeMillis();
-                    mLastValidTapX = mCurrentDownX;
-                    mLastValidTapY = mCurrentDownY;
-                }
-                break;
-                
             case MotionEvent.ACTION_CANCEL:
-                mLastValidTapTime = 0;
+                mLastTapTime = 0;
                 break;
+        }
+    }
+
+    private void invalidateGesture() {
+        mIsSwipe = true;
+        mLastTapTime = 0;
+    }
+
+    private void goSleep() {
+        if (mPowerManager != null && mPowerManager.isInteractive()) {
+            mPowerManager.goToSleep(SystemClock.uptimeMillis());
         }
     }
 }

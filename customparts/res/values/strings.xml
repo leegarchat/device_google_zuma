@@ -1,51 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pixel_parts_title">Additional Features</string>
-	
-    <string name="doze_double_tap_hook_title">Double Tap Hook Simulation (DT2W)</string>
-    <string name="doze_double_tap_hook_summary">Programmatically wait for a second tap in Doze/AOD mode. Use if the hardware double tap doesn\'t work.</string>
-	<string name="dt2w_title">Double-tap to wake</string>
-    <string name="pixel_parts_custom_summary">Double-tap settings and Thermal management</string>
-    <string name="thermal_title">Thermal management</string>
-    <string name="thermal_battery_title">Battery thermal management</string>
-    <string name="thermal_soc_title">SoC thermal management</string>
-	
-	<string name="thermal_mode_stock">Stock</string>
+    <string name="pixel_parts_title">Extra Features</string>
+    <string name="pixel_parts_custom_summary">Double-tap settings and Thermal Control</string>
+
+    <string name="dt2w_category_title">Double Tap to Wake (DT2W)</string>
+    <string name="doze_double_tap_hook_title">Double Tap to Wake</string>
+    <string name="doze_double_tap_hook_summary">Use if hardware double-tap function is not working.</string>
+    <string name="doze_double_tap_timeout_title">DT2W Double Tap Interval</string>
+    <string name="doze_double_tap_timeout_summary">Current interval: %1$d ms</string>
+    <string name="dt2w_info_text">This is not a direct kernel integration, but a software hook.\n\n<b>Note:</b>\n• Software waits for a second tap in Doze/AOD mode.\n• It may still wake the device if it has not fully entered Doze mode.\n• Double tap will start working 1–2 seconds after locking if Ambient/AOD is enabled. During these 1–2 seconds, the device is transitioning to Doze mode.</string>
+
+    <string name="dt2s_category_title">Double Tap to Sleep on Launcher (DT2S)</string>
+    <string name="launcher_dt2s_title">Double Tap to Sleep</string>
+    <string name="launcher_dt2s_summary">Tap an empty area on the launcher to lock the device.</string>
+    <string name="launcher_dt2s_timeout_title">DT2S Double Tap Interval</string>
+    <string name="launcher_dt2s_timeout_summary">Current interval: %1$d ms</string>
+    <string name="launcher_dt2s_error">The allowed range is 10 to 1000 ms.</string>
+    <string name="dt2s_info_text">This is not a direct launcher integration, but a software hook.\n\n<b>Note:</b>\n• The recommended tap interval is 150 ms to avoid false triggers.\n• Intended for Pixel Launcher.\n• <b>MAY</b> trigger unexpectedly.\n• If you are on the homescreen and pull down the notification shade, DT2S will also trigger in the shade.\n• If you open the Recents menu FROM the homescreen, DT2S will trigger there too.\n• DT2S will trigger in the App Drawer.\n• DT2S will trigger if you double-tap an app icon or any other area.\n• DT2S will <b>NOT</b> trigger when you open the App Drawer and start typing to search.\n• DT2S will <b>NOT</b> trigger in Google Feed if you open it by swiping from the homescreen.\n• This is a background service that listens for screen touches. The trigger area has been reduced by 15\% from the top and 20\% from the bottom of the screen. Taps for sleep will not be registered in these reduced areas.</string>
+
+
+    <string name="thermal_title">Thermal Control</string>
+    <string name="thermal_battery_title">Battery Thermal Control</string>
+    <string name="thermal_soc_title">SoC Thermal Control</string>
+    <string name="thermal_dialog_title">Applying Settings</string>
+    <string name="thermal_dialog_safe_msg">Reboot is not required. Based on tests, the configuration is applied immediately, but restarting the device is recommended to guarantee stability.</string>
+    <string name="thermal_dialog_risk_msg">A device reboot is required for this configuration to be applied correctly. Without a reboot, unstable CPU frequencies or incorrect charging behavior may occur.</string>
+    <string name="thermal_btn_reboot">Reboot</string>
+    <string name="thermal_btn_ok">OK</string>
+    <string name="thermal_mode_stock">Stock</string>
     <string name="thermal_mode_soft">Soft (+5°C)</string>
     <string name="thermal_mode_medium">Medium (+9°C)</string>
     <string name="thermal_mode_hard">Hard (+15°C)</string>
     <string name="thermal_mode_off">Off (+90°C)</string>
-
-	<!-- Новые строки для DT2S -->
-    <string name="launcher_dt2s_title">Double tap to sleep</string>
-    <string name="launcher_dt2s_summary">Turn off screen by double tapping on the launcher background</string>
-	<string name="launcher_dt2s_timeout_title">Double tap timeout</string>
-    <string name="launcher_dt2s_timeout_summary">Current delay: %1$d ms</string>
-    <string name="launcher_dt2s_error">Please enter a value between 10 and 1000</string>
-
-	<!-- Battery Thermal Profiles -->
-    <string name="thermal_battery_summary_stock">Standard battery thermal limits. Ensures maximum safety and longevity.</string>
-    <string name="thermal_battery_summary_soft">Slight increase in battery temperature limits (threshold raised by 5°C). Slightly improves performance in warm conditions and reduces charging slowdown.</string>
-    <string name="thermal_battery_summary_medium">Balanced increase in battery temperature limits (threshold raised by 9°C). Improves charging speed and performance while maintaining a reasonable level of safety.</string>
-    <string name="thermal_battery_summary_hard">WARNING: Significant increase in battery temperature limits (threshold raised by 15°C). \nMay lead to severe heating, accelerated wear, and potential battery damage.</string>
-    <string name="thermal_battery_summary_off">EXTREMELY DANGEROUS: Near-complete disabling of battery thermal regulation (threshold raised by 90°C). \nUse only at your own risk. May cause overheating, irreversible damage, and void your warranty.</string>
-
-    <!-- SoC Thermal Profiles -->
-    <string name="thermal_soc_summary_stock">Standard value. Aggressive thermal throttling for maximum temperature control and stability.</string>
-    <string name="thermal_soc_summary_soft">Slight softening of thermal regulation (threshold raised by 5°C). Slightly increases performance at the cost of a minor heat increase.</string>
-    <string name="thermal_soc_summary_medium">Balanced softening of thermal regulation (threshold raised by 9°C). Optimal compromise between high performance and manageable heat.</string>
-    <string name="thermal_soc_summary_hard">WARNING: Aggressive softening of thermal regulation (threshold raised by 15°C). \nProvides maximum performance but may cause severe chassis heating and system instability.</string>
-    <string name="thermal_soc_summary_off">EXTREMELY DANGEROUS: Near-complete disabling of SoC thermal regulation (threshold raised by 90°C). \nLeads to extreme heating, instability, potential component damage, and voids your warranty. Use for testing only.</string>
-
-	<string name="thermal_dialog_title">Applying settings</string>
-    <string name="thermal_dialog_safe_msg">Reboot is not required. Based on tests, the configuration is applied immediately, but it is better to restart the device to guarantee stability.</string>
-    <string name="thermal_dialog_risk_msg">Based on my tests, restarting the device is required for the correct application of this config. \n\nWithout a reboot, unstable CPU frequencies or incorrect charging behavior may occur.</string>
-    <string name="thermal_btn_reboot">Reboot</string>
-    <string name="thermal_btn_ok">OK</string>
-
-    <!-- 2. Массив ДЛЯ ОТОБРАЖЕНИЯ (Entries) -->
-    <!-- Ссылаемся на строки выше. Android сам подставит перевод в зависимости от языка -->
-    <string-array name="thermal_profiles_entries">
+    <string name="thermal_battery_summary_stock" formatted="false">
+"• Standard thermal limits for the battery.
+• Ensures maximum safety and longevity."
+    </string>
+    <string name="thermal_battery_summary_soft" formatted="false">
+"• Slight increase in battery temperature limits (threshold raised by +5°C).
+• Moderately improves performance in warm conditions and reduces charging slowdown."
+    </string>
+    <string name="thermal_battery_summary_medium" formatted="false">
+"• Balanced increase in battery temperature limits (threshold raised by +9°C).
+• Improves charging speed and performance while maintaining a reasonable safety level."
+    </string>
+    <string name="thermal_battery_summary_hard" formatted="false">
+"⚠️ WARNING: Significant increase in battery temperature limits (threshold raised by +15°C).
+• May cause severe heating, accelerated wear, and potential battery damage."
+    </string>
+    <string name="thermal_battery_summary_off" formatted="false">
+"⚠️ EXTREME DANGER: Practical complete disabling of battery thermal control (threshold raised by +90°C).
+❗ Use at your own risk. May cause overheating, irreversible damage, and void your warranty."
+    </string>
+    <string name="thermal_soc_summary_stock" formatted="false">
+"• Standard value.
+• Aggressive thermal throttling for maximum temperature control and stability."
+    </string>
+    <string name="thermal_soc_summary_soft" formatted="false">
+"• Slight relaxation of thermal throttling (threshold raised by +5°C).
+• Moderately increases performance at the cost of slightly higher heat."
+    </string>
+    <string name="thermal_soc_summary_medium" formatted="false">
+"• Balanced relaxation of thermal throttling (threshold raised by +9°C).
+• Optimal compromise between high performance and manageable heat."
+    </string>
+    <string name="thermal_soc_summary_hard" formatted="false">
+"⚠️ WARNING: Aggressive relaxation of thermal throttling (threshold raised by +15°C).
+• Provides maximum performance but may cause severe chassis heating and system instability."
+    </string>
+    <string name="thermal_soc_summary_off" formatted="false">
+"⚠️ EXTREME DANGER: Practical complete disabling of SoC thermal control (threshold raised by +90°C).
+❗ Leads to extreme heating, instability, potential component damage, and warranty voidance. Use for testing purposes only."
+    </string>
+	<string-array name="thermal_profiles_entries">
         <item>@string/thermal_mode_stock</item>
 		<item>@string/thermal_mode_soft</item>
 		<item>@string/thermal_mode_medium</item>

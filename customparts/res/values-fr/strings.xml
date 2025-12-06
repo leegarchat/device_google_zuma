@@ -1,39 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pixel_parts_title">Fonctionnalités Supplémentaires</string>
-    <string name="doze_double_tap_hook_title">Simulation de Double Tap (DT2W)</string>
-    <string name="doze_double_tap_hook_summary">Attendre le deuxième tap par programme en mode Doze/AOD. Utilisez si le double tap matériel ne fonctionne pas.</string>
-	
-	<string name="dt2w_title">Double-tapotement pour activer</string>
-    <string name="pixel_parts_custom_summary">Paramètres de double-tapotement et Gestion thermique</string>
-    <string name="thermal_title">Gestion thermique</string>
-    <string name="thermal_battery_title">Gestion thermique de la batterie</string>
-    <string name="thermal_soc_title">Gestion thermique du SoC</string>
-	
-	<string name="thermal_mode_stock">Standard</string>
-    <string name="thermal_mode_soft">Doux (+5°C)</string>
-    <string name="thermal_mode_medium">Moyen (+9°C)</string>
-    <string name="thermal_mode_hard">Dur (+15°C)</string>
-    <string name="thermal_mode_off">Désactivé (+90°C)</string>
+    <string name="pixel_parts_title">Fonctionnalités supplémentaires</string>
+    <string name="pixel_parts_custom_summary">Paramètres de double-tap et Contrôle thermique</string>
 
-	<string name="thermal_dialog_title">Application des paramètres</string>
-    <string name="thermal_dialog_safe_msg">Le redémarrage n\'est pas nécessaire. Selon les tests, la configuration est appliquée immédiatement, mais il est préférable de redémarrer l\'appareil pour garantir la stabilité.</string>
-    <string name="thermal_dialog_risk_msg">Selon mes tests, le redémarrage de l\'appareil est requis pour l\'application correcte de cette configuration. \n\nSans redémarrage, des fréquences CPU instables ou un comportement de charge incorrect peuvent survenir.</string>
+    <string name="dt2w_category_title">Double-tap pour réveiller (DT2W)</string>
+    <string name="doze_double_tap_hook_title">Double-tap pour réveiller</string>
+    <string name="doze_double_tap_hook_summary">Utilisez cette option si la fonction double-tap matérielle ne fonctionne pas.</string>
+    <string name="doze_double_tap_timeout_title">Intervalle du double-tap DT2W</string>
+    <string name="doze_double_tap_timeout_summary">Intervalle actuel : %1$d ms</string>
+    <string name="dt2w_info_text">Ce n\'est pas une intégration directe au noyau, mais une implémentation logicielle (hook).\n\n<b>Remarque :</b>\n• Le logiciel attend une seconde tape en mode Doze/AOD.\n• Peut encore réveiller l\'appareil s\'il n\'est pas complètement entré en mode Doze.\n• Le double tapotement commencera à fonctionner 1 à 2 secondes après le verrouillage si Ambient/AOD est activé. Pendant ce temps, l\'appareil passe en mode Doze.</string>
+
+    <string name="dt2s_category_title">Double-tap pour dormir sur le lanceur (DT2S)</string>
+    <string name="launcher_dt2s_title">Double-tap pour dormir</string>
+    <string name="launcher_dt2s_summary">Tapez une zone vide du lanceur pour verrouiller l\'appareil.</string>
+    <string name="launcher_dt2s_timeout_title">Intervalle du double-tap DT2S</string>
+    <string name="launcher_dt2s_timeout_summary">Intervalle actuel : %1$d ms</string>
+    <string name="launcher_dt2s_error">La plage autorisée est de 10 à 1000 ms.</string>
+    <string name="dt2s_info_text">Ce n\'est pas une intégration directe au lanceur, mais une implémentation logicielle.\n\n<b>Remarque :</b>\n• L\'intervalle recommandé est de 150 ms pour éviter les faux déclenchements.\n• Conçu pour le Pixel Launcher.\n• <b>PEUT</b> se déclencher de manière inattendue.\n• Si vous descendez le panneau de notification depuis l\'écran d\'accueil, DT2S se déclenchera aussi.\n• Si vous ouvrez le menu Récents DEPUIS l\'écran d\'accueil, DT2S se déclenchera aussi.\n• DT2S fonctionnera dans le tiroir d\'applications.\n• DT2S ne se déclenchera <b>PAS</b> si vous tapez pour rechercher dans le tiroir d\'applications.\n• DT2S ne se déclenchera <b>PAS</b> dans Google Feed.\n• C\'est un service d\'arrière-plan. La zone de déclenchement est réduite de 15\% en haut et 20\% en bas. Les tapes ne seront pas enregistrées dans ces zones.</string>
+
+
+    <string name="thermal_title">Contrôle thermique</string>
+    <string name="thermal_battery_title">Contrôle thermique de la batterie</string>
+    <string name="thermal_soc_title">Contrôle thermique du SoC</string>
+    <string name="thermal_dialog_title">Application des paramètres</string>
+    <string name="thermal_dialog_safe_msg">Le redémarrage n\'est pas nécessaire. Selon les tests, la configuration est appliquée immédiatement, mais il est recommandé de redémarrer l\'appareil pour garantir la stabilité.</string>
+    <string name="thermal_dialog_risk_msg">Un redémarrage de l\'appareil est nécessaire pour que cette configuration soit appliquée correctement. Sans redémarrage, un comportement instable des fréquences CPU ou un fonctionnement incorrect de la charge peut se produire.</string>
     <string name="thermal_btn_reboot">Redémarrer</string>
     <string name="thermal_btn_ok">OK</string>
-
-	<!-- Battery Thermal Profiles -->
-    <string name="thermal_battery_summary_stock">Limites thermiques standard de la batterie. Assure une sécurité et une longévité maximales.</string>
-    <string name="thermal_battery_summary_soft">Légère augmentation des limites de température de la batterie (seuil augmenté de 5°C). Améliore légèrement les performances dans des conditions chaudes et réduit le ralentissement de la charge.</string>
-    <string name="thermal_battery_summary_medium">Augmentation équilibrée des limites de température de la batterie (seuil augmenté de 9°C). Améliore la vitesse de charge et les performances tout en maintenant un niveau de sécurité raisonnable.</string>
-    <string name="thermal_battery_summary_hard">AVERTISSEMENT : Augmentation significative des limites de température de la batterie (seuil augmenté de 15°C). \nPeut entraîner un échauffement important, une usure accélérée et des dommages potentiels à la batterie.</string>
-    <string name="thermal_battery_summary_off">EXTRÊMEMENT DANGEREUX : Désactivation quasi-complète de la régulation thermique de la batterie (seuil augmenté de 90°C). \nÀ utiliser uniquement à vos propres risques. Peut provoquer une surchauffe, des dommages irréversibles et annuler votre garantie.</string>
-
-    <!-- SoC Thermal Profiles -->
-    <string name="thermal_soc_summary_stock">Valeur standard. Régulation thermique agressive pour un contrôle maximal de la température et une stabilité optimale.</string>
-    <string name="thermal_soc_summary_soft">Léger adoucissement de la régulation thermique (seuil augmenté de 5°C). Augmente légèrement les performances au prix d’une légère augmentation de la chaleur.</string>
-    <string name="thermal_soc_summary_medium">Adoucissement équilibré de la régulation thermique (seuil augmenté de 9°C). Compromis optimal entre haute performance et chaleur gérable.</string>
-    <string name="thermal_soc_summary_hard">AVERTISSEMENT : Adoucissement agressif de la régulation thermique (seuil augmenté de 15°C). \nFournit des performances maximales mais peut provoquer un fort échauffement du châssis et une instabilité du système.</string>
-    <string name="thermal_soc_summary_off">EXTRÊMEMENT DANGEREUX : Désactivation quasi-complète de la régulation thermique du SoC (seuil augmenté de 90°C). \nEntraîne un échauffement extrême, une instabilité, des dommages potentiels aux composants и annule votre garantie. À utiliser uniquement pour les tests.</string>
-
+    <string name="thermal_mode_stock">Stock (Par défaut)</string>
+    <string name="thermal_mode_soft">Douce (+5°C)</string>
+    <string name="thermal_mode_medium">Moyenne (+9°C)</string>
+    <string name="thermal_mode_hard">Agresive (+15°C)</string>
+    <string name="thermal_mode_off">Désactivée (+90°C)</string>
+    <string name="thermal_battery_summary_stock" formatted="false">
+"• Limites thermiques standard pour la batterie.
+• Assure une sécurité et une durée de vie maximales."
+    </string>
+    <string name="thermal_battery_summary_soft" formatted="false">
+"• Légère augmentation des limites de température de la batterie (seuil augmenté de +5°C).
+• Améliore légèrement les performances dans des conditions chaudes et réduit le ralentissement de la charge."
+    </string>
+    <string name="thermal_battery_summary_medium" formatted="false">
+"• Augmentation équilibrée des limites de température de la batterie (seuil augmenté de +9°C).
+• Améliore la vitesse de charge et les performances tout en maintenant un niveau de sécurité raisonnable."
+    </string>
+    <string name="thermal_battery_summary_hard" formatted="false">
+"⚠️ AVERTISSEMENT : Augmentation significative des limites de température de la batterie (seuil augmenté de +15°C).
+• Peut entraîner un fort échauffement, une usure accélérée et des dommages potentiels à la batterie."
+    </string>
+    <string name="thermal_battery_summary_off" formatted="false">
+"⚠️ DANGER EXTRÊME : Désactivation pratique complète du contrôle thermique de la batterie (seuil augmenté de +90°C).
+❗ Utilisez uniquement à vos propres risques. Peut entraîner une surchauffe, des dommages irréversibles et annuler votre garantie."
+    </string>
+    <string name="thermal_soc_summary_stock" formatted="false">
+"• Valeur standard.
+• Régulation thermique agressive pour un contrôle maximal de la température et la stabilité."
+    </string>
+    <string name="thermal_soc_summary_soft" formatted="false">
+"• Léger assouplissement de la régulation thermique (seuil augmenté de +5°C).
+• Augmente légèrement les performances au prix d\'une légère augmentation de la chaleur."
+    </string>
+    <string name="thermal_soc_summary_medium" formatted="false">
+"• Assouplissement équilibré de la régulation thermique (seuil augmenté de +9°C).
+• Compromis optimal entre haute performance et chaleur gérable."
+    </string>
+    <string name="thermal_soc_summary_hard" formatted="false">
+"⚠️ AVERTISSEMENT : Assouplissement agressif de la régulation thermique (seuil augmenté de +15°C).
+• Fournit des performances maximales, mais peut provoquer un fort échauffement du châssis et une instabilité du système."
+    </string>
+    <string name="thermal_soc_summary_off" formatted="false">
+"⚠️ DANGER EXTRÊME : Désactivation pratique complète du contrôle thermique du SoC (seuil augmenté de +90°C).
+❗ Entraîne une chaleur extrême, une instabilité, des dommages potentiels aux composants et l\'annulation de la garantie. Utiliser uniquement à des fins de test."
+    </string>
 </resources>
