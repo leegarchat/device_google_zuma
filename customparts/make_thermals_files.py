@@ -37,21 +37,45 @@ TARGETS_BATTERY = [
 
 generated_files_list = []
 MK_FILENAME = "PartCustomThermalConfigs.mk"
-COMMON_MK_FILENAME = "../device-shusky-common.mk" # Относительно WorkDir
 
 # --- ОПРЕДЕЛЕНИЕ ПУТЕЙ ---
+
 # 1. Определяем директорию скрипта
 if getattr(sys, 'frozen', False):
-    # Если скрипт запущен как исполняемый файл
     DIR_PY_SCRIPT = Path(sys.executable).parent
 else:
-    # Если запущен как обычный Python скрипт
     DIR_PY_SCRIPT = Path(inspect.getfile(inspect.currentframe())).resolve().parent
 
-# 2. Определяем WorkDir (DirPyScript/../../shusky/thermal)
-WORK_DIR = (DIR_PY_SCRIPT / Path("../../shusky/thermal")).resolve()
-CUSTOM_CONFIGS_DIR = WORK_DIR / "CustomConfigs"
-BASE_JSON_DIR = WORK_DIR
+# 2. Определяем корень Android исходников (ищем папку vendor вверх по дереву)
+def find_android_root(start_path):
+    current = start_path
+    # Поднимаемся вверх максимум на 6 уровней, ищем папку 'vendor'
+    for _ in range(6):
+        if (current / "vendor").exists() and (current / "device").exists():
+            return current
+        if current.parent == current:
+            break
+        current = current.parent
+    return None
+
+ANDROID_ROOT = find_android_root(DIR_PY_SCRIPT)
+
+if not ANDROID_ROOT:
+    print("❌ Ошибка: Не удалось найти корень исходников Android (папку vendor).")
+    print("   Убедитесь, что скрипт запущен внутри дерева исходников.")
+    sys.exit(1)
+
+# Вычисляем путь к скрипту относительно корня Android для Makefile
+# Например: device/google/zuma/customparts
+try:
+    REL_SCRIPT_PATH = DIR_PY_SCRIPT.relative_to(ANDROID_ROOT)
+except ValueError:
+    print("❌ Ошибка: Скрипт находится вне дерева исходников Android.")
+    sys.exit(1)
+
+print(f"📍 Скрипт запущен в: {DIR_PY_SCRIPT}")
+print(f"🌳 Корень Android: {ANDROID_ROOT}")
+print(f"🔗 Относительный путь для MK: {REL_SCRIPT_PATH}")
 
 # --- ФУНКЦИИ ---
 
@@ -104,7 +128,7 @@ def patch_file_content(content, targets_soc, offset_soc, targets_bat, offset_bat
         ht_match = ht_pattern.search(content, pos=start_pos)
         
         if ht_match:
-            # Проверка границ (упрощенная, как в оригинале)
+            # Проверка границ
             chunk_between = content[start_pos:ht_match.start()]
             if chunk_between.count('}') > chunk_between.count('{'):
                 continue
@@ -117,140 +141,76 @@ def patch_file_content(content, targets_soc, offset_soc, targets_bat, offset_bat
     result_content = content
     
     for start, end, replacement in replacements:
-        # Сохраняем стиль ключа (пробелы) из оригинала
         original_chunk = result_content[start:end]
         colon_index = original_chunk.find(':')
-        key_part = original_chunk[:colon_index+1] # "HotThreshold": или "HotThreshold" :
-        
-        # Достаем чисто массив из замены
+        key_part = original_chunk[:colon_index+1]
         value_part = replacement.split(':', 1)[1]
-        
         final_replacement = key_part + value_part
-        
         result_content = result_content[:start] + final_replacement + result_content[end:]
         
     return result_content
 
 def generate_makefile(files_list):
-    print(f"📝 Генерация {MK_FILENAME} в {WORK_DIR}...")
+    mk_path = DIR_PY_SCRIPT / MK_FILENAME
+    print(f"📝 Генерация {MK_FILENAME}...")
     
     unique_rules = set()
-    last_rule = ""
 
     for filename in files_list:
-        # thermal_info_config_soc_soft_battery_medium_shiba.json
-        # 1. Определяем базовое имя
+        # filename пример: thermal_info_config_soc_medium_shiba.json
+        
+        # 1. Формируем паттерны
+        # Имя файла на диске (источник): REL_SCRIPT_PATH/filename
+        # Имя файла в vendor (цель): thermal_info_config_soc_medium.json (без device суффикса)
+        
         base_name = filename
         for device in DEVICES:
             base_name = base_name.replace(f"_{device}.json", "")
         
-        # 2. Формируем паттерны
-        src_pattern = f"{base_name}_$(TARGET_DEVICE).json" # thermal_info_config_soc_soft_battery_medium_$(TARGET_DEVICE).json
-        dst_pattern = f"{base_name}.json" # thermal_info_config_soc_soft_battery_medium.json
+        # src_pattern: device/google/zuma/customparts/thermal_info_config_soc_medium_$(TARGET_DEVICE).json
+        src_pattern = f"{REL_SCRIPT_PATH}/CustomThermalProfiles/{base_name}_$(DEVICE_CODENAME).json"
         
-        # 3. Формируем правило
-        # Здесь добавляем '\' на конце, чтобы потом удалить его только у последнего
-        rule = f"    $(TARGET_VENDOR_THERMAL_CONFIG_PATH)/CustomConfigs/{src_pattern}:$(TARGET_COPY_OUT_VENDOR)/etc/{dst_pattern}"
+        # dst_pattern: vendor/etc/thermal_info_config_soc_medium.json
+        dst_pattern = f"$(TARGET_COPY_OUT_VENDOR)/etc/{base_name}.json"
+        
+        rule = f"    {src_pattern}:{dst_pattern}"
         unique_rules.add(rule)
 
     sorted_rules = sorted(list(unique_rules))
     
-    # 4. Удаляем '\' у последнего правила
+    last_rule = ""
     if sorted_rules:
-        # Убираем '\' из последнего правила
         last_rule = sorted_rules.pop()
-        final_last_rule = last_rule.replace('\\', '').strip() # Удаляем обратный слэш и пробелы
-        
+        final_last_rule = last_rule.strip()
     
-    with open(WORK_DIR / MK_FILENAME, "w", encoding="utf-8") as mk:
-        mk.write("# Auto-generated thermal config copy rules\n\n")
+    with open(mk_path, "w", encoding="utf-8") as mk:
+        mk.write("# Auto-generated thermal config copy rules\n")
+        mk.write(f"# Generated by script in: {REL_SCRIPT_PATH}\n\n")
         mk.write('PRODUCT_COPY_FILES += \\\n')
         
         for line in sorted_rules:
-            # Добавляем '\' и перенос строки для всех, кроме последнего
             mk.write(f"{line} \\\n")
             
         if final_last_rule:
-            mk.write(f"    {final_last_rule}\n") # Записываем последнее правило без '\'
+            mk.write(f"    {final_last_rule}\n")
             
-    print(f"✅ {MK_FILENAME} успешно создан ({len(unique_rules)} записей).")
-
-def update_common_mk():
-    """
-    Добавляет мягкий инклюд в device-shusky-common.mk
-    """
-    common_mk_path = WORK_DIR / COMMON_MK_FILENAME
-    include_line = f"inclide $(TARGET_VENDOR_THERMAL_CONFIG_PATH)/{MK_FILENAME})"
-    
-    if not common_mk_path.exists():
-        print(f"⚠️  Файл {COMMON_MK_FILENAME} не найден по пути {common_mk_path}. Пропускаем обновление.")
-        return
-
-    print(f"🛠️  Обновление {COMMON_MK_FILENAME}...")
-    
-    try:
-        with open(common_mk_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-    except Exception as e:
-        print(f"❌ Ошибка чтения {common_mk_path}: {e}")
-        return
-
-    # Проверяем, существует ли уже include
-    if include_line in content:
-        print("ℹ️  Мягкий include уже присутствует. Пропускаем.")
-        return
-
-    # Ищем место для вставки
-    # Цель: вставить сразу после:
-    # $(TARGET_VENDOR_THERMAL_CONFIG_PATH)/thermal_info_config_charge_$(TARGET_DEVICE).json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_charge.json
-    
-    # Регулярка для поиска конца блока PRODUCT_COPY_FILES
-    # Ищем thermal_info_config_charge.json и следующую за ним обратную косую черту (\) или конец строки
-    anchor_pattern = re.compile(
-        r'(\$\(TARGET_VENDOR_THERMAL_CONFIG_PATH\)\/thermal_info_config_charge_\$\(TARGET_DEVICE\)\.json:\$\(TARGET_COPY_OUT_VENDOR\)\/etc\/thermal_info_config_charge\.json\s*\\?)',
-        re.DOTALL
-    )
-
-    match = anchor_pattern.search(content)
-    
-    if match:
-        insert_point = match.end()
-        
-        # Добавляем пустую строку, а затем include
-        new_content = (
-            content[:insert_point] + 
-            "\n\n" + # Две пустые строки для чистоты
-            include_line + "\n" +
-            content[insert_point:]
-        )
-        
-        # Записываем обратно
-        with open(common_mk_path, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-            
-        print(f"✅ Мягкий include добавлен в {COMMON_MK_FILENAME}.")
-        
-    else:
-        print("⚠️  Не найдена точка вставки (thermal_info_config_charge.json). Добавьте include вручную.")
-
+    print(f"✅ {MK_FILENAME} успешно создан.")
 
 def main():
     print("--- Запуск генератора кастомных термальных конфигов ---")
-    print(f"Рабочая директория (WorkDir): {WORK_DIR}")
-    
-    # 1. Создаем директорию для сохранения файлов
-    CUSTOM_CONFIGS_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Создана/проверена директория для конфигов: {CUSTOM_CONFIGS_DIR}")
 
     for device in DEVICES:
-        source_filename = f"thermal_info_config_{device}.json"
-        source_path = BASE_JSON_DIR / source_filename
+        # Новый путь к исходнику в вендоре
+        # vendor/google/{device}/proprietary/vendor/etc/thermal_info_config.json
+        source_rel_path = Path(f"vendor/google/{device}/proprietary/vendor/etc/thermal_info_config.json")
+        source_path = ANDROID_ROOT / source_rel_path
         
         if not source_path.exists():
-            print(f"⚠️  Файл {source_filename} не найден по пути {source_path}! Пропускаем.")
+            print(f"⚠️  Файл не найден: {source_path}")
+            print(f"   (Ожидался путь относительно корня: {source_rel_path})")
             continue
             
-        print(f"📄 Чтение оригинала для {device}: {source_filename}")
+        print(f"📄 Обработка {device} (источник: {source_rel_path})")
         
         with open(source_path, 'r', encoding='utf-8') as f:
             base_content = f.read()
@@ -259,7 +219,6 @@ def main():
             for bat_name, bat_offset in OFFSETS.items():
                 
                 if soc_name == "stock" and bat_name == "stock":
-                    # Если stock/stock, то это оригинал, мы его не генерируем
                     continue
                 
                 new_content = patch_file_content(
@@ -270,26 +229,23 @@ def main():
 
                 soc_part = f"_soc_{soc_name}" if soc_name != "stock" else ""
                 bat_part = f"_battery_{bat_name}" if bat_name != "stock" else ""
-                
+                DirThermalName = 'CustomThermalProfiles'
+                # Имя файла результата
                 target_filename = f"thermal_info_config{soc_part}{bat_part}_{device}.json"
-                target_path = CUSTOM_CONFIGS_DIR / target_filename
-                
-                # Сохраняем текстовый файл в CustomConfigs
+                target_path = f"{DIR_PY_SCRIPT}/{DirThermalName}/{target_filename}"
+                sds = DIR_PY_SCRIPT / DirThermalName
+                sds.mkdir(parents=True, exist_ok=True)
                 with open(target_path, 'w', encoding='utf-8') as f:
                     f.write(new_content)
                 
-                # Сохраняем имя файла (только имя, без пути, для mk)
                 generated_files_list.append(target_filename)
-                print(f"  ✅ Создан: CustomConfigs/{target_filename}")
+                # print(f"  + Создан: {target_filename}") 
 
-    # 2. Создаем Makefile
+    # 2. Создаем Makefile в той же директории
     if generated_files_list:
         generate_makefile(generated_files_list)
     else:
-        print("ℹ️ Новых файлов не создано, Makefile не обновлен.")
-        
-    # 3. Обновляем device-shusky-common.mk
-    update_common_mk()
+        print("ℹ️ Новых файлов не создано.")
 
     print("--- Готово! ---")
 

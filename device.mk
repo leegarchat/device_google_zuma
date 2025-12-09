@@ -24,6 +24,11 @@ PRODUCT_PACKAGES += dump_modem
 # Thermal
 PRODUCT_PACKAGES += android.hardware.thermal-service.pixel
 
+# Custom Pixel Parts
+PRODUCT_PACKAGES += \
+	init.pixelparts.rc \
+	PixelCustomParts
+
 # Thermal utils
 PRODUCT_PACKAGES += thermal_symlinks
 

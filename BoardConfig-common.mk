@@ -35,7 +35,11 @@ BOARD_BOOTCONFIG += androidboot.boot_devices=13200000.ufs
 
 TARGET_NO_BOOTLOADER := true
 BOARD_PREBUILT_BOOTIMAGE := $(wildcard $(TARGET_KERNEL_DIR)/boot.img)
+ifneq (,$(BOARD_PREBUILT_BOOTIMAGE))
 TARGET_NO_KERNEL := true
+else
+TARGET_NO_KERNEL := false
+endif
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
@@ -236,6 +240,8 @@ endif
 BOARD_SYSTEM_KERNEL_MODULES := $(addprefix $(KERNEL_MODULE_DIR)/, $(notdir $(BOARD_SYSTEM_KERNEL_MODULES_LOAD)))
 
 include device/google/zuma/sepolicy/zuma-sepolicy.mk
+
+include device/google/zuma/BoardConfigEvolution.mk
 
 # Battery options
 BOARD_KERNEL_CMDLINE += at24.write_timeout=100
