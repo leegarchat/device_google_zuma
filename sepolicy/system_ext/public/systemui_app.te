@@ -1,2 +1,1 @@
 type systemui_app, domain;
-set_prop(system_app, system_pixelparts_prop)

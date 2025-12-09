@@ -5,4 +5,3 @@ system_restricted_prop(telephony_modem_prop)
 userdebug_or_eng(`
   set_prop(shell, telephony_ril_prop)
 ')
-type system_pixelparts_prop, property_type, system_property_type;

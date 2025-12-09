@@ -8,6 +8,7 @@
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.view.ViewConfiguration;
 // --- 2T2W HOOK VARIABLES END ---
 
 // Шаг 2.2: Добавить Поля класса
@@ -17,9 +18,18 @@ import android.provider.Settings;
 	// --- 2T2W PATCH VARIABLES START ---
     private static final String KEY_DOZE_DOUBLE_TAP_HOOK = "doze_double_tap_hook";
     private static final String KEY_DOZE_DOUBLE_TAP_TIMEOUT = "doze_double_tap_timeout";
+    
     private boolean mDoubleTapPending = false;
+    private float mLastTapX = -1; // Храним X первого тапа
+    private float mLastTapY = -1; // Храним Y первого тапа
+    private int mDoubleTapSlop = -1; // Допустимое расстояние
+    
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mDoubleTapTimeoutRunnable = () -> mDoubleTapPending = false;
+    private final Runnable mDoubleTapTimeoutRunnable = () -> {
+        mDoubleTapPending = false;
+        mLastTapX = -1;
+        mLastTapY = -1;
+    };
     // --- 2T2W PATCH VARIABLES END ---
 
 // Шаг 2.3: Изменить метод onSensor
@@ -28,22 +38,56 @@ import android.provider.Settings;
 	@VisibleForTesting
     void onSensor(int pulseReason, boolean sensorPerformedProxCheck,
             float screenX, float screenY, float[] rawValues) {
+        
         // --- 2T2W PATCH LOGIC START ---
         if (pulseReason == DozeLog.REASON_SENSOR_TAP || pulseReason == DozeLog.REASON_SENSOR_DOUBLE_TAP) {
             boolean isHookEnabled = Settings.Secure.getInt(
                     mContext.getContentResolver(), KEY_DOZE_DOUBLE_TAP_HOOK, 0) == 1;
 
             if (isHookEnabled) {
-                if (!mDoubleTapPending) {
-                    mDoubleTapPending = true;
-                    int timeout = Settings.Secure.getInt(
+                // Инициализируем slop (расстояние) один раз
+                if (mDoubleTapSlop < 0) {
+                    mDoubleTapSlop = ViewConfiguration.get(mContext).getScaledDoubleTapSlop();
+                }
+
+                // Читаем таймаут
+                int timeout = Settings.Secure.getInt(
                             mContext.getContentResolver(), KEY_DOZE_DOUBLE_TAP_TIMEOUT, 200);
+
+                if (!mDoubleTapPending) {
+                    // --- ЭТО ПЕРВЫЙ ТАП ---
+                    mDoubleTapPending = true;
+                    mLastTapX = screenX;
+                    mLastTapY = screenY;
+                    
                     mHandler.postDelayed(mDoubleTapTimeoutRunnable, timeout);
-                    mDozeSensors.reregisterTapSensor();
-                    return;
+                    mDozeSensors.reregisterTapSensor(); // Перезаряжаем сенсор
+                    return; // Игнорируем этот тап, ждем второй
                 } else {
-                    mDoubleTapPending = false;
-                    mHandler.removeCallbacks(mDoubleTapTimeoutRunnable);
+                    // --- ЭТО ВТОРОЙ ТАП ---
+                    float dx = Math.abs(screenX - mLastTapX);
+                    float dy = Math.abs(screenY - mLastTapY);
+
+                    // Проверяем, рядом ли пальцы (учитываем, что screenX может быть -1, если сенсор тупой)
+                    boolean isCloseEnough = (screenX < 0 || mLastTapX < 0) || (dx < mDoubleTapSlop && dy < mDoubleTapSlop);
+
+                    if (isCloseEnough) {
+                        // УСПЕХ: Тапнули в ту же область
+                        mDoubleTapPending = false;
+                        mHandler.removeCallbacks(mDoubleTapTimeoutRunnable);
+                        // Код пойдет дальше и разбудит телефон
+                    } else {
+                        // НЕУДАЧА: Тапнули слишком далеко
+                        // Считаем этот тап новым "первым" тапом
+                        mLastTapX = screenX;
+                        mLastTapY = screenY;
+                        
+                        // Перезапускаем таймер ожидания
+                        mHandler.removeCallbacks(mDoubleTapTimeoutRunnable);
+                        mHandler.postDelayed(mDoubleTapTimeoutRunnable, timeout);
+                        mDozeSensors.reregisterTapSensor();
+                        return; // Не будим телефон
+                    }
                 }
             }
         }
@@ -51,5 +95,4 @@ import android.provider.Settings;
 
         // Далее идет оригинальный код метода (без изменений)...
         boolean isDoubleTap = pulseReason == DozeLog.REASON_SENSOR_DOUBLE_TAP;
-        boolean isTap = pulseReason == DozeLog.REASON_SENSOR_TAP;
-        // ... и так далее до конца метода
+        // ...

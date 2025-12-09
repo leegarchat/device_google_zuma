@@ -1,57 +1,52 @@
 #
-# Copyright (C) 2011 The Android Open-Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# SPDX-FileCopyrightText: 2011 The Android Open-Source Project
+# SPDX-FileCopyrightText: The LineageOS Project
+# SPDX-FileCopyrightText: The Calyx Institute
+# SPDX-License-Identifier: Apache-2.0
 #
 
-include device/google/gs-common/device.mk
-include device/google/gs-common/gs_watchdogd/watchdog.mk
-include device/google/gs-common/ramdump_and_coredump/ramdump_and_coredump.mk
-include device/google/gs-common/soc/soc.mk
-include device/google/gs-common/modem/modem.mk
-include device/google/gs-common/aoc/aoc.mk
-include device/google/gs-common/trusty/trusty.mk
-include device/google/gs-common/pcie/pcie.mk
-include device/google/gs-common/storage/storage.mk
-include device/google/gs-common/thermal/dump/thermal.mk
-include device/google/gs-common/thermal/thermal_hal/device.mk
-include device/google/gs-common/performance/perf.mk
-include device/google/gs-common/power/power.mk
-include device/google/gs-common/pixel_metrics/pixel_metrics.mk
-include device/google/gs-common/soc/freq.mk
-include device/google/gs-common/gps/dump/log.mk
-include device/google/gs-common/bcmbt/dump/dumplog.mk
-include device/google/gs-common/display/dump_exynos_display.mk
-include device/google/gs-common/display_logbuffer/dump.mk
-include device/google/gs-common/gxp/gxp.mk
-include device/google/gs-common/camera/dump.mk
-include device/google/gs-common/radio/dump.mk
-include device/google/gs-common/gear/dumpstate/aidl.mk
-include device/google/gs-common/umfw_stat/umfw_stat.mk
-include device/google/gs-common/widevine/widevine.mk
-include device/google/gs-common/sota_app/factoryota.mk
-include device/google/gs-common/misc_writer/misc_writer.mk
-include device/google/gs-common/bootctrl/bootctrl_aidl.mk
-include device/google/gs-common/betterbug/betterbug.mk
-include device/google/gs-common/recorder/recorder.mk
-include device/google/gs-common/fingerprint/fingerprint.mk
-include device/google/gs-common/nfc/nfc.mk
-include device/google/gs-common/16kb/16kb.mk
+# Disable OMX
+PRODUCT_PROPERTY_OVERRIDES += \
+    vendor.media.omx=0
 
-include device/google/zuma/dumpstate/item.mk
+# Installs gsi keys into ramdisk, to boot a developer GSI with verified boot.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
+
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.software.ipsec_tunnel_migration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.ipsec_tunnel_migration.xml
+
+# sscoredump
+PRODUCT_PROPERTY_OVERRIDES += vendor.debug.ssrdump.type=sscoredump
+
+# Modem
+PRODUCT_PACKAGES += dump_modem
+
+# Thermal
+PRODUCT_PACKAGES += android.hardware.thermal-service.pixel
+
+# Thermal utils
+PRODUCT_PACKAGES += thermal_symlinks
+
+# Ensure enough free space to create zram backing device
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.zram_backing_device_min_free_mb=1536
+
+# DRM
+PRODUCT_PACKAGES += \
+    android.hardware.drm-service.clearkey
+
+# misc_writer
+PRODUCT_PACKAGES += \
+    misc_writer
+
+# Boot control
+PRODUCT_PACKAGES += \
+    android.hardware.boot-service.default-pixel \
+    android.hardware.boot-service.default_recovery-pixel
+
+PRODUCT_SOONG_NAMESPACES += device/google/gs-common/bootctrl/aidl
 
 TARGET_BOARD_PLATFORM := zuma
-ALLOW_MISSING_DEPENDENCIES := true
 
 AB_OTA_POSTINSTALL_CONFIG += \
 	RUN_POSTINSTALL_system=true \
@@ -59,32 +54,14 @@ AB_OTA_POSTINSTALL_CONFIG += \
 	FILESYSTEM_TYPE_system=ext4 \
 POSTINSTALL_OPTIONAL_system=true
 
-# Set Vendor SPL to match platform
-VENDOR_SECURITY_PATCH := 2025-08-05
-
-# Set boot SPL
-BOOT_SECURITY_PATCH := 2025-08-05
-
-# TODO(b/207450311): Remove this flag once implemented
-USE_PIXEL_GRALLOC := false
-ifeq ($(USE_PIXEL_GRALLOC),true)
-	PRODUCT_SOONG_NAMESPACES += hardware/google/gchips/GrallocHAL
-endif
-
 PRODUCT_SOONG_NAMESPACES += \
 	hardware/google/av \
 	hardware/google/interfaces \
 	hardware/google/pixel \
-	device/google/zuma \
-	device/google/zuma/powerstats
+	device/google/zuma
 
 # Set the environment variable to switch the Keymint HAL service to Rust
 TRUSTY_KEYMINT_IMPL := rust
-
-ifeq ($(RELEASE_AVF_ENABLE_LLPVM_CHANGES),true)
-	# Set the environment variable to enable the Secretkeeper HAL service.
-	SECRETKEEPER_ENABLED := true
-endif
 
 # OEM Unlock reporting
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
@@ -95,8 +72,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.telephony.default_network=27 \
 	persist.vendor.ril.db_ecc.use.iccid_to_plmn=1 \
 	persist.vendor.ril.db_ecc.id.type=5
-	#rild.libpath=/system/lib64/libsec-ril.so \
-	#rild.libargs=-d /dev/umts_ipc0
 
 # SIT-RIL Logging setting
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -173,82 +148,24 @@ PRODUCT_SYSTEM_PROPERTIES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.hdcp_checking=drm-only
 
-USE_LASSEN_OEMHOOK := true
-# The "power-anomaly-sitril" is added into PRODUCT_SOONG_NAMESPACES when
-# $(USE_LASSEN_OEMHOOK) is true and $(BOARD_WITHOUT_RADIO) is not true.
-ifneq ($(BOARD_WITHOUT_RADIO),true)
-    $(call soong_config_set_bool,sitril,use_lassen_oemhook_with_radio,true)
-endif
-
-# Use for GRIL
-USES_LASSEN_MODEM := true
-$(call soong_config_set_bool, vendor_ril_google_feature, use_lassen_modem, true)
-ifneq ($(BOARD_WITHOUT_RADIO),true)
-$(call soong_config_set_bool,grilservice,use_google_qns,true)
-endif
-
-ifeq ($(USES_GOOGLE_DIALER_CARRIER_SETTINGS),true)
-USE_GOOGLE_DIALER := true
-USE_GOOGLE_CARRIER_SETTINGS := true
-endif
-
-ifeq ($(USES_GOOGLE_PREBUILT_MODEM_SVC),true)
-USE_GOOGLE_PREBUILT_MODEM_SVC := true
-endif
-
-# Audio client implementation for RIL
-USES_GAUDIO := true
-
-# ######################
-# GRAPHICS - GPU (begin)
-
-# Must match BOARD_USES_SWIFTSHADER in BoardConfig.mk
-USE_SWIFTSHADER := false
+# Vendor modem extensive logging default property
+PRODUCT_PROPERTY_OVERRIDES += \
+	persist.vendor.modem.extensive_logging_enabled=false
 
 # HWUI
 TARGET_USES_VULKAN = true
 
-$(call soong_config_set,pixel_mali,soc,$(TARGET_BOARD_PLATFORM))
-$(call soong_config_set,arm_gralloc,soc,$(TARGET_BOARD_PLATFORM))
-
-include device/google/gs-common/gpu/gpu.mk
-
-# Custom Pixel Parts
-PRODUCT_PACKAGES += \
-	init.pixelparts.rc \
-	PixelCustomParts
-
-PRODUCT_PACKAGES += \
-	csffw_image_prebuilt__firmware_prebuilt_ttux_mali_csffw.bin \
-	libGLES_mali \
-	vulkan.mali \
-	libgpudataproducer
+# GPU
+PRODUCT_PACKAGES += gpu_probe
 
 # Install the OpenCL ICD Loader
 PRODUCT_SOONG_NAMESPACES += external/OpenCL-ICD-Loader
 PRODUCT_PACKAGES += \
-       libOpenCL \
-       mali_icd__customer_pixel_opencl-icd_ARM.icd
-ifeq ($(DEVICE_IS_64BIT_ONLY),false)
-PRODUCT_PACKAGES += \
-	mali_icd__customer_pixel_opencl-icd_ARM32.icd
-endif
+	libOpenCL
 
-ifeq ($(USE_SWIFTSHADER),true)
-PRODUCT_PACKAGES += \
-	libEGL_angle \
-	libGLESv1_CM_angle \
-	libGLESv2_angle \
-	vulkan.pastel
-
-PRODUCT_VENDOR_PROPERTIES += \
-	ro.hardware.egl=angle \
-	ro.hardware.vulkan=pastel
-else
 PRODUCT_VENDOR_PROPERTIES += \
 	ro.hardware.egl=mali \
 	ro.hardware.vulkan=mali
-endif
 
 # Mali Configuration Properties
 PRODUCT_VENDOR_PROPERTIES += \
@@ -260,13 +177,11 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.opengles.aep.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.opengles.aep.xml \
-	frameworks/native/data/etc/android.hardware.vulkan.version-1_3.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.version.xml \
+	frameworks/native/data/etc/android.hardware.vulkan.version-1_4.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.version.xml \
 	frameworks/native/data/etc/android.hardware.vulkan.level-1.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.level.xml \
 	frameworks/native/data/etc/android.hardware.vulkan.compute-0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.compute.xml \
 	frameworks/native/data/etc/android.software.vulkan.deqp.level-2025-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.vulkan.deqp.level.xml \
 	frameworks/native/data/etc/android.software.opengles.deqp.level-2025-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
-
-#endif
 
 # Configure EGL blobcache
 PRODUCT_VENDOR_PROPERTIES += \
@@ -280,33 +195,8 @@ PRODUCT_VENDOR_PROPERTIES += \
 # b/295257834 Add HDR shaders to SurfaceFlinger's pre-warming cache
 PRODUCT_VENDOR_PROPERTIES += ro.surface_flinger.prime_shader_cache.ultrahdr=1
 
-# GRAPHICS - GPU (end)
-# ####################
-
-# Device Manifest, Device Compatibility Matrix for Treble
-DEVICE_MANIFEST_FILE := \
-	device/google/zuma/manifest.xml
-
-BOARD_USE_CODEC2_AIDL := V1
-ifneq (,$(filter aosp_%,$(TARGET_PRODUCT)))
-DEVICE_MANIFEST_FILE += \
-	device/google/zuma/manifest_media_aosp.xml
-
-PRODUCT_COPY_FILES += \
-	device/google/zuma/media_codecs_aosp_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_c2.xml
-else
-DEVICE_MANIFEST_FILE += \
-	device/google/zuma/manifest_media.xml
-
-PRODUCT_COPY_FILES += \
-	device/google/zuma/media_codecs_bo_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_c2.xml \
-	device/google/zuma/media_codecs_aosp_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_aosp_c2.xml
-endif
-
-DEVICE_MATRIX_FILE := \
-	device/google/zuma/compatibility_matrix.xml
-
 DEVICE_PACKAGE_OVERLAYS += device/google/zuma/overlay
+DEVICE_PACKAGE_OVERLAYS += device/google/zuma/overlay-lineage
 
 # This device is shipped with 34 (Android U)
 PRODUCT_SHIPPING_API_LEVEL := 34
@@ -316,14 +206,6 @@ PRODUCT_PRODUCT_VNDK_VERSION := current
 PRODUCT_ENFORCE_PRODUCT_PARTITION_INTERFACE := true
 
 # Init files
-PRODUCT_COPY_FILES += \
-	device/google/zuma/conf/init.zuma.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.zuma.usb.rc \
-	device/google/zuma/conf/ueventd.zuma.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc
-
-PRODUCT_COPY_FILES += \
-	device/google/zuma/conf/init.zuma.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.zuma.rc \
-	device/google/zuma/conf/init.persist.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.persist.rc
-
 ifeq (true,$(filter $(TARGET_BOOTS_16K) $(PRODUCT_16K_DEVELOPER_OPTION),true))
 PRODUCT_COPY_FILES += \
 	device/google/zuma/conf/init.efs.16k.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.efs.rc \
@@ -335,44 +217,19 @@ PRODUCT_COPY_FILES += \
 	device/google/zuma/conf/init.efs.4k.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.efs.rc
 endif
 
-ifneq (,$(filter 5.%, $(TARGET_LINUX_KERNEL_VERSION)))
-PRODUCT_COPY_FILES += \
-	device/google/zuma/storage/5.15/init.zuma.storage.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.zuma.storage.rc
-else
-PRODUCT_COPY_FILES += \
-	device/google/zuma/storage/6.1/init.zuma.storage.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.zuma.storage.rc
-endif
-
 # Recovery files
 PRODUCT_COPY_FILES += \
 	device/google/zuma/conf/init.recovery.device.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.zuma.rc
 
 # Fstab files
-ifeq (ext4,$(TARGET_RW_FILE_SYSTEM_TYPE))
-PRODUCT_SOONG_NAMESPACES += \
-        device/google/zuma/conf/ext4
-else
 PRODUCT_SOONG_NAMESPACES += \
         device/google/zuma/conf/f2fs
-endif
 
 PRODUCT_PACKAGES += \
 	fstab.zuma \
 	fstab.zuma.vendor_ramdisk \
 	fstab.zuma-fips \
 	fstab.zuma-fips.vendor_ramdisk
-
-PRODUCT_COPY_FILES += \
-	device/google/$(TARGET_BOARD_PLATFORM)/conf/fstab.persist:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.persist \
-	device/google/$(TARGET_BOARD_PLATFORM)/conf/fstab.modem:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.modem \
-	device/google/$(TARGET_BOARD_PLATFORM)/conf/fstab.efs:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.efs
-
-
-# Shell scripts
-PRODUCT_PACKAGES += \
-	disable_contaminant_detection.sh
-
-include device/google/gs-common/insmod/insmod.mk
 
 # Insmod config files
 PRODUCT_COPY_FILES += \
@@ -383,20 +240,10 @@ PRODUCT_HOST_PACKAGES += \
 	mkdtimg
 
 # CHRE
-## HAL
-include device/google/gs-common/chre/hal.mk
+## hal
+PRODUCT_PACKAGES += android.hardware.contexthub-service.generic
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.context_hub.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.context_hub.xml
-
-## Enable the CHRE Daemon
-CHRE_USF_DAEMON_ENABLED := false
-CHRE_DEDICATED_TRANSPORT_CHANNEL_ENABLED := true
-
-# Filesystem management tools
-PRODUCT_PACKAGES += \
-	linker.vendor_ramdisk \
-	tune2fs.vendor_ramdisk \
-	resize2fs.vendor_ramdisk
 
 # Userdata Checkpointing OTA GC
 PRODUCT_PACKAGES += \
@@ -405,10 +252,6 @@ PRODUCT_PACKAGES += \
 # Vendor verbose logging default property
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.vendor.verbose_logging_enabled=false
-
-# Vendor modem extensive logging default property
-PRODUCT_PROPERTY_OVERRIDES += \
-	persist.vendor.modem.extensive_logging_enabled=false
 
 # CP Logging properties
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -427,13 +270,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.vendor.radio.multisim_switch_support=true
 
-# RPMB TA
-PRODUCT_PACKAGES += \
-	tlrpmb
-
-# Touch firmware
-#PRODUCT_COPY_FILES += \
-	device/google/zuma/firmware/touch/s6sy761.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/s6sy761.fw
 # Touch
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml
@@ -468,9 +304,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PRODUCT_PROPERTIES += \
         vendor.powerhal.adpf.rate=16666666
 
-PRODUCT_COPY_FILES += \
-	device/google/zuma/task_profiles.json:$(TARGET_COPY_OUT_VENDOR)/etc/task_profiles.json
-
 -include hardware/google/pixel/power-libperfmgr/aidl/device.mk
 
 # IRQ rebalancing.
@@ -484,10 +317,6 @@ PRODUCT_PACKAGES += \
 # Audio HALs
 #
 
-# Audio Configurations
-#USE_LEGACY_LOCAL_AUDIO_HAL := false
-#USE_XML_AUDIO_POLICY_CONF := 1
-
 # Enable AAudio MMAP/NOIRQ data path.
 PRODUCT_PROPERTY_OVERRIDES += aaudio.mmap_policy=2
 PRODUCT_PROPERTY_OVERRIDES += aaudio.mmap_exclusive_policy=2
@@ -496,66 +325,9 @@ PRODUCT_PROPERTY_OVERRIDES += aaudio.hw_burst_min_usec=2000
 # Set util_clamp_min for s/w spatializer
 PRODUCT_PROPERTY_OVERRIDES += audio.spatializer.effect.util_clamp_min=300
 
-# Calliope firmware overwrite
-#PRODUCT_COPY_FILES += \
-	device/google/zuma/firmware/calliope_dram.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/calliope_dram.bin \
-	device/google/zuma/firmware/calliope_sram.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/calliope_sram.bin \
-	device/google/zuma/firmware/calliope_dram_2.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/calliope_dram_2.bin \
-	device/google/zuma/firmware/calliope_sram_2.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/calliope_sram_2.bin \
-	device/google/zuma/firmware/calliope2.dt:$(TARGET_COPY_OUT_VENDOR)/firmware/calliope2.dt \
-
-# Cannot reference variables defined in BoardConfig.mk, uncomment this if
-# BOARD_USE_OFFLOAD_AUDIO and BOARD_USE_OFFLOAD_EFFECT are true
-## AudioEffectHAL library
-#PRODUCT_PACKAGES += \
-#	libexynospostprocbundle
-
-# Cannot reference variables defined in BoardConfig.mk, uncomment this if
-# BOARD_USE_SOUNDTRIGGER_HAL is true
-#PRODUCT_PACKAGES += \
-#	sound_trigger.primary.maran9820
-
-# A-Box Service Daemon
-#PRODUCT_PACKAGES += main_abox
-
-# Libs
-PRODUCT_PACKAGES += \
-	com.android.future.usb.accessory
-
-PRODUCT_PACKAGES += \
-	android.hardware.memtrack-service.pixel \
-	libion_exynos \
-	libion
-
-PRODUCT_PACKAGES += \
-	libhwjpeg
-
-# Video Editor
-PRODUCT_PACKAGES += \
-	VideoEditorGoogle
-
-# WideVine modules
-include device/google/zuma/widevine/device.mk
-PRODUCT_PACKAGES += \
-	liboemcrypto \
-
-RIPCURRENT_PRODUCT := %ripcurrent
-ifneq (,$(filter $(RIPCURRENT_PRODUCT), $(TARGET_PRODUCT)))
-        LOCAL_TARGET_PRODUCT := ripcurrent
-else
-        # WAR: continue defaulting to slider build on zuma
-        LOCAL_TARGET_PRODUCT := slider
-endif
-
-# Lyric Camera HAL settings
-include device/google/gs-common/camera/lyric.mk
-$(call soong_config_set,lyric,soc,zuma)
-$(call soong_config_set,google3a_config,soc,zuma)
-
-# WiFi
-PRODUCT_PACKAGES += \
-	wificond \
-	libwpa_client
+# Camera
+PRODUCT_SOONG_NAMESPACES += \
+    hardware/google/camera
 
 # Connectivity
 PRODUCT_PACKAGES += \
@@ -566,7 +338,9 @@ PRODUCT_PACKAGES += \
 	android.hardware.health.storage-service.default
 
 # Battery Mitigation
-include device/google/gs-common/battery_mitigation/bcl.mk
+PRODUCT_PROPERTY_OVERRIDES += \
+    vendor.battery_mitigation.aidl.enable=true
+
 # storage pixelstats
 -include hardware/google/pixel/pixelstats/device.mk
 
@@ -577,18 +351,6 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 
 # Enforce generic ramdisk allow list
 $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
-
-# Titan-M
-ifeq (,$(filter true, $(BOARD_WITHOUT_DTLS)))
-include device/google/gs-common/dauntless/gsc.mk
-endif
-
-# Copy Camera HFD Setfiles
-#PRODUCT_COPY_FILES += \
-	device/google/zuma/firmware/camera/libhfd/default_configuration.hfd.cfg.json:$(TARGET_COPY_OUT_VENDOR)/firmware/default_configuration.hfd.cfg.json \
-	device/google/zuma/firmware/camera/libhfd/pp_cfg.json:$(TARGET_COPY_OUT_VENDOR)/firmware/pp_cfg.json \
-	device/google/zuma/firmware/camera/libhfd/tracker_cfg.json:$(TARGET_COPY_OUT_VENDOR)/firmware/tracker_cfg.json \
-	device/google/zuma/firmware/camera/libhfd/WithLightFixNoBN.SDNNmodel:$(TARGET_COPY_OUT_VENDOR)/firmware/WithLightFixNoBN.SDNNmodel
 
 # WiFi
 PRODUCT_COPY_FILES += \
@@ -608,12 +370,6 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.camera.concurrent.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.concurrent.xml \
 	frameworks/native/data/etc/android.hardware.camera.full.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.full.xml\
 	frameworks/native/data/etc/android.hardware.camera.raw.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.raw.xml\
-
-#PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
-	frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml \
-	frameworks/native/data/etc/android.hardware.wifi.direct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.direct.xml \
-	frameworks/native/data/etc/android.hardware.wifi.passpoint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.passpoint.xml \
 
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.audio.low_latency.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.low_latency.xml \
@@ -667,17 +423,9 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.display_update_imminent
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.sf.native_mode=2
-PRODUCT_COPY_FILES += \
-	device/google/zuma/display/display_colordata_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_cal0.pb
 
 # limit DPP downscale ratio
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.hwc.dpp.downscale=4
-
-# Cannot reference variables defined in BoardConfig.mk, uncomment this if
-# BOARD_USES_EXYNOS_DSS_FEATURE is true
-## set the dss enable status setup
-#PRODUCT_PROPERTY_OVERRIDES += \
-#        ro.exynos.dss=1
 
 # Cannot reference variables defined in BoardConfig.mk, uncomment this if
 # BOARD_USES_EXYNOS_AFBC_FEATURE is true
@@ -687,57 +435,21 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_CHARACTERISTICS := nosdcard
 
-# WIFI COEX
-PRODUCT_COPY_FILES += \
-	device/google/zuma/wifi/coex_table.xml:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/coex_table.xml
-
 PRODUCT_PACKAGES += hostapd
 PRODUCT_PACKAGES += wpa_supplicant
 PRODUCT_PACKAGES += wpa_supplicant.conf
 
 WIFI_PRIV_CMD_UPDATE_MBO_CELL_STATUS := enabled
 
-####################################
-## VIDEO
-####################################
-
 # Video
-$(call soong_config_set,bigw,soc,$(TARGET_BOARD_PLATFORM))
-
-PRODUCT_PACKAGES += \
-	google.hardware.media.c2@2.0-service \
-	libgc2_bw_store \
-	libgc2_bw_base \
-	libgc2_bw_av1_dec \
-	libgc2_bw_av1_enc \
-	libbw_av1dec \
-	libbw_av1enc \
-	libgc2_bw_cwl \
-	libgc2_bw_log \
-	libgc2_bw_utils
-
-# 1. Codec 2.0
-# for settings used by different C2 hal
-include device/google/gs-common/mediacodec/common/mediacodec_common.mk
-# for Exynos C2 Hal
-include device/google/gs-common/mediacodec/samsung/mediacodec_samsung.mk
-
-PRODUCT_COPY_FILES += \
-	device/google/zuma/media_codecs_performance_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_performance_c2.xml \
-
 PRODUCT_PROPERTY_OVERRIDES += \
        debug.c2.use_dmabufheaps=1 \
        media.c2.dmabuf.padding=512 \
        debug.stagefright.ccodec_delayed_params=1 \
        ro.vendor.gpu.dataspace=1
 
-ifneq ($(BOARD_USE_CODEC2_AIDL), )
 PRODUCT_PROPERTY_OVERRIDES += \
         debug.stagefright.c2-poolmask=1507328
-else
-PRODUCT_PROPERTY_OVERRIDES += \
-        debug.stagefright.c2-poolmask=458752
-endif
 
 # Create input surface on the framework side
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -745,46 +457,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_PROPERTY_OVERRIDES += media.c2.hal.selection=aidl
 
-# 2. OpenMAX IL
-PRODUCT_COPY_FILES += \
-	device/google/zuma/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml \
-	device/google/zuma/media_codecs_performance.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_performance.xml
-####################################
-
-# Telephony
-#PRODUCT_COPY_FILES += \
-	frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_telephony.xml
-
-# CBD (CP booting deamon)
-CBD_USE_V2 := true
-CBD_PROTOCOL_SIT := true
-
 # setup dalvik vm configs.
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 
 PRODUCT_TAGS += dalvik.gc.type-precise
 
-# Exynos OpenVX framework
-PRODUCT_PACKAGES += \
-		libexynosvision
-
-ifeq ($(TARGET_USES_CL_KERNEL),true)
-PRODUCT_PACKAGES += \
-	libopenvx-opencl
-endif
-
 # Trusty (KM, GK, Storage)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)
-
-# Trusty Metrics Daemon
-PRODUCT_PACKAGES += \
-	trusty_metricsd
-
-$(call soong_config_set,google_displaycolor,displaycolor_platform,zuma)
-PRODUCT_PACKAGES += \
-	android.hardware.composer.hwc3-service.pixel \
-	libdisplaycolor
 
 # Storage: for factory reset protection feature
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -794,10 +474,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PRODUCT_PROPERTIES += \
 	persist.bluetooth.bqr.event_mask?=30 \
 	persist.bluetooth.bqr.min_interval_ms=500
-
-#VNDK
-PRODUCT_PACKAGES += \
-	vndk-libs
 
 PRODUCT_ENFORCE_RRO_TARGETS := \
 	framework-res
@@ -825,115 +501,32 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	Iwlan
 
-PRODUCT_PACKAGES += \
-	whitelist \
-	libstagefright_hdcp \
-	libskia_opt
-
-#PRODUCT_PACKAGES += \
-	mfc_fw.bin \
-	calliope_sram.bin \
-	calliope_dram.bin \
-	calliope_iva.bin \
-	vts.bin
-
-PRODUCT_PACKAGES += ShannonIms
-
-PRODUCT_PACKAGES += ShannonRcs
-
-# Exynos RIL and telephony
-# Multi SIM(DSDS)
-SIM_COUNT := 2
-$(call soong_config_set,sim,sim_count,$(SIM_COUNT))
-SUPPORT_MULTI_SIM := true
-
-# Support NR
-SUPPORT_NR := true
-# Support 5G on both stacks
-SUPPORT_NR_DS := true
-# Using IRadio 2.1
-USE_RADIO_HAL_2_1 := true
-# Using Early Send Device Info
-USE_EARLY_SEND_DEVICE_INFO := true
-
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
-
-include device/google/gs-common/sensors/sensors.mk
-$(call soong_config_set,usf,target_soc,zuma)
 
 PRODUCT_COPY_FILES += \
 	device/google/zuma/default-permissions.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/default-permissions/default-permissions.xml \
 	device/google/zuma/component-overrides.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sysconfig/component-overrides.xml \
 	frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
 
-ifneq ($(BOARD_WITHOUT_RADIO),true)
-
-# Use Lassen specifc Shared Modem Platform
-SHARED_MODEM_PLATFORM_VENDOR := lassen
-
-# Shared Modem Platform
-include device/google/gs-common/modem/modem_svc_sit/shared_modem_platform.mk
-
-# modem_ml_svc_sit daemon
-PRODUCT_PACKAGES += modem_ml_svc_sit
-
-# modem ML models configs
-PRODUCT_COPY_FILES += \
-	device/google/zuma/modem_ml/modem_ml_models_user.conf:$(TARGET_COPY_OUT_VENDOR)/etc/modem_ml_models.conf
-
-# modem logging binary/configs
-PRODUCT_PACKAGES += modem_logging_control
-
-# libeomservice_proxy binary/configs
-PRODUCT_PACKAGES += liboemservice_proxy_default
-
-# PILOT SCENARIOS
-PRODUCT_PACKAGES += \
-	Pixel_stability.cfg \
-	Pixel_stability.nprf
-
-# Default modem log mask for pixel logger
-PRODUCT_PACKAGES += \
-	logging.conf \
-	default.cfg \
-	default.nprf \
-	default_metrics.xml \
-	extensive_logging.conf
-
-# Log Masks for logmasklibrary below
-# default modem log mask
-PRODUCT_PACKAGES += \
-	default_modem_log_mask.conf \
-	default_modem_log_mask.cfg \
-	default_modem_log_mask.nprf \
-	default_modem_log_mask.xml
-
-# Empty modem log mask
-PRODUCT_PACKAGES += \
-	empty_modem_log_mask.conf \
-	empty_modem_log_mask.cfg \
-	empty_modem_log_mask.nprf \
-	empty_modem_log_mask.xml
-
-# Lassen default log mask
-PRODUCT_PACKAGES += \
-	lassen_default.conf
-
-endif
-
 PRODUCT_PACKAGES += \
 	android.hardware.health-service.zuma \
 	android.hardware.health-service.zuma_recovery \
 
 # Audio
-# Audio HAL Server & Default Implementations
-include device/google/gs-common/audio/aidl.mk
+PRODUCT_PACKAGES += \
+    libvisualizeraidl \
+    libbundleaidl \
+    libreverbaidl \
+    libdynamicsprocessingaidl \
+    libloudnessenhanceraidl \
+    libdownmixaidl \
+    libhapticgeneratoraidl
 
-## AoC soong
-$(call soong_config_set,aoc,target_soc,$(TARGET_BOARD_PLATFORM))
-$(call soong_config_set,aoc,target_product,$(TARGET_PRODUCT))
+PRODUCT_PROPERTY_OVERRIDES += \
+    vendor.audio_hal.aidl.enable=true
+PRODUCT_SYSTEM_EXT_PROPERTIES += \
+    ro.audio.ihaladaptervendorextension_enabled=true
 
-#
 ## Audio properties
 ##Audio Vendor property
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -950,32 +543,19 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += vndservicemanager
 PRODUCT_PACKAGES += vndservice
 
-PRODUCT_PACKAGES += \
-	google.hardware.media.c2@1.0-service \
-	libgc2_store \
-	libgc2_base \
-	libgc2_av1_dec \
-	libbo_av1 \
-	libgc2_cwl \
-	libgc2_utils
-
 ## Start packet router
-include device/google/gs-common/telephony/pktrouter.mk
+PRODUCT_PROPERTY_OVERRIDES += vendor.pktrouter=1
 
 # Thermal HAL
 PRODUCT_PROPERTY_OVERRIDES += persist.vendor.enable.thermal.genl=true
 
 # EdgeTPU
-include device/google/gs-common/edgetpu/edgetpu.mk
-# Config variables for TPU chip on device.
-$(call soong_config_set,edgetpu_config,chip,rio)
+# Tflite Darwinn delegate property
+PRODUCT_VENDOR_PROPERTIES += vendor.edgetpu.tflite_delegate.force_disable_io_coherency=0
 
-# TPU firmware
-PRODUCT_PACKAGES += edgetpu-rio.fw
-
-# Connectivity Thermal Power Manager
-PRODUCT_PACKAGES += \
-	ConnectivityThermalPowerManager
+# Edgetpu CPU scheduler property
+PRODUCT_VENDOR_PROPERTIES += vendor.edgetpu.cpu_scheduler.policy=FIFO
+PRODUCT_VENDOR_PROPERTIES += vendor.edgetpu.cpu_scheduler.priority=99
 
 # A/B support
 PRODUCT_PACKAGES += \
@@ -988,6 +568,8 @@ PRODUCT_PACKAGES += \
 # pKVM
 $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
 PRODUCT_BUILD_PVMFW_IMAGE := true
+# Set the environment variable to enable the Secretkeeper HAL service.
+SECRETKEEPER_ENABLED := true
 
 # Enable to build standalone vendor_kernel_boot image.
 PRODUCT_BUILD_VENDOR_KERNEL_BOOT_IMAGE := true
@@ -1014,23 +596,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Project
 include hardware/google/pixel/common/pixel-common-device.mk
 
-# Pixel Logger
-ifneq ($(BOARD_WITHOUT_RADIO),true)
-include hardware/google/pixel/PixelLogger/PixelLogger.mk
-else
-BOARD_SEPOLICY_DIRS += hardware/google/pixel-sepolicy/logger_app
-endif
-
-# RadioExt Version
-USES_RADIOEXT_V1_6 = true
-
 # Wifi ext
 include hardware/google/pixel/wifi_ext/device.mk
-
-# Install product specific framework compatibility matrix
-# (TODO: b/169535506) This includes the FCM for system_ext and product partition.
-# It must be split into the FCM of each partition.
-DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/zuma/device_framework_matrix_product.xml
 
 # Keymint configuration
 PRODUCT_COPY_FILES += \
@@ -1047,17 +614,57 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Hardware Info Collection
 include hardware/google/pixel/HardwareInfo/HardwareInfo.mk
 
-# RIL extension service
-ifeq (,$(filter aosp_%,$(TARGET_PRODUCT)))
-include device/google/gs-common/pixel_ril/ril.mk
-endif
-
-# Touch service
-include device/google/gs-common/touch/twoshay/aidl_zuma.mk
-include device/google/gs-common/touch/twoshay/twoshay.mk
-
 # Allow longer timeout for incident report generation in bugreport
 # Overriding in /product partition instead of /vendor intentionally,
 # since it can't be overridden from /vendor.
 PRODUCT_PRODUCT_PROPERTIES += \
 	dumpstate.strict_run=false
+
+# AiAi Config
+PRODUCT_COPY_FILES += \
+    device/google/zuma/allowlist_com.google.android.as.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/allowlist_com.google.android.as.xml
+
+# Camera
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
+    ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
+
+# EUICC
+PRODUCT_PACKAGES += \
+    EuiccSupportPixelOverlay
+
+# Lineage Health
+include hardware/google/pixel/lineage_health/device.mk
+
+$(call soong_config_set_bool,lineage_health,charging_control_supports_deadline,true)
+$(call soong_config_set_bool,lineage_health,charging_control_supports_limit,true)
+$(call soong_config_set_bool,lineage_health,charging_control_supports_toggle,false)
+
+# Linker config
+PRODUCT_VENDOR_LINKER_CONFIG_FRAGMENTS += \
+    device/google/zuma/linker.config.json
+
+# Parts
+PRODUCT_PACKAGES += \
+    GoogleParts
+
+# Properties
+TARGET_PRODUCT_PROP += device/google/zuma/product.prop
+TARGET_SYSTEM_PROP += device/google/zuma/system.prop
+
+# Tethering
+PRODUCT_PACKAGES += \
+    TetheringOverlay
+
+# Touch
+include hardware/google/pixel/touch/device.mk
+
+# VINTF
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    device/google/zuma/vintf/vendor_framework_compatibility_matrix.xml
+DEVICE_MANIFEST_FILE += \
+    device/google/zuma/vintf/manifest.xml
+DEVICE_MATRIX_FILE += \
+    device/google/zuma/vintf/compatibility_matrix.xml
+DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += \
+    device/google/zuma/vintf/device_framework_matrix_product.xml
