@@ -4,18 +4,18 @@
 
 
 // Шаг 2.1: Добавьте импорты
-// --- 2T2W HOOK VARIABLES START ---
+// --- DT2W HOOK VARIABLES START ---
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.ViewConfiguration;
-// --- 2T2W HOOK VARIABLES END ---
+// --- DT2W HOOK VARIABLES END ---
 
 // Шаг 2.2: Добавить Поля класса
 // В начало класса DozeTriggers, сразу после объявления 
 // private static final String TAG = "DozeTriggers"; 
 // и других переменных, добавьте переменные для логики двойного тапа:
-	// --- 2T2W PATCH VARIABLES START ---
+	// --- DT2W PATCH VARIABLES START ---
     private static final String KEY_DOZE_DOUBLE_TAP_HOOK = "doze_double_tap_hook";
     private static final String KEY_DOZE_DOUBLE_TAP_TIMEOUT = "doze_double_tap_timeout";
     
@@ -30,7 +30,7 @@ import android.view.ViewConfiguration;
         mLastTapX = -1;
         mLastTapY = -1;
     };
-    // --- 2T2W PATCH VARIABLES END ---
+    // --- DT2W PATCH VARIABLES END ---
 
 // Шаг 2.3: Изменить метод onSensor
 // Найдите метод void onSensor(...). Вам 
@@ -39,7 +39,7 @@ import android.view.ViewConfiguration;
     void onSensor(int pulseReason, boolean sensorPerformedProxCheck,
             float screenX, float screenY, float[] rawValues) {
         
-        // --- 2T2W PATCH LOGIC START ---
+        // --- DT2W PATCH LOGIC START ---
         if (pulseReason == DozeLog.REASON_SENSOR_TAP || pulseReason == DozeLog.REASON_SENSOR_DOUBLE_TAP) {
             boolean isHookEnabled = Settings.Secure.getInt(
                     mContext.getContentResolver(), KEY_DOZE_DOUBLE_TAP_HOOK, 0) == 1;
@@ -91,7 +91,7 @@ import android.view.ViewConfiguration;
                 }
             }
         }
-        // --- 2T2W PATCH LOGIC END ---
+        // --- DT2W PATCH LOGIC END ---
 
         // Далее идет оригинальный код метода (без изменений)...
         boolean isDoubleTap = pulseReason == DozeLog.REASON_SENSOR_DOUBLE_TAP;
