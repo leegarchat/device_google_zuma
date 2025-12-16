@@ -8,15 +8,22 @@
     <string name="doze_double_tap_hook_summary">Use if hardware double-tap function is not working.</string>
     <string name="doze_double_tap_timeout_title">DT2W Double Tap Interval</string>
     <string name="doze_double_tap_timeout_summary">Current interval: %1$d ms</string>
-    <string name="dt2w_info_text">This is not a direct kernel integration, but a software hook.\n\n<b>Note:</b>\n• Software waits for a second tap in Doze/AOD mode.\n• It may still wake the device if it has not fully entered Doze mode.\n• Double tap will start working 1–2 seconds after locking if Ambient/AOD is enabled. During these 1–2 seconds, the device is transitioning to Doze mode.</string>
+    <string name="dt2w_info_text">This is not a direct kernel integration, but a software hook.\n\n<b>Note:</b>\n• Software waits for a second tap in Doze/AOD mode.</string>
 
     <string name="dt2s_category_title">Double Tap to Sleep on Launcher (DT2S)</string>
     <string name="launcher_dt2s_title">Double Tap to Sleep</string>
     <string name="launcher_dt2s_summary">Tap an empty area on the launcher to lock the device.</string>
     <string name="launcher_dt2s_timeout_title">DT2S Double Tap Interval</string>
     <string name="launcher_dt2s_timeout_summary">Current interval: %1$d ms</string>
+
+    <string name="launcher_dt2s_slop_title">Touch Tolerance (Slop)</string>
+    <string name="launcher_dt2s_slop_summary">Current: %1$s. (0 = System default)</string>
+    <string name="launcher_dt2s_slop_dialog_title">Set Tolerance (px)</string>
+    <string name="launcher_dt2s_slop_dialog_msg">System value: %1$d px.\n\nEnter 0 to use system value.\nEnter 1-600 for custom setting.</string>
+    <string name="launcher_dt2s_slop_error">Enter a number between 0 and 600</string>
+
     <string name="launcher_dt2s_error">The allowed range is 10 to 1000 ms.</string>
-    <string name="dt2s_info_text">This is not a direct launcher integration, but a software hook.\n\n<b>Note:</b>\n• The recommended tap interval is 150 ms to avoid false triggers.\n• Intended for Pixel Launcher.\n• <b>MAY</b> trigger unexpectedly.\n• If you are on the homescreen and pull down the notification shade, DT2S will also trigger in the shade.\n• If you open the Recents menu FROM the homescreen, DT2S will trigger there too.\n• DT2S will trigger in the App Drawer.\n• DT2S will trigger if you double-tap an app icon or any other area.\n• DT2S will <b>NOT</b> trigger when you open the App Drawer and start typing to search.\n• DT2S will <b>NOT</b> trigger in Google Feed if you open it by swiping from the homescreen.\n• This is a background service that listens for screen touches. The trigger area has been reduced by 15\% from the top and 20\% from the bottom of the screen. Taps for sleep will not be registered in these reduced areas.</string>
+    <string name="dt2s_info_text">This is not a direct launcher integration, but a software hook.\n\n<b>Note:</b>\n• The recommended tap interval is 150 ms to avoid false triggers.\n• Intended for Pixel Launcher.\n• <b>MAY</b> trigger unexpectedly.\n• If you are on the homescreen and pull down the notification shade, DT2S will also trigger in the shade.\n• DT2S will trigger in the App Drawer.\n• DT2S will trigger if you double-tap an app icon or any other area.\n• DT2S will <b>NOT</b> trigger when you open the App Drawer and start typing to search.\n• DT2S will <b>NOT</b> trigger in Google Feed if you open it by swiping from the homescreen.\n• This is a background service that listens for screen touches. The trigger area has been reduced by 15\% from the top and 20\% from the bottom of the screen. Taps for sleep will not be registered in these reduced areas.</string>
 
 
     <string name="thermal_title">Thermal Control</string>

@@ -8,7 +8,7 @@
     <string name="doze_double_tap_hook_summary">Gunakan jika fungsi ketuk ganda hardware tidak berfungsi.</string>
     <string name="doze_double_tap_timeout_title">Interval Ketuk Ganda DT2W</string>
     <string name="doze_double_tap_timeout_summary">Interval saat ini: %1$d md</string>
-    <string name="dt2w_info_text">Ini bukan integrasi kernel langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Perangkat lunak menunggu ketukan kedua dalam mode Doze/AOD.\n• Masih dapat membangunkan perangkat jika belum sepenuhnya masuk ke mode Doze.\n• Ketuk ganda akan mulai berfungsi 1–2 detik setelah penguncian jika Ambient/AOD diaktifkan. Selama 1–2 detik ini, perangkat sedang beralih ke mode Doze.</string>
+    <string name="dt2w_info_text">Ini bukan integrasi kernel langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Perangkat lunak menunggu ketukan kedua dalam mode Doze/AOD.</string>
 
     <string name="dt2s_category_title">Ketuk Ganda untuk Tidur di Peluncur (DT2S)</string>
     <string name="launcher_dt2s_title">Ketuk Ganda untuk Tidur</string>
@@ -16,7 +16,13 @@
     <string name="launcher_dt2s_timeout_title">Interval Ketuk Ganda DT2S</string>
     <string name="launcher_dt2s_timeout_summary">Interval saat ini: %1$d md</string>
     <string name="launcher_dt2s_error">Rentang yang diizinkan adalah 10 hingga 1000 md.</string>
-    <string name="dt2s_info_text">Ini bukan integrasi peluncur langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Interval ketukan yang disarankan adalah 150 md untuk menghindari pemicu palsu.\n• Ditujukan untuk Pixel Launcher.\n• <b>DAPAT</b> memicu secara tidak terduga.\n• Jika Anda berada di layar beranda dan menarik panel notifikasi, DT2S juga akan memicu di sana.\n• Jika Anda membuka menu Terkini DARI layar beranda, DT2S juga akan memicu di sana.\n• DT2S akan memicu di Laci Aplikasi.\n• DT2S <b>TIDAK</b> akan memicu saat Anda membuka Laci Aplikasi dan mulai mengetik untuk mencari.\n• DT2S <b>TIDAK</b> akan memicu di Google Feed jika Anda membukanya dengan mengusap dari layar beranda.\n• Ini adalah layanan latar belakang. Area pemicu telah dikurangi sebesar 15\% dari atas dan 20\% dari bawah layar.</string>
+    <string name="dt2s_info_text">Ini bukan integrasi launcher langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Interval ketukan yang disarankan adalah 150 md untuk menghindari pemicu yang salah.\n• Ditujukan untuk Pixel Launcher.\n• <b>DAPAT</b> memicu secara tidak terduga.\n• Jika Anda berada di homescreen dan menarik panel notifikasi, DT2S juga akan aktif di panel tersebut.\n• DT2S akan aktif di Laci Aplikasi (App Drawer).\n• DT2S akan aktif jika Anda mengetuk dua kali ikon aplikasi atau area lainnya.\n• DT2S <b>TIDAK</b> akan aktif saat Anda membuka Laci Aplikasi dan mulai mengetik untuk mencari.\n• DT2S <b>TIDAK</b> akan aktif di Google Feed jika Anda membukanya dengan menggeser dari homescreen.\n• Ini adalah layanan latar belakang yang memantau sentuhan layar. Area pemicu telah dikurangi sebesar 15% dari atas dan 20% dari bawah layar. Ketukan untuk tidur tidak akan terdaftar di area yang dikurangi ini.</string>
+	
+	<string name="launcher_dt2s_slop_title">Toleransi Sentuhan (Slop)</string>
+    <string name="launcher_dt2s_slop_summary">Saat ini: %1$s. (0 = Sistem)</string>
+    <string name="launcher_dt2s_slop_dialog_title">Atur Toleransi (px)</string>
+    <string name="launcher_dt2s_slop_dialog_msg">Nilai sistem: %1$d px.\n\nMasukkan 0 untuk menggunakan nilai sistem.\nMasukkan 1-200 untuk pengaturan kustom.</string>
+    <string name="launcher_dt2s_slop_error">Masukkan angka antara 0 dan 600</string>
 
 
     <string name="thermal_title">Kontrol Termal</string>

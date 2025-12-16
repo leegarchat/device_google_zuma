@@ -8,7 +8,7 @@
     <string name="doze_double_tap_hook_summary">Use si la función de doble toque del hardware no funciona.</string>
     <string name="doze_double_tap_timeout_title">Intervalo de Doble Toque DT2W</string>
     <string name="doze_double_tap_timeout_summary">Intervalo actual: %1$d ms</string>
-    <string name="dt2w_info_text">No es una integración directa del kernel, sino un hook de software.\n\n<b>Nota:</b>\n• El software espera un segundo toque en modo Doze/AOD.\n• Aún puede despertar el dispositivo si no ha entrado completamente en modo Doze.\n• El doble toque funcionará 1-2 segundos después del bloqueo si Ambient/AOD está activado. Durante este tiempo, el dispositivo entra en modo Doze.</string>
+    <string name="dt2w_info_text">No es una integración directa en el kernel, sino un método de software.\n\n<b>Nota:</b>\n• El software espera un segundo toque en modo Doze/AOD.</string>
 
     <string name="dt2s_category_title">Doble Toque para Dormir en el Lanzador (DT2S)</string>
     <string name="launcher_dt2s_title">Doble Toque para Dormir</string>
@@ -16,7 +16,13 @@
     <string name="launcher_dt2s_timeout_title">Intervalo de Doble Toque DT2S</string>
     <string name="launcher_dt2s_timeout_summary">Intervalo actual: %1$d ms</string>
     <string name="launcher_dt2s_error">El rango permitido es de 10 a 1000 ms.</string>
-    <string name="dt2s_info_text">No es una integración directa del launcher, sino un hook de software.\n\n<b>Nota:</b>\n• Intervalo recomendado: 150 ms para evitar falsos positivos.\n• Destinado a Pixel Launcher.\n• <b>PUEDE</b> activarse inesperadamente.\n• Si baja la barra de notificaciones en la pantalla de inicio, DT2S también se activará allí.\n• Si abre el menú Recientes DESDE la pantalla de inicio, DT2S también se activará.\n• DT2S funcionará en el cajón de aplicaciones.\n• DT2S <b>NO</b> se activará cuando abra el cajón de aplicaciones y comience a escribir para buscar.\n• DT2S <b>NO</b> se activará en Google Feed si lo abre desde la pantalla de inicio.\n• Es un servicio en segundo plano. La zona de activación se ha reducido un 15\% en la parte superior y un 20\% en la inferior.</string>
+    <string name="dt2s_info_text">No es una integración directa en el launcher, sino un método de software.\n\n<b>Nota:</b>\n• El intervalo recomendado es 150 ms para evitar falsos positivos.\n• Destinado a Pixel Launcher.\n• <b>PUEDE</b> activarse inesperadamente.\n• Si está en la pantalla de inicio y baja la barra de notificaciones, DT2S también se activará allí.\n• DT2S se activará en el Cajón de Aplicaciones.\n• DT2S se activará si toca dos veces el icono de una aplicación o cualquier otra área.\n• DT2S <b>NO</b> se activará cuando abra el Cajón de Aplicaciones y comience a escribir para buscar.\n• DT2S <b>NO</b> se activará en Google Feed si lo abre deslizando desde la pantalla de inicio.\n• Es un servicio en segundo plano que detecta toques. El área de activación se ha reducido un 15% desde arriba y un 20% desde abajo. Los toques no se registrarán en estas áreas reducidas.</string>
+
+	<string name="launcher_dt2s_slop_title">Tolerancia táctil (Slop)</string>
+    <string name="launcher_dt2s_slop_summary">Actual: %1$s. (0 = Del sistema)</string>
+    <string name="launcher_dt2s_slop_dialog_title">Establecer tolerancia (px)</string>
+    <string name="launcher_dt2s_slop_dialog_msg">Valor del sistema: %1$d px.\n\nIntroduzca 0 para usar el valor del sistema.\nIntroduzca 1-600 para ajuste personalizado.</string>
+    <string name="launcher_dt2s_slop_error">Introduzca un número entre 0 y 600</string>
 
 
     <string name="thermal_title">Control Térmico</string>

@@ -8,7 +8,7 @@
     <string name="doze_double_tap_hook_summary">Utilisez cette option si la fonction double-tap matérielle ne fonctionne pas.</string>
     <string name="doze_double_tap_timeout_title">Intervalle du double-tap DT2W</string>
     <string name="doze_double_tap_timeout_summary">Intervalle actuel : %1$d ms</string>
-    <string name="dt2w_info_text">Ce n\'est pas une intégration directe au noyau, mais une implémentation logicielle (hook).\n\n<b>Remarque :</b>\n• Le logiciel attend une seconde tape en mode Doze/AOD.\n• Peut encore réveiller l\'appareil s\'il n\'est pas complètement entré en mode Doze.\n• Le double tapotement commencera à fonctionner 1 à 2 secondes après le verrouillage si Ambient/AOD est activé. Pendant ce temps, l\'appareil passe en mode Doze.</string>
+    <string name="dt2w_info_text">Ce n\'est pas une intégration directe au noyau, mais une méthode logicielle.\n\n<b>Note :</b>\n• Le logiciel attend une seconde tape en mode Doze/AOD.</string>
 
     <string name="dt2s_category_title">Double-tap pour dormir sur le lanceur (DT2S)</string>
     <string name="launcher_dt2s_title">Double-tap pour dormir</string>
@@ -16,8 +16,13 @@
     <string name="launcher_dt2s_timeout_title">Intervalle du double-tap DT2S</string>
     <string name="launcher_dt2s_timeout_summary">Intervalle actuel : %1$d ms</string>
     <string name="launcher_dt2s_error">La plage autorisée est de 10 à 1000 ms.</string>
-    <string name="dt2s_info_text">Ce n\'est pas une intégration directe au lanceur, mais une implémentation logicielle.\n\n<b>Remarque :</b>\n• L\'intervalle recommandé est de 150 ms pour éviter les faux déclenchements.\n• Conçu pour le Pixel Launcher.\n• <b>PEUT</b> se déclencher de manière inattendue.\n• Si vous descendez le panneau de notification depuis l\'écran d\'accueil, DT2S se déclenchera aussi.\n• Si vous ouvrez le menu Récents DEPUIS l\'écran d\'accueil, DT2S se déclenchera aussi.\n• DT2S fonctionnera dans le tiroir d\'applications.\n• DT2S ne se déclenchera <b>PAS</b> si vous tapez pour rechercher dans le tiroir d\'applications.\n• DT2S ne se déclenchera <b>PAS</b> dans Google Feed.\n• C\'est un service d\'arrière-plan. La zone de déclenchement est réduite de 15\% en haut et 20\% en bas. Les tapes ne seront pas enregistrées dans ces zones.</string>
-
+   	<string name="dt2s_info_text">Ce n\'est pas une intégration directe au launcher, mais une méthode logicielle.\n\n<b>Note :</b>\n• L\'intervalle recommandé est de 150 ms pour éviter les déclenchements intempestifs.\n• Conçu pour le Pixel Launcher.\n• <b>PEUT</b> se déclencher de manière inattendue.\n• Si vous êtes sur l\'écran d\'accueil et abaissez le volet des notifications, le DT2S se déclenchera également.\n• Le DT2S se déclenchera dans le tiroir d\'applications.\n• Le DT2S se déclenchera si vous tapez deux fois sur une icône d\'application ou toute autre zone.\n• Le DT2S ne se déclenchera <b>PAS</b> lorsque vous ouvrez le tiroir d\'applications et commencez à taper pour rechercher.\n• Le DT2S ne se déclenchera <b>PAS</b> dans Google Feed si vous l\'ouvrez en balayant depuis l\'écran d\'accueil.\n• Il s\'agit d\'un service d\'arrière-plan qui écoute les touchers. La zone de déclenchement est réduite de 15% en haut et de 20% en bas de l\'écran. Les tapes ne seront pas enregistrées dans ces zones.</string>
+	
+	<string name="launcher_dt2s_slop_title">Tolérance tactile (Slop)</string>
+    <string name="launcher_dt2s_slop_summary">Actuel : %1$s. (0 = Système)</string>
+    <string name="launcher_dt2s_slop_dialog_title">Définir la tolérance (px)</string>
+    <string name="launcher_dt2s_slop_dialog_msg">Valeur système : %1$d px.\n\nEntrez 0 pour utiliser la valeur système.\nEntrez 1-600 pour un réglage personnalisé.</string>
+    <string name="launcher_dt2s_slop_error">Entrez un nombre entre 0 et 600</string>
 
     <string name="thermal_title">Contrôle thermique</string>
     <string name="thermal_battery_title">Contrôle thermique de la batterie</string>

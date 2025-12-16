@@ -8,15 +8,19 @@
     <string name="doze_double_tap_hook_summary">Verwenden, falls die Hardware-Doppeltippfunktion nicht funktioniert.</string>
     <string name="doze_double_tap_timeout_title">DT2W Doppeltipp-Intervall</string>
     <string name="doze_double_tap_timeout_summary">Aktuelles Intervall: %1$d ms</string>
-    <string name="dt2w_info_text">Dies ist keine direkte Kernel-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Die Software wartet im Doze/AOD-Modus auf ein zweites Tippen.\n• Das Gerät kann dennoch aufgeweckt werden, wenn es den Doze-Modus noch nicht vollständig aktiviert hat.\n• Doppeltippen funktioniert 1–2 Sekunden nach dem Sperren, wenn Ambient/AOD aktiviert ist. Während dieser Zeit wechselt das Gerät in den Doze-Modus.</string>
-
+    <string name="dt2w_info_text">Dies ist keine direkte Kernel-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Die Software wartet im Doze/AOD-Modus auf ein zweites Tippen.</string>
     <string name="dt2s_category_title">Doppeltippen zum Schlafen auf dem Launcher (DT2S)</string>
     <string name="launcher_dt2s_title">Doppeltippen zum Schlafen</string>
     <string name="launcher_dt2s_summary">Tippen Sie auf eine leere Stelle des Launchers, um das Gerät zu sperren.</string>
     <string name="launcher_dt2s_timeout_title">DT2S Doppeltipp-Intervall</string>
     <string name="launcher_dt2s_timeout_summary">Aktuelles Intervall: %1$d ms</string>
     <string name="launcher_dt2s_error">Der zulässige Bereich liegt zwischen 10 und 1000 ms.</string>
-    <string name="dt2s_info_text">Dies ist keine direkte Launcher-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Empfohlenes Intervall: 150 ms, um Fehler zu vermeiden.\n• Gedacht für den Pixel Launcher.\n• <b>KANN</b> unerwartet auslösen.\n• Wenn Sie die Benachrichtigungsleiste auf dem Homescreen herunterziehen, wird DT2S auch dort ausgelöst.\n• Wenn Sie das Menü "Zuletzt geöffnet" VOM Homescreen öffnen, wird DT2S auch dort ausgelöst.\n• DT2S löst auch im App-Drawer aus.\n• DT2S <b>NICHT</b> aus, wenn Sie im App-Drawer tippen, um zu suchen.\n• DT2S löst <b>NICHT</b> im Google Feed aus, wenn dieser vom Homescreen geöffnet wird.\n• Dies ist ein Hintergrunddienst. Der Auslösebereich wurde um 15\% oben und 20\% unten reduziert. In diesen Bereichen wird der Schlafmodus nicht aktiviert.</string>
+    <string name="dt2s_info_text">Dies ist keine direkte Launcher-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Das empfohlene Tippintervall beträgt 150 ms, um Fehlauslösungen zu vermeiden.\n• Gedacht für den Pixel Launcher.\n• <b>KANN</b> unerwartet auslösen.\n• Wenn Sie auf dem Homescreen sind und die Benachrichtigungsleiste herunterziehen, löst DT2S auch dort aus.\n• DT2S löst im App-Drawer aus.\n• DT2S löst aus, wenn Sie doppelt auf ein App-Symbol oder einen anderen Bereich tippen.\n• DT2S löst <b>NICHT</b> aus, wenn Sie den App-Drawer öffnen und eine Suche eintippen.\n• DT2S löst <b>NICHT</b> im Google Feed aus, wenn dieser durch Wischen vom Homescreen geöffnet wird.\n• Dies ist ein Hintergrunddienst, der auf Bildschirmberührungen achtet. Der Auslösebereich wurde oben um 15% und unten um 20% reduziert. Tippen zum Schlafen wird in diesen Bereichen nicht registriert.</string>
+	<string name="launcher_dt2s_slop_title">Berührungstoleranz (Slop)</string>
+    <string name="launcher_dt2s_slop_summary">Aktuell: %1$s. (0 = Systemstandard)</string>
+    <string name="launcher_dt2s_slop_dialog_title">Toleranz festlegen (px)</string>
+    <string name="launcher_dt2s_slop_dialog_msg">Systemwert: %1$d px.\n\nGeben Sie 0 ein, um den Systemwert zu verwenden.\nGeben Sie 1-600 für eine eigene Einstellung ein.</string>
+    <string name="launcher_dt2s_slop_error">Geben Sie eine Zahl zwischen 0 und 600 ein</string>
 
 
     <string name="thermal_title">Thermoregulierung</string>

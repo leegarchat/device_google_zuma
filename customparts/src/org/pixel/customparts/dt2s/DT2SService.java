@@ -40,9 +40,10 @@ import java.util.List;
 public class DT2SService extends Service {
     private static final String TAG = "PixelPartsDT2S";
     
-    // КЛЮЧИ НАСТРОЕК (Проверь, как они называются у тебя в SettingsProvider)
-    private static final String KEY_DT2S_ENABLED = "launcher_dt2s_enabled"; // 1 - вкл, 0 - выкл
+    // КЛЮЧИ НАСТРОЕК
+    private static final String KEY_DT2S_ENABLED = "launcher_dt2s_enabled"; 
     private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
+    private static final String KEY_DT2S_SLOP = "launcher_dt2s_slop";
 
     private InputMonitor mInputMonitor;
     private InputEventReceiver mInputReceiver;
@@ -53,16 +54,20 @@ public class DT2SService extends Service {
     private InputMethodManager mImm;
 
     private boolean mIsMonitoring = false;
-    private boolean mIsEnabled = false; // Кэш настройки
+    private boolean mIsEnabled = false;
 
     // --- Reflection для StatusBar ---
     private Object mStatusBarService;
     private final List<Method> mPanelExpansionMethods = new ArrayList<>();
 
     private String mLauncherPackage;
+    
+    // Параметры жеста
     private int mDoubleTapTimeout = 250;
-    private int mDoubleTapSlop;
+    private int mDoubleTapSlop; // Активное значение
+    private int mSystemSlop;    // Системное значение
 
+    private long mTempDownTime; // Время начала текущего касания
     private long mLastTapTime = 0;
     private float mLastTapX;
     private float mLastTapY;
@@ -81,15 +86,19 @@ public class DT2SService extends Service {
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         
-        mDoubleTapSlop = ViewConfiguration.get(this).getScaledDoubleTapSlop();
+        // 1. Получаем системное значение
+        mSystemSlop = ViewConfiguration.get(this).getScaledDoubleTapSlop();
+        Log.d(TAG, "System Default Slop is: " + mSystemSlop + "px");
         
         mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
         
-        // Регистрируем наблюдателя за настройками
+        // Регистрируем наблюдателей
         getContentResolver().registerContentObserver(
                 Settings.Secure.getUriFor(KEY_DT2S_ENABLED), false, mSettingsObserver);
         getContentResolver().registerContentObserver(
                 Settings.Secure.getUriFor(KEY_DT2S_TIMEOUT), false, mSettingsObserver);
+        getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor(KEY_DT2S_SLOP), false, mSettingsObserver);
 
         resolveLauncher();
         registerScreenReceiver();
@@ -116,7 +125,6 @@ public class DT2SService extends Service {
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
-    // Класс для отслеживания изменений настроек в реальном времени
     private class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) { super(handler); }
         @Override
@@ -126,10 +134,18 @@ public class DT2SService extends Service {
     }
 
     private void updateSettings() {
-        // Читаем настройки. По умолчанию выключено (0), если настройки нет.
-        // ВАЖНО: Если у тебя нет отдельного переключателя enabled, используй логику по таймауту или создай его.
         mIsEnabled = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_ENABLED, 1) == 1; 
         mDoubleTapTimeout = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_TIMEOUT, 250);
+        
+        // Логика выбора Slop
+        int userSlop = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_SLOP, 0);
+        if (userSlop > 0) {
+            mDoubleTapSlop = userSlop;
+        } else {
+            mDoubleTapSlop = mSystemSlop;
+        }
+        
+        Log.d(TAG, "Active Slop: " + mDoubleTapSlop + "px (System was: " + mSystemSlop + ")");
 
         if (mIsEnabled && mPowerManager.isInteractive()) {
             startMonitoring();
@@ -156,14 +172,13 @@ public class DT2SService extends Service {
                 if (mIsEnabled) startMonitoring();
             } else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
                 stopMonitoring();
-                mLastTapTime = 0; // Сброс таймера при выключении экрана
+                mLastTapTime = 0;
             }
         }
     };
 
     private void startMonitoring() {
         if (mIsMonitoring) return;
-        // Если выключено в настройках - не запускаем монитор вообще!
         if (!mIsEnabled) return; 
 
         try {
@@ -186,7 +201,7 @@ public class DT2SService extends Service {
     }
 
     // ---------------------------------------------------------
-    // TOUCH HANDLER (OPTIMIZED)
+    // TOUCH HANDLER
     // ---------------------------------------------------------
 
     private class TouchReceiver extends InputEventReceiver {
@@ -207,7 +222,6 @@ public class DT2SService extends Service {
     private void process(MotionEvent e) {
         int action = e.getActionMasked();
 
-        // Быстрая проверка на перекрытие (флаги дешевые)
         if ((e.getFlags() & (MotionEvent.FLAG_WINDOW_IS_OBSCURED | 
                              MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED)) != 0) {
             mLastTapTime = 0;
@@ -216,75 +230,69 @@ public class DT2SService extends Service {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+                // 1. Сохраняем параметры текущего касания
                 mDownX = e.getX();
                 mDownY = e.getY();
+                mTempDownTime = SystemClock.uptimeMillis();
                 mIsSwipe = false;
-                
-                // --- ОПТИМИЗАЦИЯ: Сначала проверяем время! ---
-                // Никаких тяжелых проверок (Launcher, Keyboard, StatusBar) здесь нет.
-                
-                long now = SystemClock.uptimeMillis();
-                
-                if (mLastTapTime > 0 && (now - mLastTapTime < mDoubleTapTimeout)) {
-                    // Это ПОТЕНЦИАЛЬНО второй тап.
-                    // Проверяем расстояние (тоже дешево)
+
+                // 2. Проверяем на второй тап
+                if (mLastTapTime > 0 && (mTempDownTime - mLastTapTime < mDoubleTapTimeout)) {
                     float dx = Math.abs(mDownX - mLastTapX);
                     float dy = Math.abs(mDownY - mLastTapY);
 
                     if (dx < mDoubleTapSlop && dy < mDoubleTapSlop) {
-                        // Математически это ДВОЙНОЙ ТАП.
-                        // Только ТЕПЕРЬ делаем тяжелые проверки окружения.
+                        // Жест выполнен -> тяжелые проверки
                         if (performHeavyChecksAndSleep(e.getRawY())) {
-                            mLastTapTime = 0; // Сброс, жест выполнен
+                            mLastTapTime = 0; 
                             return;
                         }
                     }
                 }
-
-                // Запоминаем этот тап как первый
-                mLastTapTime = now;
-                mLastTapX = mDownX;
-                mLastTapY = mDownY;
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (!mIsSwipe) {
-                    // Если палец сдвинулся слишком далеко - это свайп, а не тап.
+                    // Проверка на свайп во время движения
                     if (Math.abs(e.getX() - mDownX) > mDoubleTapSlop ||
                         Math.abs(e.getY() - mDownY) > mDoubleTapSlop) {
                         mIsSwipe = true;
-                        mLastTapTime = 0; // Свайп отменяет двойной тап
+                        mLastTapTime = 0; 
                     }
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
+                if (mIsSwipe) {
+                    mLastTapTime = 0;
+                } else {
+                    // 3. Финальная проверка: не уехал ли палец далеко к моменту отпускания?
+                    if (Math.abs(e.getX() - mDownX) > mDoubleTapSlop ||
+                        Math.abs(e.getY() - mDownY) > mDoubleTapSlop) {
+                        mLastTapTime = 0; // Это был быстрый свайп
+                    } else {
+                        // 4. Чистый тап - запоминаем
+                        mLastTapTime = mTempDownTime;
+                        mLastTapX = mDownX;
+                        mLastTapY = mDownY;
+                    }
+                }
+                break;
+
             case MotionEvent.ACTION_CANCEL:
-                // Ничего не делаем, логика на ACTION_DOWN
+                mLastTapTime = 0;
+                mIsSwipe = false;
                 break;
         }
     }
 
-    // --- HEAVY CHECKS ---
-    // Этот метод вызывается ТОЛЬКО когда пользователь уже сделал двойной тап.
-    // Это происходит редко, поэтому нагрузка здесь допустима.
     private boolean performHeavyChecksAndSleep(float rawY) {
-        // 1. Зоны (верх/низ) - средне по тяжести
         if (isIgnoredZone(rawY)) return false;
-
-        // 2. Лаунчер должен быть сверху - ТЯЖЕЛО (IPC)
         if (!isLauncherOnTop()) return false;
-        
-        // 3. Клавиатура - ТЯЖЕЛО
         if (isKeyboardShown()) return false;
-
-        // 4. Шторка - ТЯЖЕЛО (Reflection)
         if (isShadeExpanded()) return false;
-
-        // 5. Локскрин - ТЯЖЕЛО (IPC)
         if (isLockscreen()) return false;
 
-        // Если все проверки пройдены - СПАТЬ
         goSleep();
         return true;
     }
@@ -295,10 +303,8 @@ public class DT2SService extends Service {
         }
     }
 
-    // ---------------------------------------------------------
-    // UTILS (Те же, что и были, но вызываются реже)
-    // ---------------------------------------------------------
-
+    // ... (Методы isIgnoredZone, isLauncherOnTop, isKeyboardShown, isShadeExpanded, isLockscreen, resolveLauncher без изменений) ...
+    // Скопируй их из своего кода, они там верные.
     private void resolveLauncher() {
         try {
             Intent i = new Intent(Intent.ACTION_MAIN);
@@ -311,7 +317,6 @@ public class DT2SService extends Service {
 
     private boolean isLauncherOnTop() {
         try {
-            // ЭТО САМЫЙ ТЯЖЕЛЫЙ ВЫЗОВ. Вызывать только при необходимости.
             ActivityTaskManager.RootTaskInfo info =
                     ActivityTaskManager.getService().getFocusedRootTaskInfo();
             return info != null &&
@@ -325,22 +330,16 @@ public class DT2SService extends Service {
     private boolean isIgnoredZone(float y) {
         if (mWindowManager == null) return false;
         try {
-            // Кэшировать размер экрана тут опасно (ротация), но вызов WindowManager терпим
             Display display = mWindowManager.getDefaultDisplay();
             android.graphics.Point p = new android.graphics.Point();
             display.getRealSize(p);
             int h = p.y;
-            return y < h * 0.15f || y > h * 0.80f; // Верх 15%, Низ 20%
+            return y < h * 0.15f || y > h * 0.80f; 
         } catch (Exception e) {
             return false;
         }
     }
-    
-    // ... [Остальные методы (isShadeExpanded, isKeyboardShown, isLockscreen) оставляем как были, 
-    // но они теперь вызываются только внутри performHeavyChecksAndSleep] ...
-    
-    // Для полноты картины добавлю методы, чтобы код компилировался
-    
+
     private boolean isKeyboardShown() {
          if (mImm != null && mImm.isAcceptingText()) return true;
          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && mWindowManager != null) {
@@ -359,7 +358,6 @@ public class DT2SService extends Service {
     }
 
     private void initStatusBarService() {
-        // Тот же код инициализации рефлексии
         try {
             mPanelExpansionMethods.clear();
             IBinder binder = ServiceManager.getService("statusbar");

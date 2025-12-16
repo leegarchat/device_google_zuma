@@ -44,7 +44,15 @@
             android:icon="@drawable/ic_tap"
             android:title="@string/launcher_dt2s_title"
             android:summary="@string/launcher_dt2s_summary" />
-
+		<EditTextPreference
+			android:key="launcher_dt2s_slop"
+			android:title="@string/launcher_dt2s_slop_title"
+			android:summary="@string/launcher_dt2s_slop_summary"
+			android:dialogTitle="@string/launcher_dt2s_slop_dialog_title"
+			android:defaultValue="0"
+			android:inputType="number"
+			android:icon="@drawable/ic_tap" 
+			android:persistent="false" />
         <EditTextPreference
             android:key="launcher_dt2s_timeout"
             android:title="@string/launcher_dt2s_timeout_title"
