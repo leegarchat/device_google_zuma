@@ -1,0 +1,5 @@
+# Разрешить системным приложениям устанавливать (записывать) эти свойства
+allow system_app system_pixelparts_prop:property_service set;
+
+# Разрешить системным приложениям читать эти свойства (для обновления UI)
+get_prop(system_app, system_pixelparts_prop)
