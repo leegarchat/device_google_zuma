@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Funciones Adicionales</string>
-    <string name="pixel_parts_custom_summary">Ajustes de doble toque y Control Térmico</string>
-
+    <string name="pixel_parts_custom_summary">Doble toque para dormir/despertar, control térmico de SOC/batería, ajustes IMS y correcciones</string>
 
 
 

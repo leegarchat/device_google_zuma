@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Додаткові функції</string>
-    <string name="pixel_parts_custom_summary">Налаштування подвійного торкання та терморегулювання</string>
-
+    <string name="pixel_parts_custom_summary">Подвійний дотик для сну/пробудження, терморегуляція SOC/батареї, налаштування IMS, фікси</string>
 
     <string name="pixel_parts_summary">Додаткові функції та налаштування IMS</string>
     <string name="ims_category_title">Мережа та IMS (від Turbo IMS)</string>

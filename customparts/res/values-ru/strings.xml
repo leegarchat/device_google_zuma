@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Дополнительные настройки</string>
-    <string name="pixel_parts_custom_summary">Управление двойным касанием и терморегулированием</string>
-
+    <string name="pixel_parts_custom_summary">Двойное касание для сна/пробуждения, терморегулирование SOC/батареи, настройки IMS, фиксы</string>
 
 
     <string name="pixel_parts_summary">Дополнительные функции и настройки IMS</string>

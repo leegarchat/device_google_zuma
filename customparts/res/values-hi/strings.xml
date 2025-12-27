@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">अतिरिक्त सुविधाएँ</string>
-    <string name="pixel_parts_custom_summary">डबल-टैप सेटिंग्स और थर्मल कंट्रोल</string>
-
-
+    <string name="pixel_parts_custom_summary">सोने/जगाने के लिए डबल टैप, SOC/बैटरी थर्मल नियंत्रण, IMS सेटिंग्स, और सुधार</string>
+    
     <string name="pixel_parts_summary">अतिरिक्त सुविधाएं और IMS सेटिंग्स</string>
     <string name="ims_category_title">नेटवर्क और IMS (Turbo IMS से)</string>
     <string name="ims_volte_title">VoLTE</string>

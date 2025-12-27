@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Fitur Tambahan</string>
-    <string name="pixel_parts_custom_summary">Pengaturan ketuk ganda dan Kontrol Termal</string>
-
-
+    <string name="pixel_parts_custom_summary">Ketuk ganda untuk tidur/bangun, kontrol termal SOC/Baterai, pengaturan IMS, dan perbaikan</string>
     <string name="pixel_parts_summary">Fitur tambahan dan pengaturan IMS</string>
     <string name="ims_category_title">Jaringan &amp; IMS (dari Turbo IMS)</string>
     <string name="ims_volte_title">VoLTE</string>

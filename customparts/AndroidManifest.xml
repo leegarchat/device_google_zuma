@@ -5,13 +5,11 @@
     android:versionCode="1"
     android:versionName="1.0"
     android:sharedUserId="android.uid.system">
-    <!-- НОВЫЕ РАЗРЕШЕНИЯ ДЛЯ IMS -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.REBOOT" />
-	<!-- ДЛЯ DT2S -->
     <uses-permission android:name="android.permission.DEVICE_POWER" />
     <uses-permission android:name="android.permission.MONITOR_INPUT" />
     <uses-permission android:name="android.permission.MANAGE_ACTIVITY_TASKS" />
@@ -57,7 +55,7 @@
             </intent-filter>
             <meta-data
                 android:name="com.android.settings.category"
-                android:value="com.android.settings.category.ia.WIRELESS" />
+                android:value="com.android.settings.category.ia.wireless" />
             <meta-data
                 android:name="com.android.settings.summary"
                 android:resource="@string/pixel_parts_custom_summary" />

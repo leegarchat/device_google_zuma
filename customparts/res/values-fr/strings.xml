@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Fonctionnalités supplémentaires</string>
-    <string name="pixel_parts_custom_summary">Paramètres de double-tap et Contrôle thermique</string>
-
+    <string name="pixel_parts_custom_summary">Double tape pour veille/réveil, contrôle thermique SOC/batterie, réglages IMS et correctifs</string>
 
     <string name="pixel_parts_summary">Fonctions supplémentaires et paramètres IMS</string>
     <string name="ims_category_title">Réseau et IMS (de Turbo IMS)</string>

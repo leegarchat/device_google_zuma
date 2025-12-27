@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Zusätzliche Funktionen</string>
-    <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Thermoregulierung</string>
-
+    <string name="pixel_parts_custom_summary">Doppeltippen für Schlaf/Wach, SOC/Akku-Wärmemanagement, IMS-Einstellungen, Fixes</string>
     <string name="pixel_parts_summary">Zusätzliche Funktionen und IMS-Einstellungen</string>
     <string name="ims_category_title">Netzwerk &amp; IMS (von Turbo IMS)</string>
     <string name="ims_volte_title">VoLTE</string>

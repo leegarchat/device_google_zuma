@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pixel_parts_title">Extra Features</string>
-    <string name="pixel_parts_custom_summary">Double-tap settings and Thermal Control</string>
+    <string name="pixel_parts_custom_summary">Double tap to sleep/wake, SOC/Battery thermal control, IMS settings, fixes</string>
 
 
     <string name="pixel_parts_summary">Additional device features and IMS settings</string>
