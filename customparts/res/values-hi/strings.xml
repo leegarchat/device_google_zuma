@@ -3,13 +3,18 @@
     <string name="pixel_parts_title">अतिरिक्त सुविधाएँ</string>
     <string name="pixel_parts_custom_summary">डबल-टैप सेटिंग्स और थर्मल कंट्रोल</string>
 
+
+    <string name="launcher_settings_title">लॉन्चर (Launcher)</string>
+    <string name="pixel_launcher_search_title">देशी Pixel Launcher खोज</string>
+    <string name="pixel_launcher_search_summary">सर्च विजेट पर टैप करने पर लॉन्चर के अंदर देशी खोज को बाध्य करता है। यदि इसके बजाय बाहरी Google खोज विंडो खुलती है तो इसका उपयोग करें।</string>
+
     <string name="dt2w_category_title">जागने के लिए डबल टैप (DT2W)</string>
     <string name="doze_double_tap_hook_title">जागने के लिए डबल टैप</string>
     <string name="doze_double_tap_hook_summary">उपयोग करें यदि हार्डवेयर डबल-टैप फ़ंक्शन काम नहीं कर रहा है।</string>
     <string name="doze_double_tap_timeout_title">DT2W डबल टैप अंतराल</string>
     <string name="doze_double_tap_timeout_summary">वर्तमान अंतराल: %1$d मिसे</string>
-    <string name="dt2w_info_text">यह डायरेक्ट कर्नेल इंटीग्रेशन नहीं है, बल्कि एक सॉफ्टवेयर हुक है।\n\n<b>नोट:</b>\n• सॉफ्टवेयर Doze/AOD मोड में दूसरे टैप का इंतजार करता है।</string>
-
+    <string name="dt2w_info_text">यह सीधा कर्नल इंटीग्रेशन नहीं है, बल्कि एक सॉफ्टवेयर हुक है।\n\n<b>नोट:</b>\n• सॉफ्टवेयर Doze/AOD मोड में दूसरे टैप की प्रतीक्षा करता है।\n• चूंकि यह एक हुक है, पहले टैप पर सेंसर को रीबूट करना पड़ता है, जिसमें 10-100ms लगते हैं। यदि आप बहुत तेज़ी से दूसरी बार टैप करते हैं, तो DT2W काम नहीं करेगा।</string>
+	
     <string name="dt2s_category_title">लॉन्चर पर सोने के लिए डबल टैप (DT2S)</string>
     <string name="launcher_dt2s_title">सोने के लिए डबल टैप</string>
     <string name="launcher_dt2s_summary">डिवाइस को लॉक करने के लिए लॉन्चर पर खाली जगह पर टैप करें।</string>

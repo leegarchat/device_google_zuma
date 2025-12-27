@@ -3,13 +3,19 @@
     <string name="pixel_parts_title">Додаткові функції</string>
     <string name="pixel_parts_custom_summary">Налаштування подвійного торкання та терморегулювання</string>
 
+
+
+    <string name="launcher_settings_title">Лаунчер</string>
+    <string name="pixel_launcher_search_title">Нативний пошук Pixel Launcher</string>
+    <string name="pixel_launcher_search_summary">Примусово вмикає нативний пошук всередині лаунчера при натисканні на віджет пошуку. Використовуйте, якщо відкривається зовнішнє вікно Google пошуку.</string>
+
     <string name="dt2w_category_title">Подвійне торкання для пробудження (DT2W)</string>
     <string name="doze_double_tap_hook_title">Подвійне торкання для пробудження</string>
     <string name="doze_double_tap_hook_summary">Використовуйте, якщо апаратна функція подвійного торкання не працює.</string>
     <string name="doze_double_tap_timeout_title">Інтервал подвійного торкання DT2W</string>
     <string name="doze_double_tap_timeout_summary">Поточний інтервал: %1$d мс</string>
-    <string name="dt2w_info_text">Це не пряма інтеграція в ядро пристрою, а програмна реалізація (хук).\n\n<b>Примітка:</b>\n• Програмно очікує другого торкання в режимі Doze/AOD.\n• Все ще може пробуджувати пристрій, якщо він не перейшов у режим Doze повністю.\n• Подвійне торкання почне спрацьовувати через 1–2 секунди після блокування, якщо у вас увімкнено Ambient/AOD. Протягом цих 1–2 секунд пристрій переходить у режим Doze.</string>
-
+    <string name="dt2w_info_text">Це не пряма інтеграція в ядро, а програмний хук.\n\n<b>Примітка:</b>\n• Система очікує другого дотику в режимах Doze/AOD.\n• Оскільки це хук, при першому торканні коду потрібно перезавантажити сенсор, що займає від 10 до 100 мс. Якщо натиснути вдруге занадто швидко, DT2W може не спрацювати.</string>
+	
     <string name="dt2s_category_title">Подвійне торкання для сну в лаунчері (DT2S)</string>
     <string name="launcher_dt2s_title">Подвійне торкання для сну</string>
     <string name="launcher_dt2s_summary">Торкніться порожнього місця лаунчера, щоб заблокувати пристрій.</string>

@@ -3,13 +3,19 @@
     <string name="pixel_parts_title">Zusätzliche Funktionen</string>
     <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Thermoregulierung</string>
 
+
+
+    <string name="launcher_settings_title">Launcher</string>
+    <string name="pixel_launcher_search_title">Native Pixel Launcher Suche</string>
+    <string name="pixel_launcher_search_summary">Erzwingt die native Suche im Launcher beim Tippen auf das Such-Widget. Verwenden Sie dies, wenn sich stattdessen ein externes Google-Suchfenster öffnet.</string>
+
     <string name="dt2w_category_title">Doppeltippen zum Aufwecken (DT2W)</string>
     <string name="doze_double_tap_hook_title">Doppeltippen zum Aufwecken</string>
     <string name="doze_double_tap_hook_summary">Verwenden, falls die Hardware-Doppeltippfunktion nicht funktioniert.</string>
     <string name="doze_double_tap_timeout_title">DT2W Doppeltipp-Intervall</string>
     <string name="doze_double_tap_timeout_summary">Aktuelles Intervall: %1$d ms</string>
-    <string name="dt2w_info_text">Dies ist keine direkte Kernel-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Die Software wartet im Doze/AOD-Modus auf ein zweites Tippen.</string>
-    <string name="dt2s_category_title">Doppeltippen zum Schlafen auf dem Launcher (DT2S)</string>
+    <string name="dt2w_info_text">Dies ist keine direkte Kernel-Integration, sondern ein Software-Hook.\n\n<b>Hinweis:</b>\n• Die Software wartet im Doze/AOD-Modus auf ein zweites Tippen.\n• Da es sich um einen Hook handelt, muss der Touch-Sensor beim ersten Tippen neu initialisiert werden (dauert 10–100 ms). Wenn Sie zu schnell ein zweites Mal tippen, wird die Geste eventuell nicht erkannt.</string>
+	<string name="dt2s_category_title">Doppeltippen zum Schlafen auf dem Launcher (DT2S)</string>
     <string name="launcher_dt2s_title">Doppeltippen zum Schlafen</string>
     <string name="launcher_dt2s_summary">Tippen Sie auf eine leere Stelle des Launchers, um das Gerät zu sperren.</string>
     <string name="launcher_dt2s_timeout_title">DT2S Doppeltipp-Intervall</string>

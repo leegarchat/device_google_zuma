@@ -3,13 +3,18 @@
     <string name="pixel_parts_title">Fitur Tambahan</string>
     <string name="pixel_parts_custom_summary">Pengaturan ketuk ganda dan Kontrol Termal</string>
 
+
+    <string name="launcher_settings_title">Launcher</string>
+    <string name="pixel_launcher_search_title">Pencarian Native Pixel Launcher</string>
+    <string name="pixel_launcher_search_summary">Memaksa pencarian native di dalam launcher saat mengetuk widget pencarian. Gunakan jika jendela Pencarian Google eksternal terbuka sebagai gantinya.</string>
+
     <string name="dt2w_category_title">Ketuk Ganda untuk Membangunkan (DT2W)</string>
     <string name="doze_double_tap_hook_title">Ketuk Ganda untuk Membangunkan</string>
     <string name="doze_double_tap_hook_summary">Gunakan jika fungsi ketuk ganda hardware tidak berfungsi.</string>
     <string name="doze_double_tap_timeout_title">Interval Ketuk Ganda DT2W</string>
     <string name="doze_double_tap_timeout_summary">Interval saat ini: %1$d md</string>
-    <string name="dt2w_info_text">Ini bukan integrasi kernel langsung, melainkan hook perangkat lunak.\n\n<b>Catatan:</b>\n• Perangkat lunak menunggu ketukan kedua dalam mode Doze/AOD.</string>
-
+    <string name="dt2w_info_text">Ini bukan integrasi kernel langsung, melainkan software hook.\n\n<b>Catatan:</b>\n• Sistem menunggu ketukan kedua dalam mode Doze/AOD.\n• Karena ini adalah hook, sensor perlu dimuat ulang pada ketukan pertama (membutuhkan 10–100ms). Jika Anda mengetuk kedua kali terlalu cepat, DT2W mungkin tidak terdeteksi.</string>
+	
     <string name="dt2s_category_title">Ketuk Ganda untuk Tidur di Peluncur (DT2S)</string>
     <string name="launcher_dt2s_title">Ketuk Ganda untuk Tidur</string>
     <string name="launcher_dt2s_summary">Ketuk area kosong di peluncur untuk mengunci perangkat.</string>

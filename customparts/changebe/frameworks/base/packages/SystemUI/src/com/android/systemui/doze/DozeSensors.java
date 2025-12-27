@@ -5,7 +5,8 @@
     public void reregisterTapSensor() {
         for (TriggerSensor s : mTriggerSensors) {
             if (s.mPulseReason == DozeLog.REASON_SENSOR_TAP) {
-                s.updateListening();
+                s.setListening(false);
+                s.setListening(true);
                 break;
             }
         }

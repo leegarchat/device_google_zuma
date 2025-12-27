@@ -3,13 +3,19 @@
     <string name="pixel_parts_title">Extra Features</string>
     <string name="pixel_parts_custom_summary">Double-tap settings and Thermal Control</string>
 
+
+    <string name="launcher_settings_title">Launcher</string>
+    <string name="pixel_launcher_search_title">Native Pixel Launcher Search</string>
+    <string name="pixel_launcher_search_summary">Forces native search inside the launcher when tapping the search widget. Use if an external Google Search window opens instead.</string>
+
+
     <string name="dt2w_category_title">Double Tap to Wake (DT2W)</string>
     <string name="doze_double_tap_hook_title">Double Tap to Wake</string>
     <string name="doze_double_tap_hook_summary">Use if hardware double-tap function is not working.</string>
     <string name="doze_double_tap_timeout_title">DT2W Double Tap Interval</string>
     <string name="doze_double_tap_timeout_summary">Current interval: %1$d ms</string>
-    <string name="dt2w_info_text">This is not a direct kernel integration, but a software hook.\n\n<b>Note:</b>\n• Software waits for a second tap in Doze/AOD mode.</string>
-
+    <string name="dt2w_info_text">This is not a direct kernel integration, but a software hook.\n\n<b>Note:</b>\n• Software waits for a second tap in Doze/AOD mode.\n• Since this is a hook, the system needs to reinitialize the touch sensor on the first tap. This takes 10–100ms. If you tap the second time too quickly, the gesture may not register.</string>
+	
     <string name="dt2s_category_title">Double Tap to Sleep on Launcher (DT2S)</string>
     <string name="launcher_dt2s_title">Double Tap to Sleep</string>
     <string name="launcher_dt2s_summary">Tap an empty area on the launcher to lock the device.</string>

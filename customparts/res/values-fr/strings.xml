@@ -3,12 +3,18 @@
     <string name="pixel_parts_title">Fonctionnalités supplémentaires</string>
     <string name="pixel_parts_custom_summary">Paramètres de double-tap et Contrôle thermique</string>
 
+
+
+    <string name="launcher_settings_title">Lanceur</string>
+    <string name="pixel_launcher_search_title">Recherche native Pixel Launcher</string>
+    <string name="pixel_launcher_search_summary">Force la recherche native dans le lanceur lors de l\'appui sur le widget de recherche. Utilisez ceci si une fenêtre de recherche Google externe s\'ouvre à la place.</string>
+
     <string name="dt2w_category_title">Double-tap pour réveiller (DT2W)</string>
     <string name="doze_double_tap_hook_title">Double-tap pour réveiller</string>
     <string name="doze_double_tap_hook_summary">Utilisez cette option si la fonction double-tap matérielle ne fonctionne pas.</string>
     <string name="doze_double_tap_timeout_title">Intervalle du double-tap DT2W</string>
     <string name="doze_double_tap_timeout_summary">Intervalle actuel : %1$d ms</string>
-    <string name="dt2w_info_text">Ce n\'est pas une intégration directe au noyau, mais une méthode logicielle.\n\n<b>Note :</b>\n• Le logiciel attend une seconde tape en mode Doze/AOD.</string>
+    <string name="dt2w_info_text">Il ne s\'agit pas d\'une intégration directe au noyau, mais d\'un hook logiciel.\n\n<b>Note :</b>\n• Le logiciel attend une deuxième pression en mode Doze/AOD.\n• S\'agissant d\'un hook, le capteur doit être réinitialisé au premier appui (10–100 ms). Si vous appuyez trop rapidement une deuxième fois, le geste peut ne pas fonctionner.</string>
 
     <string name="dt2s_category_title">Double-tap pour dormir sur le lanceur (DT2S)</string>
     <string name="launcher_dt2s_title">Double-tap pour dormir</string>

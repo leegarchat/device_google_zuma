@@ -2,17 +2,27 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/pixel_parts_title">
+    <PreferenceCategory
+        android:key="launcher_settings_category"
+        android:title="@string/launcher_settings_title">
+        
+        <SwitchPreferenceCompat
+            android:key="pixel_launcher_native_search"
+            android:defaultValue="true"
+            android:title="@string/pixel_launcher_search_title"
+            android:summary="@string/pixel_launcher_search_summary"
+            android:icon="@drawable/ic_search_pixel" /> 
+
+    </PreferenceCategory>
 	<PreferenceCategory
         android:key="dt2w_category"
         android:title="@string/dt2w_category_title">
-
         <SwitchPreferenceCompat
             android:key="doze_double_tap_hook"
             android:defaultValue="false"
             android:icon="@drawable/ic_tap"
             android:title="@string/doze_double_tap_hook_title"
             android:summary="@string/doze_double_tap_hook_summary" />
-
         <EditTextPreference
             android:key="doze_double_tap_timeout"
             android:title="@string/doze_double_tap_timeout_title"
@@ -21,8 +31,6 @@
             android:inputType="number"
             android:icon="@drawable/ic_hourglass"
             android:persistent="true" />
-
-        <!-- Инфо-текст (скрыт по умолчанию, не кликабельный) -->
         <com.android.settingslib.widget.FooterPreference
             android:key="doze_double_tap_info"
             android:title="@string/dt2w_info_text"
@@ -30,10 +38,6 @@
             android:selectable="false" />
 
     </PreferenceCategory>
-
-    <!-- =========================== -->
-    <!-- KATEGORY 2: DT2S (LAUNCHER) -->
-    <!-- =========================== -->
     <PreferenceCategory
         android:key="dt2s_category"
         android:title="@string/dt2s_category_title">
@@ -61,19 +65,15 @@
             android:inputType="number"
             android:icon="@drawable/ic_hourglass"
             android:persistent="true" />
-
-        <!-- Инфо-текст (скрыт по умолчанию, не кликабельный) -->
         <com.android.settingslib.widget.FooterPreference
             android:key="launcher_dt2s_info"
             android:title="@string/dt2s_info_text"
             android:icon="@drawable/ic_warning"
             android:selectable="false" />
-
     </PreferenceCategory>
 	<PreferenceCategory
 		android:key="thermal_category"
         android:title="@string/thermal_title">
-
         <ListPreference
             android:key="thermal_battery_mode"
             android:title="@string/thermal_battery_title"

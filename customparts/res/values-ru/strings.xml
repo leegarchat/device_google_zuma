@@ -3,13 +3,17 @@
     <string name="pixel_parts_title">Дополнительные настройки</string>
     <string name="pixel_parts_custom_summary">Управление двойным касанием и терморегулированием</string>
 
+    <string name="launcher_settings_title">Лаунчер</string>
+    <string name="pixel_launcher_search_title">Нативный поиск Pixel Launcher</string>
+    <string name="pixel_launcher_search_summary">Включает принудительно нативный поиск внутри лаунчера по нажатию на виджет поиска. Если у вас открывается внешнее окно Google поиска по нажатию виджета.</string>
+
     <string name="dt2w_category_title">Двойное касание для пробуждения (DT2W)</string>
     <string name="doze_double_tap_hook_title">Двойное касание для пробуждения</string>
     <string name="doze_double_tap_hook_summary">Используйте, если аппаратная функция двойного касания не работает.</string>
     <string name="doze_double_tap_timeout_title">Интервал двойного касания DT2W</string>
     <string name="doze_double_tap_timeout_summary">Текущий интервал: %1$d мс</string>
-    <string name="dt2w_info_text">Это не прямая интеграция в ядро, а программный перехватчик.\n\n<b>Примечание:</b>\n• Программа ожидает второго касания в режиме Doze/AOD.</string>
-
+    <string name="dt2w_info_text">Это не прямая интеграция в ядро, а программный хук.\n\n<b>Примечание:</b>\n• Система ожидает второго касания в режимах Doze/AOD.\n• Так как это хук, при первом касании коду необходимо перезагрузить сенсор, что занимает от 10 до 100 мс. Если нажать второй раз слишком быстро, DT2W может не сработать.</string>
+	
     <string name="dt2s_category_title">Двойное касание для сна в лаунчере (DT2S)</string>
     <string name="launcher_dt2s_title">Двойное касание для сна</string>
     <string name="launcher_dt2s_summary">Нажмите в пустом месте лаунчера, чтобы заблокировать устройство.</string>

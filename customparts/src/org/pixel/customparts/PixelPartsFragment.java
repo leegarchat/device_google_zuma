@@ -12,7 +12,8 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.widget.Toast;
-import android.view.ViewConfiguration; 
+import android.view.ViewConfiguration;
+import android.util.Log; // Добавлено
 
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
@@ -21,6 +22,8 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import org.pixel.customparts.dt2s.DT2SService;
+
+import java.io.DataOutputStream; // Добавлено
 
 public class PixelPartsFragment extends PreferenceFragmentCompat 
         implements Preference.OnPreferenceChangeListener {
@@ -34,6 +37,8 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
     private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
     private static final String KEY_DT2S_INFO = "launcher_dt2s_info"; 
     private static final String KEY_DT2S_SLOP = "launcher_dt2s_slop";
+
+    private static final String KEY_NATIVE_SEARCH = "pixel_launcher_native_search"; // НОВЫЙ КЛЮЧ
     
     // --- UI OBJECTS ---
     private SwitchPreferenceCompat mDoubleTapSwitch;
@@ -45,6 +50,8 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
     private Preference mDt2sInfoPref; 
     private EditTextPreference mDt2sSlopPref;
     
+    private SwitchPreferenceCompat mNativeSearchSwitch; // НОВЫЙ ОБЪЕКТ
+
     private ListPreference mThermalBatteryPref;
     private ListPreference mThermalSocPref;
 
@@ -56,6 +63,15 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
         
         mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
         ContentResolver resolver = requireContext().getContentResolver();
+
+        // --- 0. Launcher Native Search Setup (НОВОЕ) ---
+        mNativeSearchSwitch = findPreference(KEY_NATIVE_SEARCH);
+        if (mNativeSearchSwitch != null) {
+            mNativeSearchSwitch.setOnPreferenceChangeListener(this);
+            // По умолчанию включено (1)
+            boolean isSearchEnabled = Settings.Secure.getInt(resolver, KEY_NATIVE_SEARCH, 1) == 1;
+            mNativeSearchSwitch.setChecked(isSearchEnabled);
+        }
 
         // --- 1. DT2W (Doze) Setup ---
         mDoubleTapSwitch = findPreference(KEY_DOZE_DOUBLE_TAP);
@@ -154,14 +170,12 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
         if (mDozeInfoPref != null) mDozeInfoPref.setVisible(enabled);
     }
 
-    // Обновление видимости элементов DT2S (ДОБАВИЛ mDt2sSlopPref)
     private void updateDt2sVisibility(boolean visible) {
         if (mDt2sTimeoutPref != null) mDt2sTimeoutPref.setVisible(visible);
-        if (mDt2sSlopPref != null) mDt2sSlopPref.setVisible(visible); // <-- Добавлено
+        if (mDt2sSlopPref != null) mDt2sSlopPref.setVisible(visible); 
         if (mDt2sInfoPref != null) mDt2sInfoPref.setVisible(visible);
     }
 
-    // Thermal helper... (без изменений)
     private void updateThermalSummaryAndIcon(ListPreference pref, String value, boolean isBattery) {
         if (pref == null || value == null) return;
         int summaryResId;
@@ -178,7 +192,6 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
     }
 
     private void showRebootDialog(boolean isRiskyMode) {
-        // ... (код диалога без изменений)
         new AlertDialog.Builder(requireContext())
             .setTitle(R.string.thermal_dialog_title)
             .setMessage(isRiskyMode ? getString(R.string.thermal_dialog_risk_msg) : getString(R.string.thermal_dialog_safe_msg))
@@ -194,8 +207,24 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
         String key = preference.getKey();
         ContentResolver resolver = requireContext().getContentResolver();
 
-        // --- DT2S SLOP ---
-        if (KEY_DT2S_SLOP.equals(key)) {
+        // --- NATIVE SEARCH HANDLER ---
+        if (KEY_NATIVE_SEARCH.equals(key)) {
+            boolean enabled = (Boolean) newValue;
+            // 1. Сохраняем в Settings.Secure
+            Settings.Secure.putInt(resolver, KEY_NATIVE_SEARCH, enabled ? 1 : 0);
+            
+            // 2. Формируем команду
+            String cmdValue = enabled ? "true" : "false";
+            String command = "cmd device_config override launcher enable_one_search " + cmdValue +
+                             " && am force-stop com.google.android.apps.nexuslauncher";
+            
+            // 3. Выполняем в отдельном потоке (хоть это и быстро, но shell лучше не в UI)
+            new Thread(() -> runRootCommand(command)).start();
+            
+            return true;
+        }
+
+        else if (KEY_DT2S_SLOP.equals(key)) {
             try {
                 String input = (String) newValue;
                 int value = input.isEmpty() ? 0 : Integer.parseInt(input);
@@ -244,7 +273,6 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
             return handleTimeoutChange((String) newValue, KEY_DT2S_TIMEOUT, mDt2sTimeoutPref, R.string.launcher_dt2s_timeout_summary, true);
         }
         else if (ThermalUtils.KEY_THERMAL_BATTERY.equals(key)) {
-            // ... (код thermal)
             String value = (String) newValue;
             updateThermalSummaryAndIcon(mThermalBatteryPref, value, true);
             new Handler(Looper.getMainLooper()).post(() -> ThermalUtils.updateThermalProps(requireContext()));
@@ -253,7 +281,6 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
             return true;
         } 
         else if (ThermalUtils.KEY_THERMAL_SOC.equals(key)) {
-            // ... (код thermal)
             String value = (String) newValue;
             updateThermalSummaryAndIcon(mThermalSocPref, value, false);
             new Handler(Looper.getMainLooper()).post(() -> ThermalUtils.updateThermalProps(requireContext()));
@@ -283,6 +310,29 @@ public class PixelPartsFragment extends PreferenceFragmentCompat
         } catch (NumberFormatException e) {
             Toast.makeText(requireContext(), "Invalid number", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+
+    // Вспомогательный метод для выполнения Shell команд
+    private void runRootCommand(String command) {
+        Process process = null;
+        DataOutputStream os = null;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes(command + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+        } catch (Exception e) {
+            // Если root не удался, пробуем обычный exec (иногда работает для device_config в системных апп)
+            try {
+                Runtime.getRuntime().exec(new String[]{"sh", "-c", command});
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try { if (os != null) os.close(); } catch (Exception e) {}
         }
     }
 

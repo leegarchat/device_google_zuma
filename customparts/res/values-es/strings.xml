@@ -3,13 +3,18 @@
     <string name="pixel_parts_title">Funciones Adicionales</string>
     <string name="pixel_parts_custom_summary">Ajustes de doble toque y Control Térmico</string>
 
+    <string name="launcher_settings_title">Launcher</string>
+    <string name="pixel_launcher_search_title">Búsqueda nativa de Pixel Launcher</string>
+    <string name="pixel_launcher_search_summary">Fuerza la búsqueda nativa dentro del launcher al tocar el widget de búsqueda. Úselo si se abre una ventana externa de búsqueda de Google.</string>
+
+
     <string name="dt2w_category_title">Doble Toque para Despertar (DT2W)</string>
     <string name="doze_double_tap_hook_title">Doble Toque para Despertar</string>
     <string name="doze_double_tap_hook_summary">Use si la función de doble toque del hardware no funciona.</string>
     <string name="doze_double_tap_timeout_title">Intervalo de Doble Toque DT2W</string>
     <string name="doze_double_tap_timeout_summary">Intervalo actual: %1$d ms</string>
-    <string name="dt2w_info_text">No es una integración directa en el kernel, sino un método de software.\n\n<b>Nota:</b>\n• El software espera un segundo toque en modo Doze/AOD.</string>
-
+    <string name="dt2w_info_text">Esto no es una integración directa en el kernel, sino un hook de software.\n\n<b>Nota:</b>\n• El sistema espera un segundo toque en modo Doze/AOD.\n• Al ser un hook, el sensor debe reiniciarse tras el primer toque (tarda 10–100ms). Si toca por segunda vez demasiado rápido, es posible que el gesto no funcione.</string>
+	
     <string name="dt2s_category_title">Doble Toque para Dormir en el Lanzador (DT2S)</string>
     <string name="launcher_dt2s_title">Doble Toque para Dormir</string>
     <string name="launcher_dt2s_summary">Toque un área vacía del lanzador para bloquear el dispositivo.</string>
