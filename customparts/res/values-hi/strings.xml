@@ -22,7 +22,7 @@
     <string name="ims_ut_summary">IMS पर पूरक सेवाओं (USSD) के लिए समर्थन सक्षम करता है</string>
     <string name="ims_5g_thresh_title">5G सिग्नल ऑप्टिमाइज़ करें</string>
     <string name="ims_5g_thresh_summary">अनुकूलित 5G सिग्नल थ्रेसहोल्ड को सक्षम करता है</string>
-    <string name="ims_footer_info">ये सेटिंग्स कैरियर सुविधाओं के समर्थन को बाध्य करती हैं। डिफ़ॉल्ट 'बंद' है। लागू करने के लिए हवाई जहाज मोड टॉगल करें।</string>
+    <string name="ims_footer_info">ये सेटिंग्स कैरियर सुविधाओं के समर्थन को बाध्य करती हैं। डिफ़ॉल्ट \'बंद\' है। लागू करने के लिए हवाई जहाज मोड टॉगल करें।</string>
 
 
     <string name="launcher_settings_title">लॉन्चर (Launcher)</string>
