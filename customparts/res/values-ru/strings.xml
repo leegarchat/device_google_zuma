@@ -3,6 +3,38 @@
     <string name="pixel_parts_title">Дополнительные настройки</string>
     <string name="pixel_parts_custom_summary">Управление двойным касанием и терморегулированием</string>
 
+
+
+    <string name="pixel_parts_summary">Дополнительные функции и настройки IMS</string>
+    <string name="ims_category_title">Сеть и IMS (от Turbo IMS)</string>
+    
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">Включает поддержку VoLTE, если она скрыта оператором</string>
+    
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">Включает поддержку VoWiFi, если она скрыта оператором</string>
+    
+    <string name="ims_vt_title">Видеозвонки</string>
+    <string name="ims_vt_summary">Включает поддержку видеотелефонии (VT)</string>
+    
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Включает поддержку Voice over 5G (Android 14+)</string>
+    
+    <string name="ims_5g_title">Включить 5G NR</string>
+    <string name="ims_5g_summary">Включает поддержку диапазонов 5G SA и NSA</string>
+    
+    <string name="ims_cross_sim_title">Вызовы Cross-SIM</string>
+    <string name="ims_cross_sim_summary">Включает поддержку функции вызовов через другую SIM</string>
+    
+    <string name="ims_ut_title">Интерфейс UT</string>
+    <string name="ims_ut_summary">Включает поддержку доп. услуг (USSD) через IMS</string>
+    
+    <string name="ims_5g_thresh_title">Оптимизация 5G</string>
+    <string name="ims_5g_thresh_summary">Включает оптимизированные пороги сигнала 5G</string>
+    
+    <string name="ims_footer_info">Эти настройки принудительно активируют поддержку функций оператора. По умолчанию выключены (сток). Для применения переключите режим полета.</string>
+
+
     <string name="launcher_settings_title">Лаунчер</string>
     <string name="pixel_launcher_search_title">Нативный поиск Pixel Launcher</string>
     <string name="pixel_launcher_search_summary">Включает принудительно нативный поиск внутри лаунчера по нажатию на виджет поиска. Если у вас открывается внешнее окно Google поиска по нажатию виджета.</string>

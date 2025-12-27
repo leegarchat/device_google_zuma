@@ -3,7 +3,25 @@
     <string name="pixel_parts_title">Zusätzliche Funktionen</string>
     <string name="pixel_parts_custom_summary">Einstellungen für Doppeltippen und Thermoregulierung</string>
 
-
+    <string name="pixel_parts_summary">Zusätzliche Funktionen und IMS-Einstellungen</string>
+    <string name="ims_category_title">Netzwerk &amp; IMS (von Turbo IMS)</string>
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">Aktiviert VoLTE-Unterstützung (falls vom Anbieter deaktiviert)</string>
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">Aktiviert VoWiFi-Unterstützung (falls vom Anbieter deaktiviert)</string>
+    <string name="ims_vt_title">Videoanrufe</string>
+    <string name="ims_vt_summary">Aktiviert Unterstützung für Videotelefonie (VT)</string>
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Aktiviert Unterstützung für Voice over 5G (Android 14+)</string>
+    <string name="ims_5g_title">5G NR aktivieren</string>
+    <string name="ims_5g_summary">Aktiviert Unterstützung für 5G SA und NSA</string>
+    <string name="ims_cross_sim_title">Cross-SIM Anrufe</string>
+    <string name="ims_cross_sim_summary">Aktiviert Unterstützung für Cross-SIM-Anrufe</string>
+    <string name="ims_ut_title">UT-Schnittstelle</string>
+    <string name="ims_ut_summary">Aktiviert Unterstützung für IMS-Zusatzdienste (USSD)</string>
+    <string name="ims_5g_thresh_title">5G-Signal optimieren</string>
+    <string name="ims_5g_thresh_summary">Aktiviert optimierte 5G-Signalschwellenwerte</string>
+    <string name="ims_footer_info">Diese Einstellungen erzwingen die Unterstützung von Anbieterfunktionen. Standard ist \'Aus\'. Flugmodus umschalten zum Übernehmen.</string>
 
     <string name="launcher_settings_title">Launcher</string>
     <string name="pixel_launcher_search_title">Native Pixel Launcher Suche</string>

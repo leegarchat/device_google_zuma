@@ -3,6 +3,29 @@
     <string name="pixel_parts_title">Funciones Adicionales</string>
     <string name="pixel_parts_custom_summary">Ajustes de doble toque y Control Térmico</string>
 
+
+
+
+    <string name="pixel_parts_summary">Funciones adicionales y ajustes IMS</string>
+    <string name="ims_category_title">Red e IMS (de Turbo IMS)</string>
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">Habilita soporte VoLTE si está desactivado por el operador</string>
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">Habilita soporte VoWiFi si está desactivado por el operador</string>
+    <string name="ims_vt_title">Videollamadas</string>
+    <string name="ims_vt_summary">Habilita soporte para videotelefonía (VT)</string>
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Habilita soporte para Voice over 5G (Android 14+)</string>
+    <string name="ims_5g_title">Habilitar 5G NR</string>
+    <string name="ims_5g_summary">Habilita soporte para 5G SA y NSA</string>
+    <string name="ims_cross_sim_title">Llamadas Cross-SIM</string>
+    <string name="ims_cross_sim_summary">Habilita soporte para la función Cross-SIM</string>
+    <string name="ims_ut_title">Interfaz UT</string>
+    <string name="ims_ut_summary">Habilita soporte para servicios suplementarios (USSD) vía IMS</string>
+    <string name="ims_5g_thresh_title">Optimizar señal 5G</string>
+    <string name="ims_5g_thresh_summary">Habilita umbrales de señal 5G optimizados</string>
+    <string name="ims_footer_info">Estos ajustes fuerzan el soporte de funciones del operador. Por defecto \'Apagado\'. Active/desactive el modo avión para aplicar.</string>
+
     <string name="launcher_settings_title">Launcher</string>
     <string name="pixel_launcher_search_title">Búsqueda nativa de Pixel Launcher</string>
     <string name="pixel_launcher_search_summary">Fuerza la búsqueda nativa dentro del launcher al tocar el widget de búsqueda. Úselo si se abre una ventana externa de búsqueda de Google.</string>

@@ -4,6 +4,27 @@
     <string name="pixel_parts_custom_summary">डबल-टैप सेटिंग्स और थर्मल कंट्रोल</string>
 
 
+    <string name="pixel_parts_summary">अतिरिक्त सुविधाएं और IMS सेटिंग्स</string>
+    <string name="ims_category_title">नेटवर्क और IMS (Turbo IMS से)</string>
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">VoLTE समर्थन सक्षम करता है (यदि कैरियर द्वारा अक्षम है)</string>
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">VoWiFi समर्थन सक्षम करता है (यदि कैरियर द्वारा अक्षम है)</string>
+    <string name="ims_vt_title">वीडियो कॉलिंग</string>
+    <string name="ims_vt_summary">वीडियो टेलीफोनी (VT) समर्थन सक्षम करता है</string>
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Voice over 5G समर्थन सक्षम करता है (Android 14+)</string>
+    <string name="ims_5g_title">5G NR सक्षम करें</string>
+    <string name="ims_5g_summary">5G SA और NSA समर्थन को सक्षम करता है</string>
+    <string name="ims_cross_sim_title">Cross-SIM कॉलिंग</string>
+    <string name="ims_cross_sim_summary">Cross-SIM कॉलिंग सुविधा के लिए समर्थन सक्षम करता है</string>
+    <string name="ims_ut_title">UT इंटरफ़ेस</string>
+    <string name="ims_ut_summary">IMS पर पूरक सेवाओं (USSD) के लिए समर्थन सक्षम करता है</string>
+    <string name="ims_5g_thresh_title">5G सिग्नल ऑप्टिमाइज़ करें</string>
+    <string name="ims_5g_thresh_summary">अनुकूलित 5G सिग्नल थ्रेसहोल्ड को सक्षम करता है</string>
+    <string name="ims_footer_info">ये सेटिंग्स कैरियर सुविधाओं के समर्थन को बाध्य करती हैं। डिफ़ॉल्ट 'बंद' है। लागू करने के लिए हवाई जहाज मोड टॉगल करें।</string>
+
+
     <string name="launcher_settings_title">लॉन्चर (Launcher)</string>
     <string name="pixel_launcher_search_title">देशी Pixel Launcher खोज</string>
     <string name="pixel_launcher_search_summary">सर्च विजेट पर टैप करने पर लॉन्चर के अंदर देशी खोज को बाध्य करता है। यदि इसके बजाय बाहरी Google खोज विंडो खुलती है तो इसका उपयोग करें।</string>

@@ -4,6 +4,25 @@
     <string name="pixel_parts_custom_summary">Paramètres de double-tap et Contrôle thermique</string>
 
 
+    <string name="pixel_parts_summary">Fonctions supplémentaires et paramètres IMS</string>
+    <string name="ims_category_title">Réseau et IMS (de Turbo IMS)</string>
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">Active le support VoLTE si désactivé par l\'opérateur</string>
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">Active le support VoWiFi si désactivé par l\'opérateur</string>
+    <string name="ims_vt_title">Appels visio</string>
+    <string name="ims_vt_summary">Active le support de la visiophonie (VT)</string>
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Active le support Voice over 5G (Android 14+)</string>
+    <string name="ims_5g_title">Activer 5G NR</string>
+    <string name="ims_5g_summary">Active le support 5G SA et NSA</string>
+    <string name="ims_cross_sim_title">Appels Cross-SIM</string>
+    <string name="ims_cross_sim_summary">Active le support de la fonction Cross-SIM</string>
+    <string name="ims_ut_title">Interface UT</string>
+    <string name="ims_ut_summary">Active le support des services suppl. (USSD) via IMS</string>
+    <string name="ims_5g_thresh_title">Optimiser le signal 5G</string>
+    <string name="ims_5g_thresh_summary">Active les seuils de signal 5G optimisés</string>
+    <string name="ims_footer_info">Ces réglages forcent le support des fonctions opérateur. Par défaut \'Désactivé\'. Basculez le mode avion pour appliquer.</string>
 
     <string name="launcher_settings_title">Lanceur</string>
     <string name="pixel_launcher_search_title">Recherche native Pixel Launcher</string>

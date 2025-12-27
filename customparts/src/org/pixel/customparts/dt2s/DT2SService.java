@@ -39,43 +39,30 @@ import java.util.List;
 
 public class DT2SService extends Service {
     private static final String TAG = "PixelPartsDT2S";
-    
-    // КЛЮЧИ НАСТРОЕК
     private static final String KEY_DT2S_ENABLED = "launcher_dt2s_enabled"; 
     private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
     private static final String KEY_DT2S_SLOP = "launcher_dt2s_slop";
-
     private InputMonitor mInputMonitor;
     private InputEventReceiver mInputReceiver;
-
     private PowerManager mPowerManager;
     private KeyguardManager mKeyguardManager;
     private WindowManager mWindowManager;
     private InputMethodManager mImm;
-
     private boolean mIsMonitoring = false;
     private boolean mIsEnabled = false;
-
-    // --- Reflection для StatusBar ---
     private Object mStatusBarService;
     private final List<Method> mPanelExpansionMethods = new ArrayList<>();
-
     private String mLauncherPackage;
-    
-    // Параметры жеста
     private int mDoubleTapTimeout = 250;
-    private int mDoubleTapSlop; // Активное значение
-    private int mSystemSlop;    // Системное значение
-
-    private long mTempDownTime; // Время начала текущего касания
+    private int mDoubleTapSlop;
+    private int mSystemSlop;
+    private long mTempDownTime;
     private long mLastTapTime = 0;
     private float mLastTapX;
     private float mLastTapY;
-
     private float mDownX;
     private float mDownY;
     private boolean mIsSwipe;
-    
     private SettingsObserver mSettingsObserver;
 
     @Override
@@ -85,14 +72,10 @@ public class DT2SService extends Service {
         mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        
-        // 1. Получаем системное значение
         mSystemSlop = ViewConfiguration.get(this).getScaledDoubleTapSlop();
         Log.d(TAG, "System Default Slop is: " + mSystemSlop + "px");
         
         mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
-        
-        // Регистрируем наблюдателей
         getContentResolver().registerContentObserver(
                 Settings.Secure.getUriFor(KEY_DT2S_ENABLED), false, mSettingsObserver);
         getContentResolver().registerContentObserver(
@@ -103,7 +86,7 @@ public class DT2SService extends Service {
         resolveLauncher();
         registerScreenReceiver();
         
-        updateSettings(); // Первичная инициализация
+        updateSettings();
     }
 
     @Override
@@ -137,7 +120,6 @@ public class DT2SService extends Service {
         mIsEnabled = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_ENABLED, 1) == 1; 
         mDoubleTapTimeout = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_TIMEOUT, 250);
         
-        // Логика выбора Slop
         int userSlop = Settings.Secure.getInt(getContentResolver(), KEY_DT2S_SLOP, 0);
         if (userSlop > 0) {
             mDoubleTapSlop = userSlop;
@@ -153,10 +135,6 @@ public class DT2SService extends Service {
             stopMonitoring();
         }
     }
-
-    // ---------------------------------------------------------
-    // MONITORING
-    // ---------------------------------------------------------
 
     private void registerScreenReceiver() {
         IntentFilter filter = new IntentFilter();
@@ -199,11 +177,6 @@ public class DT2SService extends Service {
         mInputMonitor = null;
         mIsMonitoring = false;
     }
-
-    // ---------------------------------------------------------
-    // TOUCH HANDLER
-    // ---------------------------------------------------------
-
     private class TouchReceiver extends InputEventReceiver {
         TouchReceiver(InputChannel c, Looper l) { super(c, l); }
 
@@ -230,19 +203,15 @@ public class DT2SService extends Service {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                // 1. Сохраняем параметры текущего касания
                 mDownX = e.getX();
                 mDownY = e.getY();
                 mTempDownTime = SystemClock.uptimeMillis();
                 mIsSwipe = false;
-
-                // 2. Проверяем на второй тап
                 if (mLastTapTime > 0 && (mTempDownTime - mLastTapTime < mDoubleTapTimeout)) {
                     float dx = Math.abs(mDownX - mLastTapX);
                     float dy = Math.abs(mDownY - mLastTapY);
 
                     if (dx < mDoubleTapSlop && dy < mDoubleTapSlop) {
-                        // Жест выполнен -> тяжелые проверки
                         if (performHeavyChecksAndSleep(e.getRawY())) {
                             mLastTapTime = 0; 
                             return;
@@ -253,7 +222,6 @@ public class DT2SService extends Service {
 
             case MotionEvent.ACTION_MOVE:
                 if (!mIsSwipe) {
-                    // Проверка на свайп во время движения
                     if (Math.abs(e.getX() - mDownX) > mDoubleTapSlop ||
                         Math.abs(e.getY() - mDownY) > mDoubleTapSlop) {
                         mIsSwipe = true;
@@ -266,12 +234,10 @@ public class DT2SService extends Service {
                 if (mIsSwipe) {
                     mLastTapTime = 0;
                 } else {
-                    // 3. Финальная проверка: не уехал ли палец далеко к моменту отпускания?
                     if (Math.abs(e.getX() - mDownX) > mDoubleTapSlop ||
                         Math.abs(e.getY() - mDownY) > mDoubleTapSlop) {
-                        mLastTapTime = 0; // Это был быстрый свайп
+                        mLastTapTime = 0;
                     } else {
-                        // 4. Чистый тап - запоминаем
                         mLastTapTime = mTempDownTime;
                         mLastTapX = mDownX;
                         mLastTapY = mDownY;
@@ -303,8 +269,6 @@ public class DT2SService extends Service {
         }
     }
 
-    // ... (Методы isIgnoredZone, isLauncherOnTop, isKeyboardShown, isShadeExpanded, isLockscreen, resolveLauncher без изменений) ...
-    // Скопируй их из своего кода, они там верные.
     private void resolveLauncher() {
         try {
             Intent i = new Intent(Intent.ACTION_MAIN);
@@ -320,8 +284,8 @@ public class DT2SService extends Service {
             ActivityTaskManager.RootTaskInfo info =
                     ActivityTaskManager.getService().getFocusedRootTaskInfo();
             return info != null &&
-                   info.topActivity != null &&
-                   info.topActivity.getPackageName().equals(mLauncherPackage);
+                    info.topActivity != null &&
+                    info.topActivity.getPackageName().equals(mLauncherPackage);
         } catch (Exception e) {
             return false;
         }
@@ -341,8 +305,8 @@ public class DT2SService extends Service {
     }
 
     private boolean isKeyboardShown() {
-         if (mImm != null && mImm.isAcceptingText()) return true;
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && mWindowManager != null) {
+        if (mImm != null && mImm.isAcceptingText()) return true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && mWindowManager != null) {
             try {
                 WindowMetrics metrics = mWindowManager.getCurrentWindowMetrics();
                 WindowInsets insets = metrics.getWindowInsets();

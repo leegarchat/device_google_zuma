@@ -4,6 +4,26 @@
     <string name="pixel_parts_custom_summary">Pengaturan ketuk ganda dan Kontrol Termal</string>
 
 
+    <string name="pixel_parts_summary">Fitur tambahan dan pengaturan IMS</string>
+    <string name="ims_category_title">Jaringan &amp; IMS (dari Turbo IMS)</string>
+    <string name="ims_volte_title">VoLTE</string>
+    <string name="ims_volte_summary">Mengaktifkan dukungan VoLTE jika dinonaktifkan operator</string>
+    <string name="ims_vowifi_title">VoWiFi</string>
+    <string name="ims_vowifi_summary">Mengaktifkan dukungan VoWiFi jika dinonaktifkan operator</string>
+    <string name="ims_vt_title">Panggilan Video</string>
+    <string name="ims_vt_summary">Mengaktifkan dukungan Telepon Video (VT)</string>
+    <string name="ims_vonr_title">VoNR</string>
+    <string name="ims_vonr_summary">Mengaktifkan dukungan Voice over 5G (Android 14+)</string>
+    <string name="ims_5g_title">Aktifkan 5G NR</string>
+    <string name="ims_5g_summary">Mengaktifkan dukungan 5G SA dan NSA</string>
+    <string name="ims_cross_sim_title">Panggilan Lintas SIM</string>
+    <string name="ims_cross_sim_summary">Mengaktifkan dukungan fitur Panggilan Lintas SIM</string>
+    <string name="ims_ut_title">Antarmuka UT</string>
+    <string name="ims_ut_summary">Mengaktifkan dukungan layanan tambahan (USSD) via IMS</string>
+    <string name="ims_5g_thresh_title">Optimalkan Sinyal 5G</string>
+    <string name="ims_5g_thresh_summary">Mengaktifkan ambang batas sinyal 5G yang dioptimalkan</string>
+    <string name="ims_footer_info">Pengaturan ini memaksa dukungan fitur operator. Default \'Mati\'. Beralih Mode Pesawat untuk menerapkan.</string>
+
     <string name="launcher_settings_title">Launcher</string>
     <string name="pixel_launcher_search_title">Pencarian Native Pixel Launcher</string>
     <string name="pixel_launcher_search_summary">Memaksa pencarian native di dalam launcher saat mengetuk widget pencarian. Gunakan jika jendela Pencarian Google eksternal terbuka sebagai gantinya.</string>
