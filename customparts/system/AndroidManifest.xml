@@ -29,6 +29,7 @@
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
         android:defaultToDeviceProtectedStorage="true"
         android:directBootAware="true">
+        
         <activity
             android:name=".MainActivity"
             android:label="@string/main_title"
@@ -36,85 +37,38 @@
             android:icon="@drawable/ic_settings_outline"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
-            <!-- ВАЖНО: Добавляем priority="1", как у системных настроек. 
-                Это повышает вес элемента при сортировке и группировке. -->
             <intent-filter android:priority="1">
                 <action android:name="com.android.settings.action.IA_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
-            <!-- ВАЖНО: Добавляем второй фильтр SHORTCUT. 
-                Многие кастомные прошивки используют его наличие как признак 
-                "полноценного" элемента меню для отрисовки UI. -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="com.android.settings.SHORTCUT" />
-            </intent-filter>
-
             <meta-data
                 android:name="com.android.settings.category"
-                android:value="com.android.settings.category.ia.homepage" />
+                android:value="com.android.settings.category.ia.display" />
 
-            <!-- Порядок 0 поместит пункт сразу под Evolver (-1). 
-                Соседство с приоритетным элементом поможет "склеить" их в одну группу карточек. -->
             <meta-data
                 android:name="com.android.settings.order"
-                android:value="0" />
+                android:value="1000" />
 
             <meta-data
                 android:name="com.android.settings.summary"
                 android:resource="@string/main_desc" />
 
+            <!-- Иконка прозрачная, как было в старом алиасе дисплея -->
             <meta-data 
                 android:name="com.android.settings.icon"
-                android:resource="@drawable/ic_settings_outline" />
+                android:resource="@android:color/transparent" />
 
-            <!-- ВИЗУАЛ: Чтобы иконка не выглядела "чужой", ей нужен тинт.
-                Используем системный белый цвет (или замените на свой ресурс цвета). -->
-            <meta-data
-                android:name="com.android.settings.icon_tint"
-                android:resource="@android:color/white" />
-
-            <!-- FIX: Добавляем FRAGMENT_CLASS, чтобы система считала этот пункт "родным" фрагментом
-                и применяла к нему layout с подложкой. Указываем класс вашей Activity. -->
             <meta-data
                 android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value=".MainActivity" />
-
-            <!-- FIX: Добавляем HIGHLIGHT_MENU_KEY для полного соответствия системному формату -->
-            <meta-data
-                android:name="com.android.settings.HIGHLIGHT_MENU_KEY"
-                android:value="custom_settings_menu_key" />
             
-            <!-- Флаг управления профилем (обязателен для системного вида) -->
             <meta-data
                 android:name="com.android.settings.PRIMARY_PROFILE_CONTROLLED"
                 android:value="true" />
         </activity>
-        <!-- <activity
-            android:name=".MainActivity"
-            android:label="@string/main_title"
-            android:exported="true"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
-            
-            <intent-filter>
-                <action android:name="com.android.settings.action.IA_SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data
-                android:name="com.android.settings.category"
-                android:value="com.android.settings.category.ia.homepage" />
-            <meta-data
-                android:name="com.android.settings.order"
-                android:value="-80" />
-            <meta-data
-                android:name="com.android.settings.summary"
-                android:resource="@string/main_desc" />
-            <meta-data 
-                android:name="com.android.settings.icon"
-                android:resource="@drawable/ic_settings_outline" />
-        </activity> -->
 
+        <!-- ALIAS: Network/Wireless Category -->
         <activity-alias
             android:name=".PixelPartsActivityNetwork"
             android:targetActivity=".MainActivity"
@@ -139,6 +93,7 @@
                 android:resource="@drawable/ic_settings_outline" />
         </activity-alias>
 
+        <!-- ALIAS: Battery Category -->
         <activity-alias
             android:name=".PixelPartsActivityBattery"
             android:targetActivity=".MainActivity"
@@ -152,20 +107,18 @@
             <meta-data
                 android:name="com.android.settings.category"
                 android:value="com.android.settings.category.ia.battery" />
-
             <meta-data
                 android:name="com.android.settings.order"
                 android:value="1000" />
-
             <meta-data
                 android:name="com.android.settings.summary"
                 android:resource="@string/main_desc" />
-
             <meta-data 
                 android:name="com.android.settings.icon" 
                 android:resource="@android:color/transparent" />
         </activity-alias>
 
+        <!-- ALIAS: System Category -->
         <activity-alias
             android:name=".PixelPartsActivitySystem"
             android:targetActivity=".MainActivity"
@@ -179,43 +132,17 @@
             <meta-data
                 android:name="com.android.settings.category"
                 android:value="com.android.settings.category.ia.system" />
-
             <meta-data
                 android:name="com.android.settings.order"
                 android:value="1000" />
-
             <meta-data
                 android:name="com.android.settings.summary"
                 android:resource="@string/main_desc" />
-
             <meta-data 
                 android:name="com.android.settings.icon" 
                 android:resource="@drawable/ic_settings_outline" />
         </activity-alias>
 
-        <activity-alias
-            android:name=".PixelPartsActivityDisplay"
-            android:targetActivity=".MainActivity"
-            android:label="@string/main_title"
-            android:exported="true"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
-            <intent-filter>
-                <action android:name="com.android.settings.action.IA_SETTINGS" />
-            </intent-filter>
-            
-            <meta-data
-                android:name="com.android.settings.category"
-                android:value="com.android.settings.category.ia.display" />
-            <meta-data
-                android:name="com.android.settings.order"
-                android:value="1000" />
-            <meta-data
-                android:name="com.android.settings.summary"
-                android:resource="@string/main_desc" />
-            <meta-data
-                android:name="com.android.settings.icon"
-                android:resource="@android:color/transparent" />
-        </activity-alias>
 
         <activity
             android:name=".activities.DoubleTapActivity"
@@ -232,19 +159,16 @@
             android:label="@string/launcher_settings_title"
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
-
         <activity
             android:name=".activities.OverscrollActivity"
             android:label="@string/os_title_activity"
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
-
         <activity
             android:name=".activities.ImsActivity"
             android:label="@string/ims_category_title"
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
-
         <activity
             android:name=".activities.ThermalActivity"
             android:label="@string/thermal_title"
