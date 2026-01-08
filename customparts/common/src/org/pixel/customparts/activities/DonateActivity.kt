@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -170,6 +171,7 @@ fun DonateScreen(onBack: () -> Unit) {
     var pageData by remember { mutableStateOf<DonatePageData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var loadError by remember { mutableStateOf<String?>(null) }
+    var refreshKey by remember { mutableIntStateOf(0) } // Ключ для принудительного обновления
 
     val targetStates = remember { mutableStateMapOf<String, TargetState>() }
 
@@ -180,29 +182,42 @@ fun DonateScreen(onBack: () -> Unit) {
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshKey) {
         val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json"
         try {
-            // 1. Сначала загружаем конфиг страницы
+            isLoading = true
+            loadError = null
+            
+            // 1. Загружаем конфиг страницы
             val result = fetchDonatePageData(rawJsonUrl)
             
             if (result != null) {
                 pageData = result
                 isLoading = false
+                
+                // Перезагружаем данные всех карточек (последовательно)
                 result.progress.forEach { config ->
-                    if (targetStates[config.apiUrl] !is TargetState.Success) {
-                        targetStates[config.apiUrl] = TargetState.Loading
-                        val state = fetchCardState(config)
-                        targetStates[config.apiUrl] = state
-                    }
+                    targetStates[config.apiUrl] = TargetState.Loading
+                    val state = fetchCardState(config)
+                    targetStates[config.apiUrl] = state
+                }
+                
+                if (refreshKey > 0) {
+                    Toast.makeText(context, "Страница обновлена", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 loadError = "Failed to parse config"
                 isLoading = false
+                if (refreshKey > 0) {
+                    Toast.makeText(context, "Ошибка получения данных", Toast.LENGTH_SHORT).show()
+                }
             }
         } catch (e: Exception) {
             loadError = e.message
             isLoading = false
+            if (refreshKey > 0) {
+                Toast.makeText(context, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -214,6 +229,14 @@ fun DonateScreen(onBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { refreshKey++ }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = dynamicStringResource(R.string.menu_refresh)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
