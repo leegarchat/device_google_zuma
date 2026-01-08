@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import org.pixel.customparts.R
+import org.pixel.customparts.AppConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -539,50 +540,118 @@ fun InfoDialog(
                         var isNetworkSource by remember { mutableStateOf(false) }
 
                         LaunchedEffect(videoResName, reloadKey) {
+                            val TAG = "CustomPartsVideo" // Тег для фильтрации в Logcat
+
                             if (videoResName == "test_row") {
+                                android.util.Log.d(TAG, "Skipping logic for 'test_row'")
                                 isLoading = false
                                 return@LaunchedEffect
                             }
 
+                            android.util.Log.d(TAG, ">>> START LaunchedEffect for: $videoResName | ReloadKey: $reloadKey")
                             isLoading = true
                             isError = false
                             
                             val webUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/VideoSample/$videoResName.mp4"
+                            android.util.Log.d(TAG, "Target URL: $webUrl")
+                            
+                            // 1. Проверяем ресурсы APK
                             val resId = context.resources.getIdentifier(videoResName, "raw", context.packageName)
-
                             if (resId != 0) {
+                                android.util.Log.d(TAG, "Found VALID local resource ID: $resId. Using local raw resource.")
                                 currentUri = Uri.parse("android.resource://${context.packageName}/$resId")
                                 isNetworkSource = false
                                 isLoading = false
+                                return@LaunchedEffect
                             } else {
-                                isNetworkSource = true
-                                val cacheFile = File(context.cacheDir, "$videoResName.mp4")
+                                android.util.Log.d(TAG, "Resource not found in APK (resId=0). Switching to Network/Cache mode.")
+                            }
 
-                                try {
-                                    withContext(Dispatchers.IO) {
-                                        // Скачиваем только если файла нет или запрошен reload
-                                        if (!cacheFile.exists() || cacheFile.length() == 0L || reloadKey > 0) {
-                                            if (cacheFile.exists()) cacheFile.delete()
-                                            
-                                            URL(webUrl).openStream().use { input ->
-                                                cacheFile.outputStream().use { output ->
-                                                    input.copyTo(output)
-                                                }
+                            isNetworkSource = true
+                            
+                            // 2. Выбор директории
+                            val targetDir = if (!AppConfig.IS_XPOSED) {
+                                val extCache = context.externalCacheDir
+                                android.util.Log.d(TAG, "Mode: SYSTEM APP. Attempting External Cache. Available: ${extCache != null}")
+                                if (extCache == null) android.util.Log.w(TAG, "WARNING: externalCacheDir is NULL! Falling back to internal cache (may fail).")
+                                extCache ?: context.cacheDir
+                            } else {
+                                android.util.Log.d(TAG, "Mode: XPOSED MODULE. Using internal cacheDir.")
+                                context.cacheDir
+                            }
+                            
+                            android.util.Log.d(TAG, "Selected Cache Dir: ${targetDir.absolutePath}")
+                            val cacheFile = File(targetDir, "$videoResName.mp4")
+                            android.util.Log.d(TAG, "Target File Path: ${cacheFile.absolutePath}")
+
+                            try {
+                                withContext(Dispatchers.IO) {
+                                    val fileExists = cacheFile.exists()
+                                    val fileLength = cacheFile.length()
+                                    android.util.Log.d(TAG, "Pre-check: Exists=$fileExists, Size=$fileLength bytes")
+
+                                    // Логика загрузки
+                                    if (!fileExists || fileLength == 0L || reloadKey > 0) {
+                                        android.util.Log.d(TAG, "Download REQUIRED. (Reason: Missing=${!fileExists}, Empty=${fileLength==0L}, Force=${reloadKey > 0})")
+                                        
+                                        if (fileExists) {
+                                            val deleted = cacheFile.delete()
+                                            android.util.Log.d(TAG, "Old file deletion result: $deleted")
+                                        }
+
+                                        android.util.Log.d(TAG, "Opening HTTP connection...")
+                                        val url = URL(webUrl)
+                                        val connection = url.openConnection() as java.net.HttpURLConnection
+                                        connection.connectTimeout = 15000
+                                        connection.readTimeout = 15000
+                                        connection.instanceFollowRedirects = true
+                                        connection.connect()
+
+                                        val responseCode = connection.responseCode
+                                        android.util.Log.d(TAG, "HTTP Response: $responseCode | Msg: ${connection.responseMessage} | Content-Len: ${connection.contentLength}")
+
+                                        if (responseCode != 200) {
+                                            throw Exception("HTTP Failed: $responseCode ${connection.responseMessage}")
+                                        }
+
+                                        android.util.Log.d(TAG, "Starting stream copy...")
+                                        connection.inputStream.use { input ->
+                                            cacheFile.outputStream().use { output ->
+                                                input.copyTo(output)
                                             }
                                         }
+                                        android.util.Log.d(TAG, "Stream copy FINISHED. File size on disk: ${cacheFile.length()}")
+                                        
+                                        // Настройка прав
+                                        if (!AppConfig.IS_XPOSED) {
+                                            val setReadableResult = cacheFile.setReadable(true, false)
+                                            android.util.Log.d(TAG, "Permissions: setReadable(true, false) result = $setReadableResult")
+                                            if (!setReadableResult) {
+                                                android.util.Log.e(TAG, "CRITICAL: Failed to make file world-readable!")
+                                            }
+                                        }
+
+                                    } else {
+                                        android.util.Log.d(TAG, "File is VALID. Skipping download.")
                                     }
 
+                                    // Финальная валидация
                                     if (cacheFile.exists() && cacheFile.length() > 0) {
-                                        currentUri = Uri.fromFile(cacheFile)
+                                        val uri = Uri.fromFile(cacheFile)
+                                        android.util.Log.d(TAG, "SUCCESS! Final URI: $uri")
+                                        currentUri = uri
                                     } else {
-                                        throw Exception("File downloaded but empty")
+                                        android.util.Log.e(TAG, "FAILURE: File verification failed after processing. Exists=${cacheFile.exists()}, Size=${cacheFile.length()}")
+                                        throw Exception("File verification failed")
                                     }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    currentUri = Uri.parse(webUrl)
-                                } finally {
-                                    isLoading = false
                                 }
+                            } catch (e: Exception) {
+                                android.util.Log.e(TAG, "EXCEPTION CAUGHT in LaunchedEffect", e)
+                                e.printStackTrace() // Печатаем полный стек в лог
+                                isError = true 
+                            } finally {
+                                isLoading = false
+                                android.util.Log.d(TAG, "<<< END LaunchedEffect state: isError=$isError, isLoading=$isLoading")
                             }
                         }
 
