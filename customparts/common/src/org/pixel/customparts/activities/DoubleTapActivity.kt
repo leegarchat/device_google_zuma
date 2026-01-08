@@ -63,7 +63,7 @@ fun DoubleTapScreen(onBack: () -> Unit) {
     var infoDialogTitle by remember { mutableStateOf<String?>(null) }
     var infoDialogText by remember { mutableStateOf<String?>(null) }
     var showXposedInactiveDialog by remember { mutableStateOf(false) }
-
+    var infoDialogVideo by remember { mutableStateOf<String?>(null) }
     var dt2wEnabled by remember { mutableStateOf(DoubleTapManager.isDt2wEnabled(context)) }
     var dt2wTimeout by remember { mutableIntStateOf(DoubleTapManager.getDt2wTimeout(context)) }
     
@@ -126,7 +126,11 @@ fun DoubleTapScreen(onBack: () -> Unit) {
                         },
                         videoResName = "dt2w_hook",
                         infoText = dt2wDesc,
-                        onInfoClick = { t, s, _ -> infoDialogTitle = t; infoDialogText = s }
+                        onInfoClick = { t, s, v ->
+                            infoDialogTitle = t
+                            infoDialogText = s
+                            infoDialogVideo = v
+                        }
                     )
                     
                     Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
@@ -149,8 +153,12 @@ fun DoubleTapScreen(onBack: () -> Unit) {
                 Dt2sUiSection(
                     context = context,
                     scope = scope,
-                    showXposedDialog = { showXposedInactiveDialog = true }, 
-                    onInfoClick = { t, s, _ -> infoDialogTitle = t; infoDialogText = s }
+                    showXposedDialog = { showXposedInactiveDialog = true },
+                    onInfoClick = { t, s, v ->
+                        infoDialogTitle = t
+                        infoDialogText = s
+                        infoDialogVideo = v
+                    }
                 )
             }
         }
