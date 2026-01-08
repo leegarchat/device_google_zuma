@@ -40,32 +40,4 @@ public class NativePartsManager {
             return false;
         }
     }
-
-    public static void onEdgeEffectInit(EdgeEffect effect, Context context) {
-        EdgeEffectHooks.init(effect, context);
-    }
-
-    public static boolean onEdgeEffectDraw(EdgeEffect effect, Canvas canvas, float width, float height) {
-        return EdgeEffectHooks.draw(effect, canvas, width, height);
-    }
-
-    public static boolean onEdgeEffectPull(EdgeEffect effect, float deltaDistance, float displacement, float width, float height) {
-        return EdgeEffectHooks.onPull(effect, deltaDistance, displacement, width, height);
-    }
-
-    public static void onEdgeEffectRelease(EdgeEffect effect) {
-        EdgeEffectHooks.onRelease(effect);
-    }
-
-    public static void onEdgeEffectAbsorb(EdgeEffect effect, int velocity, float height) {
-        EdgeEffectHooks.onAbsorb(effect, velocity, height);
-    }
-
-    public static boolean isEdgeEffectFinished(EdgeEffect effect) {
-        return EdgeEffectHooks.isFinished(effect);
-    }
-
-    public static void onEdgeEffectFinish(EdgeEffect effect) {
-        EdgeEffectHooks.finish(effect);
-    }
 }
