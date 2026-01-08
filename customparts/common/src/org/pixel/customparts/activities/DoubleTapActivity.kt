@@ -33,6 +33,7 @@ import org.pixel.customparts.ui.InfoDialog
 import org.pixel.customparts.ui.SettingsGroupCard
 import org.pixel.customparts.ui.SliderSetting
 import org.pixel.customparts.utils.dynamicStringResource
+
 class DoubleTapActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +145,11 @@ fun DoubleTapScreen(onBack: () -> Unit) {
                         onValueChange = { dt2wTimeout = it; scope.launch { DoubleTapManager.setDt2wTimeout(context, it) } },
                         onDefault = { dt2wTimeout = 200; scope.launch { DoubleTapManager.setDt2wTimeout(context, 200) } },
                         infoText = dynamicStringResource(R.string.dt2w_timeout_desc),
-                        onInfoClick = { t, s, _ -> infoDialogTitle = t; infoDialogText = s }
+                        onInfoClick = { t, s, v -> 
+                            infoDialogTitle = t
+                            infoDialogText = s
+                            infoDialogVideo = v
+                        }
                     )
                 }
             }
@@ -165,7 +170,16 @@ fun DoubleTapScreen(onBack: () -> Unit) {
     }
 
     if (infoDialogTitle != null && infoDialogText != null) {
-        InfoDialog(title = infoDialogTitle!!, text = infoDialogText!!, onDismiss = { infoDialogTitle = null; infoDialogText = null })
+        InfoDialog(
+            title = infoDialogTitle!!, 
+            text = infoDialogText!!, 
+            videoResName = infoDialogVideo,
+            onDismiss = { 
+                infoDialogTitle = null
+                infoDialogText = null
+                infoDialogVideo = null
+            }
+        )
     }
 }
 
