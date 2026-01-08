@@ -41,6 +41,7 @@ import org.pixel.customparts.AppConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import java.net.URL
 import androidx.compose.material.icons.rounded.Refresh
 import org.pixel.customparts.utils.dynamicStringResource
@@ -492,11 +493,18 @@ fun InfoDialog(
     val scrollState = rememberScrollState()
 
     Dialog(onDismissRequest = onDismiss) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center
+                .padding(vertical = 24.dp)
+                .verticalScroll(scrollState)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss 
+                ),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
@@ -505,12 +513,11 @@ fun InfoDialog(
                 shadowElevation = 8.dp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight() 
                     .padding(horizontal = 16.dp)
+                    .clickable(enabled = false) {}
             ) {
                 Column(
                     modifier = Modifier
-                        .verticalScroll(scrollState)
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -523,7 +530,7 @@ fun InfoDialog(
                         IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
                             Icon(
                                 Icons.Default.Close,
-                                stringResource(R.string.btn_close), // Используйте обычный stringResource если dynamic не критичен тут
+                                stringResource(R.string.btn_close),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -540,7 +547,7 @@ fun InfoDialog(
                         var isNetworkSource by remember { mutableStateOf(false) }
 
                         LaunchedEffect(videoResName, reloadKey) {
-                            val TAG = "CustomPartsVideo" // Тег для фильтрации в Logcat
+                            val TAG = "CustomPartsVideo"
 
                             if (videoResName == "test_row") {
                                 android.util.Log.d(TAG, "Skipping logic for 'test_row'")
@@ -553,105 +560,68 @@ fun InfoDialog(
                             isError = false
                             
                             val webUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/VideoSample/$videoResName.mp4"
-                            android.util.Log.d(TAG, "Target URL: $webUrl")
                             
                             // 1. Проверяем ресурсы APK
                             val resId = context.resources.getIdentifier(videoResName, "raw", context.packageName)
                             if (resId != 0) {
-                                android.util.Log.d(TAG, "Found VALID local resource ID: $resId. Using local raw resource.")
                                 currentUri = Uri.parse("android.resource://${context.packageName}/$resId")
                                 isNetworkSource = false
                                 isLoading = false
                                 return@LaunchedEffect
-                            } else {
-                                android.util.Log.d(TAG, "Resource not found in APK (resId=0). Switching to Network/Cache mode.")
                             }
 
                             isNetworkSource = true
                             
-                            // 2. Выбор директории
                             val targetDir = if (!AppConfig.IS_XPOSED) {
                                 val extCache = context.externalCacheDir
-                                android.util.Log.d(TAG, "Mode: SYSTEM APP. Attempting External Cache. Available: ${extCache != null}")
-                                if (extCache == null) android.util.Log.w(TAG, "WARNING: externalCacheDir is NULL! Falling back to internal cache (may fail).")
                                 extCache ?: context.cacheDir
                             } else {
-                                android.util.Log.d(TAG, "Mode: XPOSED MODULE. Using internal cacheDir.")
                                 context.cacheDir
                             }
                             
-                            android.util.Log.d(TAG, "Selected Cache Dir: ${targetDir.absolutePath}")
                             val cacheFile = File(targetDir, "$videoResName.mp4")
-                            android.util.Log.d(TAG, "Target File Path: ${cacheFile.absolutePath}")
 
                             try {
                                 withContext(Dispatchers.IO) {
                                     val fileExists = cacheFile.exists()
                                     val fileLength = cacheFile.length()
-                                    android.util.Log.d(TAG, "Pre-check: Exists=$fileExists, Size=$fileLength bytes")
 
-                                    // Логика загрузки
                                     if (!fileExists || fileLength == 0L || reloadKey > 0) {
-                                        android.util.Log.d(TAG, "Download REQUIRED. (Reason: Missing=${!fileExists}, Empty=${fileLength==0L}, Force=${reloadKey > 0})")
-                                        
-                                        if (fileExists) {
-                                            val deleted = cacheFile.delete()
-                                            android.util.Log.d(TAG, "Old file deletion result: $deleted")
-                                        }
+                                        if (fileExists) cacheFile.delete()
 
-                                        android.util.Log.d(TAG, "Opening HTTP connection...")
-                                        val url = URL(webUrl)
+                                        val url = java.net.URL(webUrl)
                                         val connection = url.openConnection() as java.net.HttpURLConnection
                                         connection.connectTimeout = 15000
                                         connection.readTimeout = 15000
                                         connection.instanceFollowRedirects = true
                                         connection.connect()
 
-                                        val responseCode = connection.responseCode
-                                        android.util.Log.d(TAG, "HTTP Response: $responseCode | Msg: ${connection.responseMessage} | Content-Len: ${connection.contentLength}")
-
-                                        if (responseCode != 200) {
-                                            throw Exception("HTTP Failed: $responseCode ${connection.responseMessage}")
+                                        if (connection.responseCode != 200) {
+                                            throw Exception("HTTP Failed: ${connection.responseCode}")
                                         }
 
-                                        android.util.Log.d(TAG, "Starting stream copy...")
                                         connection.inputStream.use { input ->
                                             cacheFile.outputStream().use { output ->
                                                 input.copyTo(output)
                                             }
                                         }
-                                        android.util.Log.d(TAG, "Stream copy FINISHED. File size on disk: ${cacheFile.length()}")
                                         
-                                        // Настройка прав
                                         if (!AppConfig.IS_XPOSED) {
-                                            val setReadableResult = cacheFile.setReadable(true, false)
-                                            android.util.Log.d(TAG, "Permissions: setReadable(true, false) result = $setReadableResult")
-                                            if (!setReadableResult) {
-                                                android.util.Log.e(TAG, "CRITICAL: Failed to make file world-readable!")
-                                            }
+                                            cacheFile.setReadable(true, false)
                                         }
-
-                                    } else {
-                                        android.util.Log.d(TAG, "File is VALID. Skipping download.")
                                     }
-
-                                    // Финальная валидация
+                                    
                                     if (cacheFile.exists() && cacheFile.length() > 0) {
-                                        val uri = Uri.fromFile(cacheFile)
-                                        android.util.Log.d(TAG, "SUCCESS! Final URI: $uri")
-                                        currentUri = uri
+                                        currentUri = Uri.fromFile(cacheFile)
                                     } else {
-                                        android.util.Log.e(TAG, "FAILURE: File verification failed after processing. Exists=${cacheFile.exists()}, Size=${cacheFile.length()}")
-                                        throw Exception("File verification failed")
+                                        throw Exception("Verification failed")
                                     }
                                 }
                             } catch (e: Exception) {
-                                android.util.Log.e(TAG, "EXCEPTION CAUGHT in LaunchedEffect", e)
-                                e.printStackTrace() // Печатаем полный стек в лог
+                                e.printStackTrace()
                                 isError = true 
                             } finally {
                                 isLoading = false
-                                android.util.Log.d(TAG, "<<< END LaunchedEffect state: isError=$isError, isLoading=$isLoading")
                             }
                         }
 
@@ -723,7 +693,7 @@ fun InfoDialog(
                                     ) {
                                         Box(contentAlignment = Alignment.Center) {
                                             Icon(
-                                                imageVector = Icons.Default.Refresh,
+                                                imageVector = androidx.compose.material.icons.Icons.Default.Refresh,
                                                 contentDescription = "Refresh",
                                                 tint = MaterialTheme.colorScheme.onSurface,
                                                 modifier = Modifier.size(24.dp)
