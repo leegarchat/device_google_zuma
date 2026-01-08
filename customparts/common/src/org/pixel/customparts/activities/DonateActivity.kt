@@ -178,7 +178,7 @@ fun DonateScreen(onBack: () -> Unit) {
     }
 
     LaunchedEffect(Unit) {
-        val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json" 
+        val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json"
         try {
             val result = fetchDonatePageData(rawJsonUrl)
             if (result != null) {
