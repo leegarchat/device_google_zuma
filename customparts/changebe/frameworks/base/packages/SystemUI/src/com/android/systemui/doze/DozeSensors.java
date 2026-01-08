@@ -1,14 +1,14 @@
 
-// Откройте frameworks/base/packages/SystemUI/src/com/android/systemui/doze/DozeSensors.java 
-// и добавьте этот метод в конец класса (перед последней закрывающей скобкой }):
-	// --- DT2W PATCH START ---
+public class DozeSensors {
+    // --- [CustomNativeParts] START inject in end ---
     public void reregisterTapSensor() {
         for (TriggerSensor s : mTriggerSensors) {
-            if (s.mPulseReason == DozeLog.REASON_SENSOR_TAP) {
+            if (s.mPulseReason == com.android.systemui.doze.DozeLog.REASON_SENSOR_TAP) {
                 s.setListening(false);
                 s.setListening(true);
                 break;
             }
         }
     }
-    // --- DT2W PATCH END ---
+    // --- [CustomNativeParts] END ---
+}

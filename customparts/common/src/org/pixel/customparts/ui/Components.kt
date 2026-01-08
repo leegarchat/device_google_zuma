@@ -1,0 +1,673 @@
+package org.pixel.customparts.ui
+
+import android.net.Uri
+import android.widget.VideoView
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import org.pixel.customparts.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.net.URL
+import androidx.compose.material.icons.rounded.Refresh
+import org.pixel.customparts.utils.dynamicStringResource
+
+@Composable
+fun ExpandableWarningCard(
+    title: String,
+    text: String,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f),
+    contentColor: Color = MaterialTheme.colorScheme.onErrorContainer,
+    dividerAlpha: Float = 0.2f
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "rot",
+        animationSpec = tween(300)
+    )
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        shape = RoundedCornerShape(24.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessHigh
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.Warning, null, tint = contentColor)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = contentColor,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                )
+                Icon(Icons.Rounded.ExpandMore, null, modifier = Modifier.rotate(rotation), tint = contentColor)
+            }
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeIn(),
+                exit = shrinkVertically(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeOut()
+            ) {
+                Column {
+                    Spacer(Modifier.height(12.dp))
+                    Divider(color = contentColor.copy(alpha = dividerAlpha), modifier = Modifier.padding(bottom = 12.dp))
+                    Text(text = text, style = MaterialTheme.typography.bodyMedium, color = contentColor)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GenericSwitchRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    summary: String? = null,
+    infoText: String? = null,
+    videoResName: String? = null,
+    enabled: Boolean = true,
+    onInfoClick: ((String, String, String?) -> Unit)? = null
+) {
+    val contentAlpha = if (enabled) 1f else 0.4f
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f).alpha(contentAlpha)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (summary != null) {
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        if (onInfoClick != null && infoText != null) {
+            IconButton(
+                onClick = { onInfoClick(title, infoText, videoResName) },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = "Info",
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+        }
+
+        Switch(
+            checked = checked,
+            enabled = enabled,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.alpha(contentAlpha)
+        )
+    }
+}
+
+@Composable
+fun SliderSetting(
+    title: String,
+    value: Int,
+    range: IntRange,
+    unit: String,
+    enabled: Boolean,
+    onValueChange: (Int) -> Unit,
+    onDefault: () -> Unit,
+    valueText: String? = null,
+    infoText: String? = null,
+    videoResName: String? = null,
+    onInfoClick: ((String, String, String?) -> Unit)? = null
+) {
+    SliderSettingFloat(
+        title = title,
+        value = value.toFloat(),
+        range = range.first.toFloat()..range.last.toFloat(),
+        unit = unit,
+        enabled = enabled,
+        onValueChange = { onValueChange(it.toInt()) },
+        onDefault = onDefault,
+        valueText = valueText,
+        isInteger = true,
+        infoText = infoText,
+        videoResName = videoResName,
+        onInfoClick = onInfoClick
+    )
+}
+
+@Composable
+fun SliderSettingFloat(
+    title: String,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    unit: String,
+    enabled: Boolean,
+    onValueChange: (Float) -> Unit,
+    onDefault: () -> Unit,
+    valueText: String? = null,
+    isInteger: Boolean = false,
+    infoText: String? = null,
+    videoResName: String? = null,
+    onInfoClick: ((String, String, String?) -> Unit)? = null
+) {
+    var showManualInput by remember { mutableStateOf(false) }
+    val contentAlpha = if (enabled) 1f else 0.4f
+
+    val formattedValue = valueText ?: if (isInteger) {
+        "${value.toInt()} $unit"
+    } else {
+        String.format("%.2f %s", value, unit)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled) { showManualInput = true }
+            .padding(horizontal = 20.dp, vertical = 12.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().alpha(contentAlpha)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            Text(
+                text = formattedValue,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        
+        Spacer(Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(
+                onClick = onDefault,
+                enabled = enabled,
+                modifier = Modifier.size(32.dp).alpha(contentAlpha)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = "Reset to default",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            Slider(
+                value = value.coerceIn(range.start, range.endInclusive),
+                onValueChange = onValueChange,
+                valueRange = range,
+                enabled = enabled,
+                modifier = Modifier.weight(1f).alpha(contentAlpha)
+            )
+
+            if (onInfoClick != null && infoText != null) {
+                Spacer(Modifier.width(8.dp))
+                IconButton(
+                    onClick = { onInfoClick(title, infoText, videoResName) },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    if (showManualInput) {
+        FloatInputDialog(
+            title = title,
+            initialValue = value,
+            rangeStart = range.start,
+            rangeEnd = range.endInclusive,
+            unit = unit,
+            isInteger = isInteger,
+            onDismiss = { showManualInput = false },
+            onConfirm = { 
+                onValueChange(it)
+                showManualInput = false 
+            },
+            onDefault = {
+                onDefault()
+                showManualInput = false
+            }
+        )
+    }
+}
+
+@Composable
+fun RadioSelectionGroup(
+    title: String,
+    options: List<String>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    enabled: Boolean = true,
+    infoText: String? = null,
+    videoResName: String? = null,
+    onInfoClick: ((String, String, String?) -> Unit)? = null
+) {
+    val contentAlpha = if (enabled) 1f else 0.4f
+
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f).alpha(contentAlpha)
+            )
+            
+            if (onInfoClick != null && infoText != null) {
+                IconButton(
+                    onClick = { onInfoClick(title, infoText, videoResName) },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        options.forEachIndexed { index, label ->
+            val isSelected = index == selectedIndex
+            val targetContainerColor = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent
+            val backgroundColor by animateColorAsState(targetContainerColor, label = "bg")
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 2.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(backgroundColor)
+                    .clickable(enabled = enabled) { onSelect(index) }
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .alpha(contentAlpha),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                AnimatedVisibility(
+                    visible = isSelected,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut()
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsGroupCard(
+    title: String,
+    enabled: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(vertical = 12.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp).alpha(if (enabled) 1f else 0.5f)
+            )
+            content()
+        }
+    }
+}
+
+@Composable
+fun FloatInputDialog(
+    title: String,
+    initialValue: Float,
+    rangeStart: Float,
+    rangeEnd: Float,
+    unit: String,
+    isInteger: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (Float) -> Unit,
+    onDefault: (() -> Unit)? = null
+) {
+    val initText = if (isInteger) initialValue.toInt().toString() else initialValue.toString()
+    var text by remember { mutableStateOf(initText) }
+    var isError by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column {
+                Text(
+                    text = dynamicStringResource(R.string.common_range_format, rangeStart.toInt(), rangeEnd.toInt()),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = {
+                        text = it
+                        val num = it.toFloatOrNull()
+                        isError = num == null || num < rangeStart || num > rangeEnd
+                    },
+                    label = { Text(dynamicStringResource(R.string.common_input_label)) },
+                    isError = isError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    suffix = { Text(unit) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Row {
+                if (onDefault != null) {
+                    TextButton(onClick = onDefault) { Text(dynamicStringResource(R.string.btn_default)) }
+                }
+                Button(
+                    onClick = {
+                        val num = text.toFloatOrNull()
+                        if (num != null && num >= rangeStart && num <= rangeEnd) {
+                            onConfirm(num)
+                        } else {
+                            isError = true
+                        }
+                    }
+                ) { Text(dynamicStringResource(R.string.btn_apply)) }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(dynamicStringResource(R.string.btn_cancel)) }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    )
+}
+
+@Composable
+fun InfoDialog(
+    title: String,
+    text: String,
+    videoResName: String? = null,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(vertical = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                tonalElevation = 6.dp,
+                shadowElevation = 8.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Icon(Icons.Outlined.Info, null, tint = MaterialTheme.colorScheme.secondary)
+                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
+                            Icon(
+                                Icons.Default.Close,
+                                dynamicStringResource(R.string.btn_close), 
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+
+                    if (videoResName != null) {
+                        var videoRatio by remember { mutableFloatStateOf(16f / 9f) }
+                        var currentUri by remember { mutableStateOf<Uri?>(null) }
+                        var isLoading by remember { mutableStateOf(true) }
+                        var isError by remember { mutableStateOf(false) }
+                        
+                        var reloadKey by remember { mutableIntStateOf(0) }
+                        var isNetworkSource by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(videoResName, reloadKey) {
+                            if (videoResName == "test_row") {
+                                isLoading = false
+                                return@LaunchedEffect
+                            }
+
+                            isLoading = true
+                            isError = false
+                            
+                            val webUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/VideoSample/$videoResName.mp4"
+
+                            val resId = context.resources.getIdentifier(videoResName, "raw", context.packageName)
+                            if (resId != 0) {
+                                currentUri = Uri.parse("android.resource://${context.packageName}/$resId")
+                                isNetworkSource = false
+                                isLoading = false
+                            } else {
+                                isNetworkSource = true
+                                val cacheFile = File(context.cacheDir, "$videoResName.mp4")
+
+                                if (cacheFile.exists() && cacheFile.length() > 0 && reloadKey == 0) {
+                                    currentUri = Uri.fromFile(cacheFile)
+                                    isLoading = false
+                                } else {
+                                    try {
+                                        withContext(Dispatchers.IO) {
+                                            if (cacheFile.exists()) cacheFile.delete()
+                                            
+                                            URL(webUrl).openStream().use { input ->
+                                                cacheFile.outputStream().use { output ->
+                                                    input.copyTo(output)
+                                                }
+                                            }
+                                        }
+
+                                        if (cacheFile.exists() && cacheFile.length() > 0) {
+                                            currentUri = Uri.fromFile(cacheFile)
+                                        } else {
+                                            throw Exception("File downloaded but empty")
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        if (cacheFile.exists()) cacheFile.delete()
+                                        currentUri = Uri.parse(webUrl)
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(videoRatio)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(Color.Black),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (videoResName == "test_row") {
+                                Text(dynamicStringResource(R.string.common_video_placeholder), color = Color.White)
+                            } else if (currentUri != null && !isError) {
+                                AndroidView(
+                                    factory = { ctx ->
+                                        VideoView(ctx).apply {
+                                            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                                            clipToOutline = true
+                                            setVideoURI(currentUri)
+                                            
+                                            setOnPreparedListener { mp ->
+                                                mp.isLooping = true
+                                                if (mp.videoWidth > 0 && mp.videoHeight > 0) {
+                                                    videoRatio = mp.videoWidth.toFloat() / mp.videoHeight.toFloat()
+                                                }
+                                                mp.setVideoScalingMode(android.media.MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
+                                                start()
+                                            }
+                                            setOnErrorListener { _, _, _ ->
+                                                isError = true
+                                                true
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.matchParentSize()
+                                )
+                            }
+                            
+                            if (isError) {
+                                Text(dynamicStringResource(R.string.status_error), color = Color.Red)
+                            }
+
+                            if (isLoading) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                            }
+
+                            if (isNetworkSource) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(12.dp)
+                                ) {
+                                    Surface(
+                                        onClick = { reloadKey++ },
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.surfaceContainer,
+                                        shadowElevation = 12.dp,
+                                        tonalElevation = 6.dp,
+                                        modifier = Modifier.size(44.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = dynamicStringResource(R.string.menu_refresh),
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+
+                    Text(text = title, style = MaterialTheme.typography.titleLarge, fontSize = 18.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Spacer(Modifier.height(16.dp))
+                    Text(text = text, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+object ModuleStatus {
+    fun isModuleActive(): Boolean = false
+}

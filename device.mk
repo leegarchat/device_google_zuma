@@ -27,7 +27,7 @@ PRODUCT_PACKAGES += android.hardware.thermal-service.pixel
 # Custom Pixel Parts
 PRODUCT_PACKAGES += \
 	init.pixelparts.rc \
-	PixelCustomParts
+	PixelCustomPartsSystem
 
 # Thermal utils
 PRODUCT_PACKAGES += thermal_symlinks
