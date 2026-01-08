@@ -140,6 +140,26 @@ fun getLocalizedText(map: Map<String, String>?): String {
     return map[systemLanguage] ?: map["en"] ?: map.values.firstOrNull() ?: ""
 }
 
+private suspend fun fetchCardState(config: DonateCardConfig): TargetState = withContext(Dispatchers.IO) {
+    try {
+        val rub = async { fetchBoostyTarget(config.apiUrl, "RUB") }
+        val usd = async { fetchBoostyTarget(config.apiUrl, "USD") }
+        val eur = async { fetchBoostyTarget(config.apiUrl, "EUR") }
+
+        val r = rub.await()
+        val u = usd.await()
+        val e = eur.await()
+
+        if (r != null && u != null && e != null) {
+            TargetState.Success(r, u, e)
+        } else {
+            TargetState.Error("API Error")
+        }
+    } catch (e: Exception) {
+        TargetState.Error(e.message ?: "Unknown Error")
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DonateScreen(onBack: () -> Unit) {
@@ -153,38 +173,29 @@ fun DonateScreen(onBack: () -> Unit) {
 
     val targetStates = remember { mutableStateMapOf<String, TargetState>() }
 
-    val loadTargetData: (DonateCardConfig) -> Unit = { config ->
+    val refreshSingleCard: (DonateCardConfig) -> Unit = { config ->
         targetStates[config.apiUrl] = TargetState.Loading
         scope.launch {
-            try {
-                val newState = withContext(Dispatchers.IO) {
-                    val rub = async { fetchBoostyTarget(config.apiUrl, "RUB") }
-                    val usd = async { fetchBoostyTarget(config.apiUrl, "USD") }
-                    val eur = async { fetchBoostyTarget(config.apiUrl, "EUR") }
-                    
-                    val r = rub.await()
-                    val u = usd.await()
-                    val e = eur.await()
-                    
-                    if (r != null && u != null && e != null) {
-                        TargetState.Success(r, u, e)
-                    } else TargetState.Error("API Error")
-                }
-                targetStates[config.apiUrl] = newState
-            } catch (e: Exception) {
-                targetStates[config.apiUrl] = TargetState.Error(e.message ?: "Error")
-            }
+            targetStates[config.apiUrl] = fetchCardState(config)
         }
     }
 
     LaunchedEffect(Unit) {
         val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json"
         try {
+            // 1. Сначала загружаем конфиг страницы
             val result = fetchDonatePageData(rawJsonUrl)
+            
             if (result != null) {
                 pageData = result
                 isLoading = false
-                result.progress.forEach { if (!targetStates.containsKey(it.apiUrl)) loadTargetData(it) }
+                result.progress.forEach { config ->
+                    if (targetStates[config.apiUrl] !is TargetState.Success) {
+                        targetStates[config.apiUrl] = TargetState.Loading
+                        val state = fetchCardState(config)
+                        targetStates[config.apiUrl] = state
+                    }
+                }
             } else {
                 loadError = "Failed to parse config"
                 isLoading = false
@@ -243,7 +254,7 @@ fun DonateScreen(onBack: () -> Unit) {
                         DonateTargetCard(
                             config = config,
                             state = targetStates[config.apiUrl] ?: TargetState.Loading,
-                            onRefresh = { loadTargetData(config) }
+                            onRefresh = { refreshSingleCard(config) }
                         )
                     }
                 }
