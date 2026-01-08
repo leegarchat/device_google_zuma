@@ -263,6 +263,28 @@
     <string name="status_active">Активно</string>
     <string name="status_disabled">Отключено</string>
     <string name="status_error">Ошибка</string>
+    <string name="donate_progress_title">Прогресс сбора средств</string>
+    <string name="menu_refresh">Обновить</string>
+    <string name="donate_open_target">Открыть страницу сбора</string>
+    <string name="donate_error_loading">Ошибка получения данных</string>
+    <string name="donate_retry">Повторить</string>
+    <string name="donate_title">Поддержка и ссылки</string>
+    <string name="donate_desc_short">GitHub, Telegram, Boosty</string>
+    <string name="donate_header">Поддержать проект</string>
+    <string name="donate_desc_long">Если вам нравится этот модуль и вы хотите поддержать его дальнейшую разработку, вы можете сделать это на Boosty.</string>
+    <string name="donate_btn_boosty">Перейти на Boosty</string>
+    <string name="donate_links_header">Полезные ссылки</string>
+
+    <string name="launcher_clear_all_title">Кнопка «Очистить всё»</string>
+    <string name="launcher_clear_all_desc">Добавляет кнопку закрытия всех приложений в меню многозадачности (Recents).\n\nПоддерживает несколько режимов отображения для интеграции в стандартный интерфейс.</string>
+
+    <string name="launcher_ca_mode_float">Снизу по центру</string>
+    <string name="launcher_ca_mode_screenshot">Заменить «Скриншот»</string>
+    <string name="launcher_ca_mode_select">Заменить «Выбрать»</string>
+
+    <string name="launcher_ca_margin">Позиция (Отступ снизу)</string>
+    <string name="launcher_btn_restart">Перезапустить лаунчер</string>
+    <string name="launcher_ca_margin_desc">Регулирует вертикальное положение плавающей кнопки. Значение — множитель стандартного отступа.</string>
 
     <!-- MAIN ACTIVITY -->
     <string name="main_desc">Кастомные модули и твики</string>
