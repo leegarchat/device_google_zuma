@@ -510,13 +510,13 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
         try { return Settings.Secure.getFloat(mContext.getContentResolver(), key, def); } 
         catch (Exception e) { return def; }
     }
-  
+    
     private int getIntSetting(String key, int def) {
         if (mContext == null) return def;
         try { return Settings.Secure.getInt(mContext.getContentResolver(), key, def); } 
         catch (Exception e) { return def; }
     }
-  
+    
     private float calcScale(String modeKey, String intKey, String limKey, float ratio) {
         int mode = getIntSetting(modeKey, 0);
         float intensity = getFloatSetting(intKey, 0.0f);
@@ -597,7 +597,11 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
                 f.setAccessible(true);
                 sCanvasNodeField = f;
                 return (android.graphics.RenderNode) f.get(canvas);
-            } catch (NoSuchFieldException e) { clazz = clazz.getSuperclass(); }
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                return null;
+            }
         }
         return null;
     }
@@ -667,5 +671,6 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
     // ============================================================================================
     // [CustomNativeParts] END: UTILS, HELPERS & SPRING CLASS
     // ============================================================================================
+
 
 ```
