@@ -494,7 +494,6 @@ fun InfoDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
                 .padding(vertical = 24.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -503,10 +502,15 @@ fun InfoDialog(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 tonalElevation = 6.dp,
                 shadowElevation = 8.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight() 
+                    .padding(horizontal = 16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
@@ -518,7 +522,7 @@ fun InfoDialog(
                         IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
                             Icon(
                                 Icons.Default.Close,
-                                dynamicStringResource(R.string.btn_close), 
+                                stringResource(R.string.btn_close), // Используйте обычный stringResource если dynamic не критичен тут
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -544,8 +548,8 @@ fun InfoDialog(
                             isError = false
                             
                             val webUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/VideoSample/$videoResName.mp4"
-
                             val resId = context.resources.getIdentifier(videoResName, "raw", context.packageName)
+
                             if (resId != 0) {
                                 currentUri = Uri.parse("android.resource://${context.packageName}/$resId")
                                 isNetworkSource = false
@@ -554,12 +558,10 @@ fun InfoDialog(
                                 isNetworkSource = true
                                 val cacheFile = File(context.cacheDir, "$videoResName.mp4")
 
-                                if (cacheFile.exists() && cacheFile.length() > 0 && reloadKey == 0) {
-                                    currentUri = Uri.fromFile(cacheFile)
-                                    isLoading = false
-                                } else {
-                                    try {
-                                        withContext(Dispatchers.IO) {
+                                try {
+                                    withContext(Dispatchers.IO) {
+                                        // Скачиваем только если файла нет или запрошен reload
+                                        if (!cacheFile.exists() || cacheFile.length() == 0L || reloadKey > 0) {
                                             if (cacheFile.exists()) cacheFile.delete()
                                             
                                             URL(webUrl).openStream().use { input ->
@@ -568,19 +570,18 @@ fun InfoDialog(
                                                 }
                                             }
                                         }
-
-                                        if (cacheFile.exists() && cacheFile.length() > 0) {
-                                            currentUri = Uri.fromFile(cacheFile)
-                                        } else {
-                                            throw Exception("File downloaded but empty")
-                                        }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                        if (cacheFile.exists()) cacheFile.delete()
-                                        currentUri = Uri.parse(webUrl)
-                                    } finally {
-                                        isLoading = false
                                     }
+
+                                    if (cacheFile.exists() && cacheFile.length() > 0) {
+                                        currentUri = Uri.fromFile(cacheFile)
+                                    } else {
+                                        throw Exception("File downloaded but empty")
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    currentUri = Uri.parse(webUrl)
+                                } finally {
+                                    isLoading = false
                                 }
                             }
                         }
@@ -590,7 +591,7 @@ fun InfoDialog(
                                 .fillMaxWidth()
                                 .aspectRatio(videoRatio)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(Color.Black),
+                                .background(if (isLoading || isError || currentUri == null) Color.Black else Color.Transparent),
                             contentAlignment = Alignment.Center
                         ) {
                             if (videoResName == "test_row") {
@@ -601,20 +602,30 @@ fun InfoDialog(
                                         VideoView(ctx).apply {
                                             setBackgroundColor(android.graphics.Color.TRANSPARENT)
                                             clipToOutline = true
-                                            setVideoURI(currentUri)
-                                            
+                                            outlineProvider = object : android.view.ViewOutlineProvider() {
+                                                override fun getOutline(view: android.view.View, outline: android.graphics.Outline) {
+                                                    outline.setRoundRect(0, 0, view.width, view.height, 24.dp.value * ctx.resources.displayMetrics.density)
+                                                }
+                                            }
+
                                             setOnPreparedListener { mp ->
                                                 mp.isLooping = true
+                                                mp.setVideoScalingMode(android.media.MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
+                                                
                                                 if (mp.videoWidth > 0 && mp.videoHeight > 0) {
                                                     videoRatio = mp.videoWidth.toFloat() / mp.videoHeight.toFloat()
                                                 }
-                                                mp.setVideoScalingMode(android.media.MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
                                                 start()
                                             }
                                             setOnErrorListener { _, _, _ ->
                                                 isError = true
                                                 true
                                             }
+                                        }
+                                    },
+                                    update = { videoView ->
+                                        if (currentUri != null && !videoView.isPlaying) {
+                                                videoView.setVideoURI(currentUri)
                                         }
                                     },
                                     modifier = Modifier.matchParentSize()
@@ -629,7 +640,7 @@ fun InfoDialog(
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                             }
 
-                            if (isNetworkSource) {
+                            if (isNetworkSource && !isLoading) {
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.BottomEnd)
@@ -638,15 +649,13 @@ fun InfoDialog(
                                     Surface(
                                         onClick = { reloadKey++ },
                                         shape = CircleShape,
-                                        color = MaterialTheme.colorScheme.surfaceContainer,
-                                        shadowElevation = 12.dp,
-                                        tonalElevation = 6.dp,
+                                        color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f),
                                         modifier = Modifier.size(44.dp)
                                     ) {
                                         Box(contentAlignment = Alignment.Center) {
                                             Icon(
                                                 imageVector = Icons.Default.Refresh,
-                                                contentDescription = dynamicStringResource(R.string.menu_refresh),
+                                                contentDescription = "Refresh",
                                                 tint = MaterialTheme.colorScheme.onSurface,
                                                 modifier = Modifier.size(24.dp)
                                             )
@@ -658,9 +667,21 @@ fun InfoDialog(
                         Spacer(Modifier.height(16.dp))
                     }
 
-                    Text(text = title, style = MaterialTheme.typography.titleLarge, fontSize = 18.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = title, 
+                        style = MaterialTheme.typography.titleLarge, 
+                        fontSize = 18.sp, 
+                        textAlign = TextAlign.Start, 
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Spacer(Modifier.height(16.dp))
-                    Text(text = text, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = text, 
+                        style = MaterialTheme.typography.bodyMedium, 
+                        textAlign = TextAlign.Start, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Spacer(Modifier.height(8.dp))
                 }
             }
