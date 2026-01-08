@@ -586,7 +586,7 @@ private fun ExpandableSettingsGroupCard(
     enabled: Boolean = true,
     expanded: Boolean,
     onExpandChange: (Boolean) -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -777,8 +777,14 @@ private fun ScaleGroup(
     ) {
         val scope = rememberCoroutineScope()
         val modeKey = "${prefix}_mode"
-        var mode by remember(refreshKey) { mutableIntStateOf(Settings.Secure.getInt(context.contentResolver, modeKey, 0)) }
-        val modes = listOf(dynamicStringResource(R.string.os_mode_off), dynamicStringResource(R.string.os_mode_shrink), dynamicStringResource(R.string.os_mode_grow))
+        var mode by remember(refreshKey) { 
+            mutableIntStateOf(Settings.Secure.getInt(context.contentResolver, modeKey, 0))
+        }
+        val modes = listOf(
+            dynamicStringResource(R.string.os_mode_off),
+            dynamicStringResource(R.string.os_mode_shrink),
+            dynamicStringResource(R.string.os_mode_grow)
+            )
         
         val areSlidersActive = isMasterEnabled && (mode != 0)
 
