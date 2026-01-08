@@ -234,6 +234,8 @@
     <string name="donate_links_header">Полезные ссылки</string>
     <string name="error_network">Network Error</string>
     <string name="refresh_strings">Activity page strings updated</string>
+    <string name="donate_page_updated">Page updated</string>
+    <string name="donate_page_updated_error">Error loading data</string>
 
     <string name="launcher_clear_all_title">Кнопка «Очистить всё»</string>
     <string name="launcher_clear_all_desc">Добавляет кнопку закрытия всех приложений в меню многозадачности (Recents).\n\nПоддерживает несколько режимов отображения для интеграции в стандартный интерфейс.</string>

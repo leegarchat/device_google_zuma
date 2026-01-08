@@ -143,7 +143,8 @@ fun MainDashboard() {
                     IconButton(onClick = {
                         scope.launch {
                             val success = RemoteStringsManager.forceRefresh(context)
-                            val message = if (success) dynamicStringResource(R.string.refresh_strings) else dynamicStringResource(R.string.error_network)
+                            // val message = RemoteStringsManager.getString(context, R.string.donate_page_updated)
+                            val message = if (success) RemoteStringsManager.getString(context, R.string.refresh_strings) else RemoteStringsManager.getString(context, R.string.error_network)
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                             
                             if (success) {

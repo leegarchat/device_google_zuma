@@ -183,7 +183,7 @@ fun DonateScreen(onBack: () -> Unit) {
     }
 
     LaunchedEffect(refreshKey) {
-        val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json"
+        val rawJsonUrl = "https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/donate_page.json?t=${System.currentTimeMillis()}"
         try {
             isLoading = true
             loadError = null
@@ -470,7 +470,13 @@ private suspend fun fetchDonatePageData(jsonUrl: String): DonatePageData? = with
     var conn: HttpURLConnection? = null
     try {
         conn = URL(jsonUrl).openConnection() as HttpURLConnection
-        conn.apply { connectTimeout = 10000; readTimeout = 10000; setRequestProperty("User-Agent", "Android") }
+        conn.apply { 
+            connectTimeout = 10000
+            readTimeout = 10000
+            useCaches = false // Отключаем локальный кэш
+            setRequestProperty("User-Agent", "Android")
+            setRequestProperty("Cache-Control", "no-cache") // Запрос к серверу/прокси не использовать кэш
+        }
         if (conn.responseCode == 200) {
             val response = conn.inputStream.bufferedReader().use { it.readText() }
             val root = JSONObject(response)
