@@ -3,6 +3,7 @@ package org.pixel.customparts
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,11 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.pixel.customparts.activities.*
 import org.pixel.customparts.utils.RootUtils
@@ -106,6 +108,7 @@ fun MainDashboard() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val context = LocalContext.current
     val activity = context as? Activity
+    val scope = rememberCoroutineScope()
     val isCollapsed by remember {
         derivedStateOf { scrollBehavior.state.collapsedFraction > 0.5f }
     }
@@ -134,6 +137,24 @@ fun MainDashboard() {
                 navigationIcon = {
                     IconButton(onClick = { activity?.finish() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, dynamicStringResource(R.string.btn_exit))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            val success = RemoteStringsManager.forceRefresh(context)
+                            val message = if (success) "Строки обновлены" else "Ошибка сети"
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            
+                            if (success) {
+                                activity?.recreate()
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = dynamicStringResource(R.string.menu_refresh)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(

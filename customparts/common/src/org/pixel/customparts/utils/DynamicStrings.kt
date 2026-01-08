@@ -4,14 +4,13 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Locale
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 
 object RemoteStringsManager {
     private const val PREFS_NAME = "remote_strings_cache"
@@ -30,10 +29,19 @@ object RemoteStringsManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val lastUpdate = prefs.getLong("last_update_time", 0L)
         val currentTime = System.currentTimeMillis()
+        
         if (currentTime - lastUpdate < 300000L) {
             return 
         }
 
+        performUpdate(context)
+    }
+
+    suspend fun forceRefresh(context: Context): Boolean {
+        return performUpdate(context)
+    }
+
+    private suspend fun performUpdate(context: Context): Boolean {
         val currentLanguage = Locale.getDefault().language
         var jsonString = fetchJson(getUrlForLocale(currentLanguage))
 
@@ -41,12 +49,18 @@ object RemoteStringsManager {
             jsonString = fetchJson(getUrlForLocale("en"))
         }
 
-        if (isValidJson(jsonString)) {
+        return if (isValidJson(jsonString)) {
             parseAndApply(context, jsonString!!)
             saveToCache(context, jsonString)
-            prefs.edit().putLong("last_update_time", currentTime).apply()
+            
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putLong("last_update_time", System.currentTimeMillis()).apply()
+            true
+        } else {
+            false
         }
     }
+
     private fun isValidJson(json: String?): Boolean {
         if (json.isNullOrBlank()) return false
         return try {
@@ -138,7 +152,7 @@ fun dynamicStringResource(@StringRes id: Int, vararg formatArgs: Any): String {
 
 @Composable
 private fun safeStringResource(@StringRes id: Int, vararg args: Any): String {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     return try {
         if (args.isEmpty()) {
             context.getString(id)
