@@ -7,7 +7,11 @@ from pathlib import Path
 
 # --- КОНФИГУРАЦИЯ ---
 
-DEVICES = ["shiba", "husky"]
+DEVICES = [
+    # "shiba",
+    # "husky",
+    "akita"
+    ]
 
 # Сетка температур (смещения)
 OFFSETS = {
@@ -31,8 +35,10 @@ TARGETS_SOC = [
 ]
 
 TARGETS_BATTERY = [
-    "VIRTUAL-SKIN-CHARGE-PERSIST",
-    "VIRTUAL-SKIN-CHARGE-WIRED"
+    "VIRTUAL-SKIN-CHARGE-PERSIST", # shusky
+    "VIRTUAL-SKIN-CHARGE-WIRED", # shusky
+    "VIRTUAL-SKIN-CHARGE", # akita
+    "VIRTUAL-SKIN-CHARGE-WLC" # akita
 ]
 
 generated_files_list = []
