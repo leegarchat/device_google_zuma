@@ -1,9 +1,4 @@
-#
-# SPDX-FileCopyrightText: 2011 The Android Open-Source Project
-# SPDX-FileCopyrightText: The LineageOS Project
-# SPDX-FileCopyrightText: The Calyx Institute
-# SPDX-License-Identifier: Apache-2.0
-#
+
 
 # Disable OMX
 PRODUCT_PROPERTY_OVERRIDES += \
