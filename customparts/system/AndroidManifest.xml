@@ -36,7 +36,10 @@
             android:exported="true"
             android:icon="@drawable/ic_settings_outline"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
-
+            <intent-filter>
+                <action android:name="org.pixel.customparts.action.OPEN_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
             <intent-filter android:priority="1">
                 <action android:name="com.android.settings.action.IA_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -251,9 +251,6 @@ public class LauncherClearAll {
         return btn;
     }
 
-    /**
-     * Основная логика клика с исправленной рефлексией (Hierarchy Traversal).
-     */
     private static void performClearAllClick(Context context, View view) {
         Object recentsView = getRecentsView(context);
         if (recentsView != null) {
@@ -262,7 +259,6 @@ public class LauncherClearAll {
                 return;
             }
 
-            // Попытка 2: Рефлексия метода dismissAllTasks(View)
             try {
                 Method method = findMethod(recentsView.getClass(), "dismissAllTasks", View.class);
                 if (method != null) {
@@ -272,7 +268,6 @@ public class LauncherClearAll {
                 }
             } catch (Exception ignored) {}
             
-            // Попытка 3: Рефлексия метода dismissAllTasks()
             try {
                 Method method = findMethod(recentsView.getClass(), "dismissAllTasks");
                 if (method != null) {
@@ -306,7 +301,6 @@ public class LauncherClearAll {
         Activity activity = getActivityFromContext(context);
         if (activity != null) {
             try {
-                // Ищем метод getOverviewPanel в иерархии (он может быть в BaseQuickstepLauncher)
                 Method method = findMethod(activity.getClass(), "getOverviewPanel");
                 if (method != null) {
                     method.setAccessible(true);
@@ -319,9 +313,6 @@ public class LauncherClearAll {
         return null;
     }
 
-    /**
-     * Разворачиваем ContextWrapper/ContextThemeWrapper чтобы найти Activity.
-     */
     private static Activity getActivityFromContext(Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {
@@ -332,9 +323,6 @@ public class LauncherClearAll {
         return null;
     }
 
-    /**
-     * Ищет метод рекурсивно по иерархии классов.
-     */
     private static Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         Class<?> current = clazz;
         while (current != null) {
@@ -347,9 +335,6 @@ public class LauncherClearAll {
         return null;
     }
 
-    /**
-     * Ищет поле рекурсивно по иерархии классов.
-     */
     private static Field findField(Class<?> clazz, String fieldName) {
         Class<?> current = clazz;
         while (current != null) {

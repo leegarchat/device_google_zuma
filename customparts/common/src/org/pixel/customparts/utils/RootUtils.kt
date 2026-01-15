@@ -24,16 +24,24 @@ object RootUtils {
         var process: Process? = null
         return try {
             process = Runtime.getRuntime().exec("su")
+            
+            // [FIX] Обязательно вычитываем потоки вывода и ошибок, иначе процесс может зависнуть (deadlock),
+            // если буфер переполнится сообщениями от системы.
+            Thread { try { process?.inputStream?.readBytes() } catch (ignored: Exception) {} }.start()
+            Thread { try { process?.errorStream?.readBytes() } catch (ignored: Exception) {} }.start()
+
             val os = DataOutputStream(process.outputStream)
             os.writeBytes("exit\n")
             os.flush()
+            os.close() // [FIX] Закрываем поток, чтобы отправить EOF и su точно завершился
+            
             val exitValue = process.waitFor()
             exitValue == 0
         } catch (e: Exception) {
             Log.e(TAG, "Root check failed", e)
             false
         } finally {
-            process?.destroy()
+            try { process?.destroy() } catch (ignored: Exception) {}
         }
     }
 
@@ -41,16 +49,20 @@ object RootUtils {
         val packageName = context.packageName
         val commands = StringBuilder()
         
-        for (perm in REQUIRED_PERMISSIONS) {
-            if (context.checkSelfPermission(perm) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Granting permission: $perm")
-                commands.append("pm grant $packageName $perm\n")
+        try {
+            for (perm in REQUIRED_PERMISSIONS) {
+                if (context.checkSelfPermission(perm) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Granting permission: $perm")
+                    commands.append("pm grant $packageName $perm\n")
+                }
             }
-        }
 
-        if (commands.isNotEmpty()) {
-            commands.append("exit\n")
-            runSuCommand(commands.toString())
+            if (commands.isNotEmpty()) {
+                commands.append("exit\n")
+                runSuCommand(commands.toString())
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error preparing permissions", e)
         }
     }
 
@@ -58,14 +70,21 @@ object RootUtils {
         var process: Process? = null
         try {
             process = Runtime.getRuntime().exec("su")
+            
+            // [FIX] Вычитываем потоки для предотвращения зависания
+            Thread { try { process?.inputStream?.readBytes() } catch (ignored: Exception) {} }.start()
+            Thread { try { process?.errorStream?.readBytes() } catch (ignored: Exception) {} }.start()
+
             val os = DataOutputStream(process.outputStream)
             os.writeBytes(command)
             os.flush()
+            os.close() // [FIX] Закрываем поток
+            
             process.waitFor()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to run su command", e)
         } finally {
-            process?.destroy()
+            try { process?.destroy() } catch (ignored: Exception) {}
         }
     }
-}   
+}

@@ -380,7 +380,7 @@ private fun OverscrollScreen(onBack: () -> Unit) {
                     OverscrollFloatSlider(
                         context = context,
                         title = dynamicStringResource(R.string.os_lbl_min_vel),
-                        key = "overscroll_physics_min_vel",
+                        key = "overscroll_physics_min_vel_v2",
                         range = 0f..100f,
                         defVal = 20.0f,
                         infoText = dynamicStringResource(R.string.os_desc_min_vel),
@@ -394,8 +394,8 @@ private fun OverscrollScreen(onBack: () -> Unit) {
                     OverscrollFloatSlider(
                         context = context,
                         title = dynamicStringResource(R.string.os_lbl_min_val),
-                        key = "overscroll_physics_min_val",
-                        range = 0f..10f,
+                        key = "overscroll_physics_min_val_v2",
+                        range = 0f..6f,
                         defVal = 2.0f,
                         infoText = dynamicStringResource(R.string.os_desc_min_val),
                         video = "overscroll_physics_min_val",
@@ -489,35 +489,67 @@ private fun OverscrollScreen(onBack: () -> Unit) {
 
             item(key = "app_configs_header", contentType = "settings_group") {
                 val expanded = expandedStates["apps"] ?: false
+                
+                val infoTitle = dynamicStringResource(R.string.os_group_apps)
+                val infoText = dynamicStringResource(R.string.os_group_apps)
+
                 ExpandableSettingsGroupCard(
                     title = dynamicStringResource(R.string.os_group_apps),
                     enabled = isMasterEnabled,
                     expanded = expanded,
                     onExpandChange = { expandedStates["apps"] = it }
                 ) {
-                    Button(
-                        onClick = { showAddAppDialog = true },
-                        enabled = isMasterEnabled,
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.primary)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(dynamicStringResource(R.string.os_btn_add_app))
+                        Button(
+                            onClick = { showAddAppDialog = true },
+                            enabled = isMasterEnabled,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(dynamicStringResource(R.string.os_btn_add_app))
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        IconButton(
+                            onClick = {
+                                infoDialogTitle = infoTitle
+                                infoDialogText = infoText
+                                infoDialogVideo = "app_config"
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Info,
+                                contentDescription = "Info",
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
-                    
+
                     Column(modifier = Modifier.alpha(if (isMasterEnabled) 1f else 0.5f)) {
                         appConfigs.forEachIndexed { index, app ->
-                            key(app.pkg) { 
+                            key(app.pkg) {
                                 if (index > 0) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                                
+
                                 AppConfigCard(
-                                    context = context, 
+                                    context = context,
                                     item = app,
                                     onConfigChange = { newItem ->
                                         val newList = appConfigs.toMutableList()
                                         newList[index] = newItem
                                         appConfigs = newList
                                         scope.launch { OverscrollManager.saveAppConfig(context, appConfigs) }
-                                    }, 
+                                    },
                                     onDelete = {
                                         val newList = appConfigs.toMutableList().apply { removeAt(index) }
                                         appConfigs = newList

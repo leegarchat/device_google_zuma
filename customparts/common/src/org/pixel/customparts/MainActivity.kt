@@ -48,7 +48,11 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             
             LaunchedEffect(Unit) {
-                RemoteStringsManager.initialize(context)
+                try {
+                    RemoteStringsManager.initialize(context)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
 
             var rootState by remember { mutableStateOf(if (AppConfig.NEEDS_ROOT_ACCESS) 0 else 1) }
@@ -56,10 +60,15 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 if (AppConfig.NEEDS_ROOT_ACCESS) {
                     withContext(Dispatchers.IO) {
-                        if (RootUtils.hasRootAccess()) {
-                            RootUtils.grantPermissions(context)
-                            rootState = 1
-                        } else {
+                        try {
+                            if (RootUtils.hasRootAccess()) {
+                                RootUtils.grantPermissions(context)
+                                rootState = 1
+                            } else {
+                                rootState = 2
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                             rootState = 2
                         }
                     }

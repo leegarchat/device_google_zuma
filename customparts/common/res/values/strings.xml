@@ -119,6 +119,7 @@
     <string name="os_btn_add_app">Add Application</string>
     <string name="os_btn_cancel">Cancel</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_restart_launcher">Apply and restart launcher</string>
     
     <!-- App Config Items -->
     <string name="os_app_filter">Smoothing (Filter)</string>
@@ -321,4 +322,61 @@
 
     <string name="ims_desc_activity">VoLTE, VoWiFi, 5G</string>
     <string name="ims_title_activity">IMS Config</string>
+
+
+    <!-- Grid Sizer / App Drawer Customization -->
+    <string name="grid_group_homepage">Homepage Customization</string>
+    <string name="grid_lbl_home_enable">Homepage Grid Customization</string>
+    <string name="grid_desc_home_enable">Enables customization of the home screen grid columns and rows.</string>
+    
+    <string name="grid_lbl_columns">Columns</string>
+    <string name="grid_desc_home_cols">Number of columns on the home screen.</string>
+    
+    <string name="grid_lbl_rows">Rows</string>
+    <string name="grid_desc_home_rows">Number of rows on the home screen.</string>
+    
+    <string name="grid_lbl_hide_text">Hide Icon Text</string>
+    <string name="grid_desc_home_hide_text">Hides icon labels on the home screen.</string>
+
+    <string name="grid_group_drawer">App Drawer Customization</string>
+    <string name="grid_lbl_drawer_enable">App Drawer Customization</string>
+    <string name="grid_desc_drawer_enable">Enables customization of the app drawer grid and layout.</string>
+    
+    <string name="grid_lbl_drawer_cols">Menu Columns</string>
+    <string name="grid_desc_drawer_cols">Number of columns in the app drawer.</string>
+    
+    <string name="grid_lbl_row_height">Row Height</string>
+    <string name="grid_desc_row_height">Adjusts the vertical spacing between rows in the app drawer (100% is standard).</string>
+    
+    <string name="grid_lbl_drawer_hide_text">Hide Menu Text</string>
+    <string name="grid_desc_drawer_hide_text">Hides icon labels in the app drawer.</string>
+    <string name="grid_lbl_search_cols">Search Columns</string>
+    <string name="grid_desc_search_cols">Number of columns for search results and suggestions in the app drawer.</string>
+    <!-- Search Widget & Dock Section -->
+    <string name="search_widget_group_title">Search Widget and Dock</string>
+    
+    <string name="search_widget_enable_dock">Enable Dock Customization</string>
+    <string name="search_widget_desc_dock">Master switch for all dock and search bar modifications below.</string>
+    
+    <string name="search_widget_hide_search">Hide Search Bar</string>
+    <string name="search_widget_desc_hide_search">Hides the search widget at the bottom.</string>
+    
+    <string name="search_widget_hide_dock">Hide Dock Icons</string>
+    <string name="search_widget_desc_hide_dock">Hides the bottom dock (hotseat) icons area.</string>
+    
+    <string name="search_widget_padding_home">Homepage Padding</string>
+    <string name="search_widget_desc_padding_home">Adjusts the bottom padding for the workspace grid icons.</string>
+    
+    <string name="search_widget_padding_dock">Dock Icon Padding</string>
+    <string name="search_widget_desc_padding_dock">Adjusts the vertical position of dock icons (+/-).</string>
+    
+    <string name="search_widget_padding_search">Search Widget Padding</string>
+    <string name="search_widget_desc_padding_search">Adjusts the vertical position of the search widget (+/-).</string>
+
+    <string name="search_widget_padding_dots">Dots Padding</string>
+    <string name="search_widget_desc_padding_dots">Adjusts the vertical position of the page indicator dots.</string>
+    <string name="misc_group_title">Miscellaneous</string>
+    
+    <string name="launcher_feed_title">Disable Google Feed</string>
+    <string name="launcher_feed_desc">Disables the -1 screen (Google Discover/Feed) on the home screen.</string>
 </resources>

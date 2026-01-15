@@ -11,16 +11,16 @@ import android.os.Bundle;
 public class LauncherHooks {
 
     public static void init(Application app) {
-        // Инициализация статических ресурсов подмодулей (например, рефлексия полей)
         LauncherDT2S.init();
-        
-        // Регистрация единого колбэка для всех хуков лаунчера
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
             public void onActivityResumed(Activity activity) {
-                // Подключаем функционал к активной Activity
                 LauncherDT2S.attach(activity);
                 LauncherClearAll.attach(activity);
+                LauncherGridSize.attach(activity);
+                SearchWidgetHook.attach(activity);
+                LauncherFeedDisabler.attach(activity);
+                // LauncherGridDebug.dump(activity);
             }
 
             @Override public void onActivityCreated(Activity a, Bundle b) {}

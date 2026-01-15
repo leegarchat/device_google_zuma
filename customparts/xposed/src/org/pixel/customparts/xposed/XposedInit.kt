@@ -8,8 +8,10 @@ import android.util.Log
 import org.pixel.customparts.xposed.hooks.DT2SHook
 import org.pixel.customparts.xposed.hooks.DT2WHook
 import org.pixel.customparts.xposed.hooks.ClearAllHook
-import org.pixel.customparts.xposed.hooks.LauncherDebugHook
+import org.pixel.customparts.xposed.hooks.SearchWidgetHook
 import org.pixel.customparts.xposed.hooks.EdgeEffectHook
+import org.pixel.customparts.xposed.hooks.DisableGoogleFeedHook
+import org.pixel.customparts.xposed.hooks.GridSizeHook
 import de.robv.android.xposed.XposedBridge
 
 class XposedInit : IXposedHookLoadPackage {
@@ -17,6 +19,7 @@ class XposedInit : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 
         if (lpparam.packageName != null) {
+            IconPackNativeEmulationHook.init(lpparam)
             EdgeEffectHook.init(lpparam)
         }
 
@@ -28,7 +31,9 @@ class XposedInit : IXposedHookLoadPackage {
         if (lpparam.packageName == "com.google.android.apps.nexuslauncher") {
             DT2SHook.init(lpparam)
             ClearAllHook.init(lpparam)
-            LauncherDebugHook.init(lpparam)
+            SearchWidgetHook.init(lpparam)
+            GridSizeHook.init(lpparam)
+            DisableGoogleFeedHook.init(lpparam)
         }
 
         if (lpparam.packageName == "org.pixel.customparts.xposed") { 

@@ -58,8 +58,8 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
     private static final String KEY_STIFFNESS = "overscroll_stiffness";
     private static final String KEY_DAMPING = "overscroll_damping";
     private static final String KEY_FLING = "overscroll_fling";
-    private static final String KEY_PHYSICS_MIN_VEL = "overscroll_physics_min_vel";
-    private static final String KEY_PHYSICS_MIN_VAL = "overscroll_physics_min_val";
+    private static final String KEY_PHYSICS_MIN_VEL = "overscroll_physics_min_vel_v2";
+    private static final String KEY_PHYSICS_MIN_VAL = "overscroll_physics_min_val_v2";
   
     // Render Node Reflection Cache
     private static java.lang.reflect.Field sCanvasNodeField;
@@ -100,7 +100,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
             float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 2.0f);
             boolean physicsDone = !mSpring.isRunning() && Math.abs(mSpring.mValue) < minVal;
             boolean visualDone = Math.abs(mSmoothOffsetY) < minVal;
-        
+      
             if (physicsDone && visualDone) {
                 resetCustomState();
                 mState = STATE_IDLE;
@@ -164,7 +164,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
 
             float correctedDelta = (Math.abs(mCfgScale) > 0.001f) ? deltaDistance / mCfgScale : deltaDistance;
             float inputSmoothFactor = getFloatSetting("overscroll_input_smooth", 0.5f);
-        
+      
             if (mFirstTouch) {
                 mLastDelta = correctedDelta;
                 mFirstTouch = false;
@@ -240,7 +240,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
                 mSpring.setTargetValue(0);
                 mSpring.setVelocity(0);
                 mSpring.start();
-            
+          
                 mState = STATE_RECEDE;
             } else {
                 mState = STATE_IDLE;
@@ -285,7 +285,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
 
             // Логика Xposed: maxVel строго зависит от высоты экрана, игнорируя размер View
             float maxVel = mScreenHeight * 10f; 
-        
+      
             if (Math.abs(velocityPx) > maxVel) velocityPx = Math.signum(velocityPx) * maxVel;
 
             mSpring.setParams(stiffness, damping, minVel, minVal);
@@ -328,7 +328,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
             // Привязка к векторам (Vector Snapping)
             mPoints[0] = 0; mPoints[1] = 0;
             mPoints[2] = 0; mPoints[3] = 1;
-        
+      
             try {
                 canvas.getMatrix(mMatrix);
                 mMatrix.mapPoints(mPoints);
@@ -336,7 +336,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
 
             float vx = mPoints[2] - mPoints[0];
             float vy = mPoints[3] - mPoints[1];
-        
+      
             if (Math.abs(vx) > Math.abs(vy)) {
                 vx = Math.signum(vx); vy = 0f;
             } else {
@@ -352,7 +352,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
             float targetOffset = mSpring.mValue;
             float currentOffset = mSmoothOffsetY;
             float newOffset = currentOffset + (targetOffset - currentOffset) * lerpFactorMain;
-        
+      
             if (Math.abs(targetOffset - newOffset) < 0.5f) newOffset = targetOffset;
             mSmoothOffsetY = newOffset;
 
@@ -362,7 +362,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
 
             // SCALING
             float targetScaleV = 1f, targetScaleZ = 1f, targetScaleH = 1f;
-        
+      
             if (isActive) {
                 String keyScaleInt = isVertical ? "overscroll_scale_intensity" : "overscroll_scale_intensity_horiz";
                 String keyZoomInt = isVertical ? "overscroll_zoom_intensity" : "overscroll_zoom_intensity_horiz";
@@ -386,7 +386,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
                 safeResetRenderNode(renderNode);
                 return false;
             }
-        
+      
             float effectiveSize = Math.max(Math.abs(mHeight), Math.abs(mWidth));
             if (effectiveSize < 1f) effectiveSize = mScreenHeight;
             mDistance = newOffset / effectiveSize;
@@ -397,7 +397,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
 
                 float axisMainScale = mSmoothScale * mSmoothZoom;
                 float axisCrossScale = mSmoothHScale * mSmoothZoom;
-            
+          
                 float finalScaleX, finalScaleY;
                 if (isVertical) {
                     finalScaleX = axisCrossScale; 
@@ -438,7 +438,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
                 }
 
                 boolean invertAnchor = getIntSetting("overscroll_invert_anchor", 1) == 1;
-            
+          
                 float canvasW = (float) canvas.getWidth();
                 float canvasH = (float) canvas.getHeight();
                 float pX, pY;
@@ -457,11 +457,11 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
                 renderNode.setPivotY(pY);
                 renderNode.setScaleX(finalScaleX);
                 renderNode.setScaleY(finalScaleY);
-            
+          
                 renderNode.setRotationX(0f);
                 renderNode.setRotationY(0f);
                 renderNode.setRotationZ(0f);
-            
+          
                 try {
                    renderNode.getClass().getMethod("stretch", float.class, float.class, float.class, float.class)
                        .invoke(renderNode, 0f, 0f, mWidth, mHeight);
@@ -510,13 +510,13 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
         try { return Settings.Secure.getFloat(mContext.getContentResolver(), key, def); } 
         catch (Exception e) { return def; }
     }
-    
+  
     private int getIntSetting(String key, int def) {
         if (mContext == null) return def;
         try { return Settings.Secure.getInt(mContext.getContentResolver(), key, def); } 
         catch (Exception e) { return def; }
     }
-    
+  
     private float calcScale(String modeKey, String intKey, String limKey, float ratio) {
         int mode = getIntSetting(modeKey, 0);
         float intensity = getFloatSetting(intKey, 0.0f);

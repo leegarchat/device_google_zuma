@@ -57,7 +57,6 @@ public class LauncherDT2S {
     }
 
     private static void applySpyListener(final Context context, View view) {
-        // 1. Сохраняем оригинальный Listener, если он есть (через рефлексию, так как getOnTouchListener скрыт)
         final View.OnTouchListener originalListener = getExistingOnTouchListener(view);
 
         final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -66,7 +65,6 @@ public class LauncherDT2S {
                 if (Settings.Secure.getInt(context.getContentResolver(), KEY_DT2S_ENABLED, 1) == 1) {
                     Log.d(TAG, "DoubleTap detected -> Sending Broadcast");
                     sendSleepBroadcast(context);
-                    // Возвращаем true, чтобы GestureDetector знал, что жест обработан
                     return true;
                 }
                 return false; 
@@ -74,8 +72,6 @@ public class LauncherDT2S {
 
             @Override
             public boolean onDown(MotionEvent e) {
-                // Как и в Xposed реализации: возвращаем false, чтобы не блокировать другие жесты,
-                // но GestureDetector все равно сможет детектить DoubleTap по цепочке событий.
                 return false; 
             }
         });
@@ -83,7 +79,6 @@ public class LauncherDT2S {
         gestureDetector.setIsLongpressEnabled(false);
         updateTimeout(context, gestureDetector);
 
-        // 2. Устанавливаем нашу обертку
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -91,17 +86,12 @@ public class LauncherDT2S {
                     updateTimeout(context, gestureDetector);
                 }
 
-                // Проверяем DT2S
                 boolean handledByDt2s = gestureDetector.onTouchEvent(event);
 
-                // Если это был Double Tap (и он включен), мы поглощаем событие (return true),
-                // точно так же, как param.result = true в Xposed.
                 if (handledByDt2s) {
                     return true;
                 }
 
-                // Если DT2S не сработал, передаем событие оригинальному слушателю,
-                // чтобы работали Long Press, скролл и другие функции лаунчера.
                 if (originalListener != null) {
                     return originalListener.onTouch(v, event);
                 }
@@ -113,18 +103,13 @@ public class LauncherDT2S {
         Log.i(TAG, "DT2S hooked successfully (Chain Mode). Original listener found: " + (originalListener != null));
     }
 
-    /**
-     * Извлекает существующий OnTouchListener через рефлексию, так как геттер может быть недоступен.
-     */
     private static View.OnTouchListener getExistingOnTouchListener(View view) {
         try {
-            // Доступ к mListenerInfo внутри View
             Field listenerInfoField = View.class.getDeclaredField("mListenerInfo");
             listenerInfoField.setAccessible(true);
             Object listenerInfo = listenerInfoField.get(view);
             
             if (listenerInfo != null) {
-                // Доступ к mOnTouchListener внутри ListenerInfo
                 Field listenerField = listenerInfo.getClass().getDeclaredField("mOnTouchListener");
                 listenerField.setAccessible(true);
                 return (View.OnTouchListener) listenerField.get(listenerInfo);

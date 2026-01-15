@@ -21,7 +21,6 @@ public class NativePartsManager {
     public static void init(Application app) {
         String pkg = app.getPackageName();
         if (PKG_LAUNCHER.equals(pkg)) {
-            // Проверка аварийного выключателя
             if (isNativeHookDisabled(app)) {
                 Log.w(TAG, "Native hooks for Launcher are DISABLED via Settings (" + KEY_NATIVE_HOOK_DISABLE + "=1)");
                 return;

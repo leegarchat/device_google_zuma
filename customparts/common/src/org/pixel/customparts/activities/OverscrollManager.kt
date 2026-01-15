@@ -58,8 +58,8 @@ object OverscrollManager {
     const val KEY_H_SCALE_ANCHOR_X_HORIZ = "overscroll_h_scale_anchor_x_horiz"
     const val KEY_H_SCALE_ANCHOR_Y_HORIZ = "overscroll_h_scale_anchor_y_horiz"
     const val KEY_INPUT_SMOOTH_FACTOR = "overscroll_input_smooth"
-    const val KEY_PHYSICS_MIN_VEL = "overscroll_physics_min_vel"
-    const val KEY_PHYSICS_MIN_VAL = "overscroll_physics_min_val"
+    const val KEY_PHYSICS_MIN_VEL = "overscroll_physics_min_vel_v2"
+    const val KEY_PHYSICS_MIN_VAL = "overscroll_physics_min_val_v2"
     const val KEY_LERP_MAIN_IDLE = "overscroll_lerp_main_idle"
     const val KEY_LERP_MAIN_RUN = "overscroll_lerp_main_run"
 
