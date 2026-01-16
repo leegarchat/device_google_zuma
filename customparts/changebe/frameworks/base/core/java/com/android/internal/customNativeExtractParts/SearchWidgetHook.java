@@ -11,6 +11,8 @@ import android.view.ViewTreeObserver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SearchWidgetHook {
 
@@ -22,7 +24,20 @@ public class SearchWidgetHook {
     private static final String KEY_PADDING_DOCK = "launcher_padding_dock";
     private static final String KEY_PADDING_SEARCH = "launcher_padding_search";
     private static final String KEY_PADDING_DOTS = "launcher_padding_dots";
+    
     private static int lastAppliedHash = 0;
+
+    private static final Map<String, Field> sFieldCache = new HashMap<>();
+    private static final Map<String, Method> sMethodCache = new HashMap<>();
+    private static boolean sSettingsLoaded = false;
+    private static boolean sIsDockEnabled;
+    private static boolean sHideSearch;
+    private static boolean sHideDock;
+    private static int sPaddingHomepage;
+    private static int sPaddingDock;
+    private static int sPaddingSearch;
+    private static int sPaddingDots;
+
     public static void attach(final Activity activity) {
         if (activity == null) return;
         View contentView = activity.findViewById(android.R.id.content);
@@ -33,18 +48,34 @@ public class SearchWidgetHook {
         }
     }
 
+    private static void loadSettings(Context context) {
+        try {
+            sIsDockEnabled = isEnabled(context, KEY_DOCK_ENABLE);
+            if (sIsDockEnabled) {
+                sHideSearch = isEnabled(context, KEY_HIDE_SEARCH);
+                sHideDock = isEnabled(context, KEY_HIDE_DOCK);
+                sPaddingHomepage = getInt(context, KEY_PADDING_HOMEPAGE, 165);
+                sPaddingDock = getInt(context, KEY_PADDING_DOCK, 0);
+                sPaddingSearch = getInt(context, KEY_PADDING_SEARCH, 0);
+                sPaddingDots = getInt(context, KEY_PADDING_DOTS, 0);
+            }
+            sSettingsLoaded = true;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to load settings", e);
+        }
+    }
+
     private static void applySettings(Activity activity) {
         try {
-            if (!isEnabled(activity, KEY_DOCK_ENABLE)) return;
-            boolean hideSearch = isEnabled(activity, KEY_HIDE_SEARCH);
-            boolean hideDock = isEnabled(activity, KEY_HIDE_DOCK);
-            int paddingHomepage = getInt(activity, KEY_PADDING_HOMEPAGE, 165);
-            int paddingDock = getInt(activity, KEY_PADDING_DOCK, 0);
-            int paddingSearch = getInt(activity, KEY_PADDING_SEARCH, 0);
-            int paddingDots = getInt(activity, KEY_PADDING_DOTS, 0);
-            int currentHash = (hideSearch ? 1 : 0) + (hideDock ? 1 : 0) * 2 + 
-                              paddingHomepage * 4 + paddingDock * 8 + 
-                              paddingSearch * 16 + paddingDots * 32;
+            if (!sSettingsLoaded) {
+                loadSettings(activity);
+            }
+
+            if (!sIsDockEnabled) return;
+
+            int currentHash = (sHideSearch ? 1 : 0) + (sHideDock ? 1 : 0) * 2 + 
+                              sPaddingHomepage * 4 + sPaddingDock * 8 + 
+                              sPaddingSearch * 16 + sPaddingDots * 32;
             
             Object deviceProfile = getField(activity, "mDeviceProfile");
             if (deviceProfile == null) return;
@@ -61,10 +92,10 @@ public class SearchWidgetHook {
                 if (paddingObj instanceof Rect) {
                     Rect rect = (Rect) paddingObj;
                     int desiredBottom;
-                    if (paddingHomepage == -45) {
+                    if (sPaddingHomepage == -45) {
                         desiredBottom = rect.bottom;
                     } else {
-                        desiredBottom = toPx(activity, paddingHomepage + 20);
+                        desiredBottom = toPx(activity, sPaddingHomepage + 20);
                     }
 
                     if (rect.bottom != desiredBottom) {
@@ -85,19 +116,19 @@ public class SearchWidgetHook {
             View pageIndicator = findPageIndicator(activity);
 
             if (qsbView != null) {
-                float searchTranslationY = (paddingSearch != 0) ? -1f * toPx(activity, paddingSearch) : 0f;
-                int searchVisibility = hideSearch ? View.GONE : View.VISIBLE;
-                enforceViewProperties(qsbView, searchVisibility, searchTranslationY, hideSearch);
+                float searchTranslationY = (sPaddingSearch != 0) ? -1f * toPx(activity, sPaddingSearch) : 0f;
+                int searchVisibility = sHideSearch ? View.GONE : View.VISIBLE;
+                enforceViewProperties(qsbView, searchVisibility, searchTranslationY, sHideSearch);
             }
 
             if (dockIconsView != null) {
-                float dockTranslationY = (paddingDock != 0) ? -1f * toPx(activity, paddingDock) : 0f;
-                int dockVisibility = hideDock ? View.GONE : View.VISIBLE;
-                enforceViewProperties(dockIconsView, dockVisibility, dockTranslationY, hideDock);
+                float dockTranslationY = (sPaddingDock != 0) ? -1f * toPx(activity, sPaddingDock) : 0f;
+                int dockVisibility = sHideDock ? View.GONE : View.VISIBLE;
+                enforceViewProperties(dockIconsView, dockVisibility, dockTranslationY, sHideDock);
             }
 
             if (pageIndicator != null) {
-                applyDotsMargin(pageIndicator, activity, paddingDots);
+                applyDotsMargin(pageIndicator, activity, sPaddingDots);
             }
 
         } catch (Exception e) {
@@ -269,35 +300,71 @@ public class SearchWidgetHook {
     private static Object getField(Object obj, String fieldName) {
         if (obj == null) return null;
         try {
-            Field field = findField(obj.getClass(), fieldName);
+            Field field = getFieldObject(obj.getClass(), fieldName);
             if (field != null) {
-                field.setAccessible(true);
                 return field.get(obj);
             }
         } catch (Exception ignored) {}
         return null;
     }
 
-    private static Field findField(Class<?> clazz, String fieldName) {
+    private static Field getFieldObject(Class<?> clazz, String fieldName) {
+        String key = clazz.getName() + "." + fieldName;
+        synchronized (sFieldCache) {
+            if (sFieldCache.containsKey(key)) {
+                return sFieldCache.get(key);
+            }
+        }
+
         Class<?> current = clazz;
         while (current != null) {
             try {
-                return current.getDeclaredField(fieldName);
+                Field field = current.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                synchronized (sFieldCache) {
+                    sFieldCache.put(key, field);
+                }
+                return field;
             } catch (NoSuchFieldException e) {
                 current = current.getSuperclass();
             }
+        }
+        
+        synchronized (sFieldCache) {
+            sFieldCache.put(key, null);
         }
         return null;
     }
 
     private static Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        StringBuilder keyBuilder = new StringBuilder(clazz.getName()).append(".").append(methodName);
+        for (Class<?> p : parameterTypes) {
+            keyBuilder.append("-").append(p.getName());
+        }
+        String key = keyBuilder.toString();
+
+        synchronized (sMethodCache) {
+            if (sMethodCache.containsKey(key)) {
+                return sMethodCache.get(key);
+            }
+        }
+
         Class<?> current = clazz;
         while (current != null) {
             try {
-                return current.getDeclaredMethod(methodName, parameterTypes);
+                Method method = current.getDeclaredMethod(methodName, parameterTypes);
+                method.setAccessible(true);
+                synchronized (sMethodCache) {
+                    sMethodCache.put(key, method);
+                }
+                return method;
             } catch (NoSuchMethodException e) {
                 current = current.getSuperclass();
             }
+        }
+        
+        synchronized (sMethodCache) {
+            sMethodCache.put(key, null);
         }
         return null;
     }

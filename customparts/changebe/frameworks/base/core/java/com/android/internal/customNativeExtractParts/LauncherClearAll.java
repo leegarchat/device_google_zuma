@@ -33,11 +33,16 @@ public class LauncherClearAll {
 
     private static final WeakHashMap<Activity, Boolean> layoutListeners = new WeakHashMap<>();
 
+    private static Method sDismissAllMethod;
+    private static Method sDismissAllWithViewMethod;
+    private static Field sNativeClearButtonField;
+    private static Method sGetOverviewPanelMethod;
+    private static boolean sReflectionInitialized = false;
+
     public static void attach(Activity activity) {
         if (layoutListeners.containsKey(activity)) return;
 
         final View decorView = activity.getWindow().getDecorView();
-        
         decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -252,42 +257,62 @@ public class LauncherClearAll {
     }
 
     private static void performClearAllClick(Context context, View view) {
-        Object recentsView = getRecentsView(context);
+        if (!sReflectionInitialized) {
+            initReflection(context);
+        }
+
+        Object recentsView = getRecentsViewCached(context);
+        
         if (recentsView != null) {
-            // Попытка 1: Родная кнопка
-            if (tryClickNativeClearAll(recentsView)) {
+            if (tryClickNativeClearAllCached(recentsView)) {
                 return;
             }
 
             try {
-                Method method = findMethod(recentsView.getClass(), "dismissAllTasks", View.class);
-                if (method != null) {
-                    method.setAccessible(true);
-                    method.invoke(recentsView, view);
+                if (sDismissAllWithViewMethod != null) {
+                    sDismissAllWithViewMethod.invoke(recentsView, view);
                     return;
                 }
             } catch (Exception ignored) {}
             
             try {
-                Method method = findMethod(recentsView.getClass(), "dismissAllTasks");
-                if (method != null) {
-                    method.setAccessible(true);
-                    method.invoke(recentsView);
+                if (sDismissAllMethod != null) {
+                    sDismissAllMethod.invoke(recentsView);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Failed to clear tasks", e);
+                Log.e(TAG, "Failed to clear tasks via cached methods", e);
             }
         } else {
             Log.e(TAG, "RecentsView is null - unable to perform action");
         }
     }
 
-    private static boolean tryClickNativeClearAll(Object recentsView) {
+    private static void initReflection(Context context) {
         try {
-            Field field = findField(recentsView.getClass(), "mClearAllButton");
-            if (field != null) {
-                field.setAccessible(true);
-                View btn = (View) field.get(recentsView);
+            Object recentsView = getRecentsViewSlow(context);
+            if (recentsView == null) return;
+            
+            Class<?> recentsClass = recentsView.getClass();
+
+            sNativeClearButtonField = findField(recentsClass, "mClearAllButton");
+            if (sNativeClearButtonField != null) sNativeClearButtonField.setAccessible(true);
+
+            sDismissAllWithViewMethod = findMethod(recentsClass, "dismissAllTasks", View.class);
+            if (sDismissAllWithViewMethod != null) sDismissAllWithViewMethod.setAccessible(true);
+
+            sDismissAllMethod = findMethod(recentsClass, "dismissAllTasks");
+            if (sDismissAllMethod != null) sDismissAllMethod.setAccessible(true);
+
+            sReflectionInitialized = true;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to init reflection cache", e);
+        }
+    }
+
+    private static boolean tryClickNativeClearAllCached(Object recentsView) {
+        try {
+            if (sNativeClearButtonField != null) {
+                View btn = (View) sNativeClearButtonField.get(recentsView);
                 if (btn != null) {
                     btn.performClick();
                     return true;
@@ -297,7 +322,26 @@ public class LauncherClearAll {
         return false;
     }
 
-    private static Object getRecentsView(Context context) {
+    private static Object getRecentsViewCached(Context context) {
+        Activity activity = getActivityFromContext(context);
+        if (activity != null) {
+            try {
+                if (sGetOverviewPanelMethod == null) {
+                    sGetOverviewPanelMethod = findMethod(activity.getClass(), "getOverviewPanel");
+                    if (sGetOverviewPanelMethod != null) sGetOverviewPanelMethod.setAccessible(true);
+                }
+                
+                if (sGetOverviewPanelMethod != null) {
+                    return sGetOverviewPanelMethod.invoke(activity);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to get overview panel via cache", e);
+            }
+        }
+        return null;
+    }
+
+    private static Object getRecentsViewSlow(Context context) {
         Activity activity = getActivityFromContext(context);
         if (activity != null) {
             try {
@@ -306,9 +350,7 @@ public class LauncherClearAll {
                     method.setAccessible(true);
                     return method.invoke(activity);
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to get overview panel", e);
-            }
+            } catch (Exception ignored) {}
         }
         return null;
     }

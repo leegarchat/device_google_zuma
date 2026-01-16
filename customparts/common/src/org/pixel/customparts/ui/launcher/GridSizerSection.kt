@@ -68,14 +68,26 @@ fun GridSizerSection(
     var menuRowHeight by remember { mutableIntStateOf(initMenuRowHeight) }
     var baselineMenuRowHeight by remember { mutableIntStateOf(initMenuRowHeight) }
     
-    val isAnyModified = homeCols != baselineHomeCols || 
-                        homeRows != baselineHomeRows || 
-                        menuCols != baselineMenuCols || 
+    val isHomeModified = homeCols != baselineHomeCols || homeRows != baselineHomeRows
+    val isMenuModified = menuCols != baselineMenuCols || 
                         menuSearchCols != baselineMenuSearchCols || 
                         menuRowHeight != baselineMenuRowHeight
 
-    LaunchedEffect(isAnyModified) {
-        onShowBottomRestartChange(isAnyModified)
+    val onApplyAndRestart = {
+        scope.launch {
+            LauncherManager.restartLauncher(context)
+            withContext(Dispatchers.Main) {
+                baselineHomeCols = homeCols
+                baselineHomeRows = homeRows
+                baselineMenuCols = menuCols
+                baselineMenuSearchCols = menuSearchCols 
+                baselineMenuRowHeight = menuRowHeight
+            }
+        }
+    }
+
+    LaunchedEffect(isHomeModified, isMenuModified) {
+        onShowBottomRestartChange(isHomeModified || isMenuModified)
     }
 
     SettingsGroupCard(title = dynamicStringResource(R.string.grid_group_homepage)) {
@@ -160,11 +172,35 @@ fun GridSizerSection(
             videoResName = keyHomeHideText,
             onInfoClick = onInfoClick
         )
+
+        AnimatedVisibility(
+            visible = isHomeModified,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Button(
+                    onClick = { onApplyAndRestart() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(Icons.Rounded.Refresh, null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(dynamicStringResource(R.string.btn_restart_launcher))
+                }
+            }
+        }
+        
+        if (!isHomeModified) {
+            Spacer(Modifier.height(8.dp))
+        }
     }
 
     Spacer(Modifier.height(16.dp)) 
 
-    // App Drawer Customization Section
     SettingsGroupCard(title = dynamicStringResource(R.string.grid_group_drawer)) {
         GenericSwitchRow(
             title = dynamicStringResource(R.string.grid_lbl_drawer_enable),
@@ -300,25 +336,15 @@ fun GridSizerSection(
             videoResName = keyMenuHideText,
             onInfoClick = onInfoClick
         )
+        
         AnimatedVisibility(
-            visible = isAnyModified,
+            visible = isMenuModified,
             enter = expandVertically() + fadeIn(),
             exit = shrinkVertically() + fadeOut()
         ) {
             Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Button(
-                    onClick = {
-                        scope.launch {
-                            LauncherManager.restartLauncher(context)
-                            withContext(Dispatchers.Main) {
-                                baselineHomeCols = homeCols
-                                baselineHomeRows = homeRows
-                                baselineMenuCols = menuCols
-                                baselineMenuSearchCols = menuSearchCols 
-                                baselineMenuRowHeight = menuRowHeight
-                            }
-                        }
-                    },
+                    onClick = { onApplyAndRestart() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -332,7 +358,7 @@ fun GridSizerSection(
             }
         }
 
-        if (!isAnyModified) {
+        if (!isMenuModified) {
             Spacer(Modifier.height(8.dp))
         }
     }

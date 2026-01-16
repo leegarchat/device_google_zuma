@@ -110,7 +110,7 @@ public class EdgeEffectHook {
 
                 SpringDynamics mSpring = (SpringDynamics) XposedHelpers.getAdditionalInstanceField(thiz, FIELD_SPRING);
                 Float smoothY = (Float) XposedHelpers.getAdditionalInstanceField(thiz, FIELD_SMOOTH_OFFSET_Y);
-                float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 2.0f);
+                float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 4.0f);
 
                 if (mSpring != null) {
                     boolean physicsDone = !mSpring.isRunning() && Math.abs(mSpring.mValue) < minVal;
@@ -258,8 +258,8 @@ public class EdgeEffectHook {
                 if (mSpring != null && Math.abs(mSpring.mValue) > 0.5f) {
                     float stiffness = getFloatSetting(ctx, KEY_STIFFNESS, 450f);
                     float damping = getFloatSetting(ctx, KEY_DAMPING, 0.7f);
-                    float minVel = getFloatSetting(ctx, KEY_PHYSICS_MIN_VEL, 20.0f);
-                    float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 2.0f);
+                    float minVel = getFloatSetting(ctx, KEY_PHYSICS_MIN_VEL, 80.0f);
+                    float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 4.0f);
 
                     mSpring.setParams(stiffness, damping, minVel, minVal);
                     mSpring.setTargetValue(0);
@@ -298,8 +298,8 @@ public class EdgeEffectHook {
                     float flingMult = getFloatSetting(ctx, KEY_FLING, 0.6f);
                     float stiffness = getFloatSetting(ctx, KEY_STIFFNESS, 450f);
                     float damping = getFloatSetting(ctx, KEY_DAMPING, 0.7f);
-                    float minVel = getFloatSetting(ctx, KEY_PHYSICS_MIN_VEL, 20.0f);
-                    float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 2.0f);
+                    float minVel = getFloatSetting(ctx, KEY_PHYSICS_MIN_VEL, 80.0f);
+                    float minVal = getFloatSetting(ctx, KEY_PHYSICS_MIN_VAL, 4.0f);
                     
                     float velocityPx = velocity * flingMult;
                     if (flingMult > 1.0f) stiffness /= flingMult;
