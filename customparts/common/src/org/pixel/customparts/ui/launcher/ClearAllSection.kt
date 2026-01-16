@@ -81,7 +81,7 @@ fun ClearAllSection(
                     }
                 }
             },
-            videoResName = "search_fix",
+            videoResName = "launcher_clear_all",
             infoText = dynamicStringResource(R.string.launcher_clear_all_desc),
             onInfoClick = onInfo
         )
