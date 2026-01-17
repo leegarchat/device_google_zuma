@@ -23,15 +23,23 @@ DO_CLEAN=false
 DO_SETUP_ENV=false
 FORCE_ENV=false
 FORCE_LUNCH=false
-
+SYNC_DRIVE=false
+DO_CLEAN_DEVICE=false
 # Параметры
 JOBS=""
 DEVICE_CODE=""
 BUILD_TYPE="" # Default: userdebug
 APP_TARGET="" # --app
-VERSION_PART="bp3a" # --version (default)
+VERSION_PART="bp4a" # --version (default)
 
 
+# for kernel in "bp4a.251105.015-zuma_A16_Sultan_WKSU_SUSFS-v2.0.0-r2" "bp4a.251105.015-SukiSU-37714-zuma_A16_Sultan-20250909_SUSFS-v2.0.0-r12" "bp4a.251105.015-StockKernel" ; do
+#     for d in husky shiba akita ; do 
+#         . ./make.sh -j 16 --build $d user --kernel "${d}-bp4a.251105.015-zuma_A16_Sultan_WKSU_SUSFS-v2.0.0-r2" --clean-device --sync-drive
+#         . ./make.sh -j 16 --build $d user --kernel "${d}-bp4a.251105.015-SukiSU-37714-zuma_A16_Sultan-20250909_SUSFS-v2.0.0-r12" --clean-device --sync-drive
+#         . ./make.sh -j 16 --build $d user --kernel "${d}-bp4a.251105.015-StockKernel" --clean-device --sync-drive
+#     done
+# done
 safe_exit() {
     local code=${1:-1}
     # Проверка: если скрипт запущен через source, используем return
@@ -43,7 +51,7 @@ safe_exit() {
 }
 
 show_help() {
-    echo -e "${BLUE}Android Build Wrapper (v2.1)${NC}"
+    echo -e "${BLUE}Android Build Wrapper (v2.2)${NC}"
     echo -e "Использование: ${GREEN}source ./make.sh [ОПЦИИ] [DEVICE] [TYPE]${NC}"
     echo ""
     echo -e "${YELLOW}Окружение:${NC}"
@@ -55,16 +63,19 @@ show_help() {
     echo -e "  -j <num>         : Потоки."
     echo ""
     echo -e "${YELLOW}Ядро (Kernel):${NC}"
-    echo -e "  --kernel <dir>   : Указать папку ядра (в device/google/shusky-kernels)."
+    echo -e "  --kernel <dir>   : Указать папку ядра (в device/google/pixel-kernels)."
+    echo -e "  --prebuild-kernel: Режим сборки с prebuilt ядрами."
     echo -e "  --ls-kernel      : Показать список доступных ядер."
     echo ""
-    echo -e "${YELLOW}Сборка:${NC}"
+    echo -e "${YELLOW}Сборка и Выгрузка:${NC}"
     echo -e "  --build          : Активировать сборку."
     echo -e "  --app <name>     : Сбилдить конкретное приложение/модуль (требует --build)."
-    echo -e "  --clean          : m clean."
+    echo -e "  --clean          : Полная очистка (m clean)."
+    echo -e "  --clean-device   : Очистить только папку устройства (rm -rf out/target/product/DEVICE)."
+    echo -e "  --sync-drive     : Авто-выгрузка последнего ZIP и образов на GDrive после успеха."
     echo -e "  --env            : Force source build/envsetup.sh."
     echo -e "  --lunch          : Force lunch."
-    echo -e "  --version <ver>  : Версия платформы в lunch (def: bp3a). Пример: -QPR3-."
+    echo -e "  --version <ver>  : Версия платформы в lunch (def: bp4a)."
     echo ""
     echo -e "${YELLOW}Аргументы:${NC}"
     echo -e "  DEVICE           : Codename (shiba, stone)."
@@ -191,18 +202,18 @@ run_env_setup() {
 # ============================================================
 export TARGET_KERNEL_DIR_EXT=""
 
-KERNEL_BASE_PATH="device/google/shusky-kernels"
+KERNEL_BASE_PATH_PIXEL="device/google/pixel-kernels"
 
 function list_available_kernels() {
-    if [ -d "$KERNEL_BASE_PATH" ]; then
+    if [ -d "$1" ]; then
         echo "================================================="
-        echo "📦 Доступные каталоги ядер в $KERNEL_BASE_PATH/:"
+        echo "📦 Доступные каталоги ядер в $1/:"
         echo "================================================="
         # Ищем только папки (type d) на глубине 1
-        find "$KERNEL_BASE_PATH" -maxdepth 1 -mindepth 1 -type d -printf "  - %P\n"
+        find "$1" -maxdepth 1 -mindepth 1 -type d -printf "  - %P\n" | grep -vE "\.git|anykernels"
         echo "================================================="
     else
-        echo "❌ Ошибка: Базовая директория ядер '$KERNEL_BASE_PATH' не найдена."
+        echo "❌ Ошибка: Базовая директория ядер '$1' не найдена."
         return 1
     fi
 }
@@ -219,6 +230,7 @@ main() {
     APP_TARGET=""
     export RELEASE_PIXEL_2025_ENABLED="true"
     # Парсинг аргументов
+    export TARGET_KERNEL_IMAGES_EXT="0"
     while [[ $# -gt 0 ]]; do
       case $1 in
         --setup-env) DO_SETUP_ENV=true; shift ;;
@@ -242,22 +254,31 @@ main() {
                  VERSION_PART="$2"
                  shift 2
              else
-                 echo -e "${RED}Ошибка: --version требует параметр (напр. bp3a)${NC}"
+                 echo -e "${RED}Ошибка: --version требует параметр (напр. bp4a)${NC}"
                  safe_exit 1
              fi
              ;;
         -j)          JOBS="-j$2"; shift 2 ;;
+        --clean-device)
+            DO_CLEAN_DEVICE=true
+            shift
+            ;;
+        --sync-drive)
+            SYNC_DRIVE=true
+            shift
+            ;;
+        --prebuild-kernel) export TARGET_KERNEL_IMAGES_EXT=1; shift ;;
         --kernel)
             # 1. Проверка, передан ли параметр
             if [ -z "$2" ]; then
                 echo "❌ Ошибка: Для параметра '--kernel' требуется указать имя каталога."
                 echo "   Использование: --kernel <ИмяКаталога>"
-                list_available_kernels
+                list_available_kernels $KERNEL_BASE_PATH_PIXEL
                 return 1 
             fi
 
             KERNEL_EXTENSION="$2"
-            KERNEL_FULL_PATH="$KERNEL_BASE_PATH/$KERNEL_EXTENSION"
+            KERNEL_FULL_PATH="$KERNEL_BASE_PATH_PIXEL/$KERNEL_EXTENSION"
 
             # 2. Проверка, существует ли каталог
             if [ -d "$KERNEL_FULL_PATH" ]; then
@@ -272,7 +293,7 @@ main() {
             ;;
 
         --ls-kernel)
-            list_available_kernels
+            list_available_kernels $KERNEL_BASE_PATH_PIXEL
             shift 1
             ;;
         --help)      show_help; safe_exit 0 ; return 0;;
@@ -289,7 +310,15 @@ main() {
           ;;
       esac
     done
-
+    if [ "$DO_CLEAN_DEVICE" = true ]; then
+        if [ -n "$DEVICE_CODE" ]; then
+            echo -e "${YELLOW}--> Очистка out/target/product/$DEVICE_CODE ...${NC}"
+            rm -rf "out/target/product/$DEVICE_CODE"
+        else
+             echo -e "${RED}Ошибка: --clean-device требует указания устройства (codename)!${NC}"
+             safe_exit 1
+        fi
+    fi
     # 1. SETUP ENV
     if [ "$DO_SETUP_ENV" = true ]; then
         run_env_setup
@@ -499,7 +528,81 @@ main() {
         else
             echo -e "${GREEN}=== BUILDING ROM ===${NC}"
             m evolution $JOBS
+            BUILD_STATUS=$?
+
+            # Если сборка успешна и включена синхронизация
+            if [ $BUILD_STATUS -eq 0 ] && [ "$SYNC_DRIVE" = true ]; then
+                echo -e "${BLUE}=== Starting Upload to Drive process ===${NC}"
+                
+                local DATE_STR=$(date +%Y%m%d)
+                local SRC_DIR="out/target/product/${DEVICE_CODE}"
+                
+                # --- АВТОПОИСК ПОСЛЕДНЕГО ZIP ---
+                # Сортируем по времени (-t), берем первый (head -1). Ищем только .zip
+                local LATEST_ZIP_PATH=$(ls -t "$SRC_DIR"/*.zip 2>/dev/null | head -n 1)
+                
+                if [ -z "$LATEST_ZIP_PATH" ]; then
+                    echo -e "${RED}Error: ZIP file not found in $SRC_DIR${NC}"
+                else
+                    local ZIP_NAME=$(basename "$LATEST_ZIP_PATH")
+                    echo -e "${GREEN}Found build: $ZIP_NAME${NC}"
+
+                    # Формирование путей
+                    # Локально: myout/device/{date}{KERNEL_EXTENSION}/
+                    local DIR_SUFFIX=""
+                    [ -n "$TARGET_KERNEL_DIR_EXT" ] && DIR_SUFFIX="/$(echo "${TARGET_KERNEL_DIR_EXT}" | cut -d'-' -f3-)"
+                    
+                    local LOCAL_OUT="myout/${DEVICE_CODE}/${DATE_STR}${DIR_SUFFIX}"
+                    local LOCAL_BOOT_STAFF="${LOCAL_OUT}/boot_staff"
+                    
+                    mkdir -p "$LOCAL_BOOT_STAFF"
+                    
+                    # На Диске: {device}/{date}/{KERNEL_EXTENSION}/
+                    local DRIVE_PATH="${DEVICE_CODE}/${DATE_STR}"
+                    if [ -n "$TARGET_KERNEL_DIR_EXT" ]; then
+                        DRIVE_PATH="${DRIVE_PATH}${DIR_SUFFIX}"
+                    fi
+
+                    # 1. Копируем найденный ZIP
+                    cp "$LATEST_ZIP_PATH" "$LOCAL_OUT/"
+                    echo "Copied ZIP to $LOCAL_OUT"
+
+                    # 2. Копируем Boot Staff (имена стандартные)
+                    local IMAGES=("vendor_boot.img" "vendor_kernel_boot.img" "boot.img" "dtbo.img" "init_boot.img")
+                    for img in "${IMAGES[@]}"; do
+                        if [ -f "$SRC_DIR/$img" ]; then
+                            cp "$SRC_DIR/$img" "$LOCAL_BOOT_STAFF/"
+                        fi
+                    done
+                    
+                    # 3. Запуск Python скрипта в фоне
+                    (
+                        # Загрузка ZIP
+                        python3 UploadToDrive.py \
+                        --secret "Google.json" \
+                        --input "$LOCAL_OUT/$ZIP_NAME" \
+                        --out "$DRIVE_PATH" \
+                        --root_id '160d3KGHPnkksmYJ_ztDXOLXkXkl_jZj-'
+
+                        # Загрузка Boot Staff
+                        for img in "${IMAGES[@]}"; do
+                            if [ -f "$LOCAL_BOOT_STAFF/$img" ]; then
+                                python3 UploadToDrive.py \
+                                --secret "Google.json" \
+                                --input "$LOCAL_BOOT_STAFF/$img" \
+                                --out "$DRIVE_PATH/BootStaff/" \
+                                --root_id '160d3KGHPnkksmYJ_ztDXOLXkXkl_jZj-'
+                            fi
+                        done
+                        
+                        echo -e "${GREEN}Upload process finished in background.${NC}"
+                    ) &
+
+                    echo -e "${YELLOW}Upload task detached to background.${NC}"
+                fi
+            fi
         fi
+                        
     fi
 }
 

@@ -142,7 +142,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.vendor.usb.displayport.enabled=1
 
 # Enable Settings 2-pane optimization for devices supporting display ports.
-PRODUCT_SYSTEM_PROPERTIES += \
+PRODUCT_PRODUCT_PROPERTIES += \
         persist.settings.large_screen_opt_for_dp.enabled=true
 
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -653,7 +653,7 @@ PRODUCT_PACKAGES += \
 
 # Properties
 TARGET_PRODUCT_PROP += device/google/zuma/product.prop
-TARGET_SYSTEM_PROP += device/google/zuma/system.prop
+TARGET_SYSTEM_EXT_PROP += device/google/zuma/system_ext.prop
 
 # Tethering
 PRODUCT_PACKAGES += \
@@ -663,8 +663,6 @@ PRODUCT_PACKAGES += \
 include hardware/google/pixel/touch/device.mk
 
 # VINTF
-DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
-    device/google/zuma/vintf/vendor_framework_compatibility_matrix.xml
 DEVICE_MANIFEST_FILE += \
     device/google/zuma/vintf/manifest.xml
 DEVICE_MATRIX_FILE += \
