@@ -10,14 +10,28 @@ import android.view.ViewGroup;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Native implementation for Custom Grid Size customization.
+ * Logic ported from GridSizeNativeEmulationHook.kt (OPTIMIZED & LOGIC FIXED version).
+ * * Logic Summary:
+ * 1. DeviceProfile is configured with 'globalCols' (Search Priority) to ensure Header/Search looks correct.
+ * 2. Cell Width is recalculated based on 'listCols' (Menu Priority) to ensure Grid fills the screen width.
+ * 3. RecyclerView SpanCount is forced to 'listCols'.
+ */
 public class LauncherGridSize {
 
     private static final String TAG = "LauncherGridSize";
+
+    // Keys Home
     private static final String KEY_HOME_ENABLE = "launcher_homepage_sizer";
     private static final String KEY_HOME_COLS = "launcher_homepage_h";
     private static final String KEY_HOME_ROWS = "launcher_homepage_v";
     private static final String KEY_HOME_HIDE_TEXT = "launcher_homepage_hide_text";
+
+    // Keys Menu
     private static final String KEY_MENU_ENABLE = "launcher_menupage_sizer";
     private static final String KEY_MENU_COLS = "launcher_menupage_h";
     private static final String KEY_MENU_SEARCH_COLS = "launcher_menupage_search_h";
@@ -25,6 +39,24 @@ public class LauncherGridSize {
     private static final String KEY_MENU_ROW_HEIGHT = "launcher_menupage_row_height";
 
     private static int lastAppliedConfigHash = 0;
+
+    // --- Cache ---
+    private static final Map<String, Field> sFieldCache = new HashMap<>();
+    private static final Map<String, Method> sMethodCache = new HashMap<>();
+    
+    // Settings cache (Simplified for native: reload if attach called)
+    // In a real native service, you might want to observe changes, but for this hook structure,
+    // we read on every attach/layout pass, so caching values is good.
+    private static boolean sSettingsLoaded = false;
+    private static boolean sIsMenuEnabled;
+    private static boolean sIsHomeEnabled;
+    private static int sMenuCols;
+    private static int sSearchCols;
+    private static int sRowHeightRaw;
+    private static boolean sHideMenuText;
+    private static int sHomeCols;
+    private static int sHomeRows;
+    private static boolean sHideHomeText;
 
     public static void attach(final Activity activity) {
         if (activity == null) return;
@@ -36,23 +68,44 @@ public class LauncherGridSize {
         }
     }
 
+    private static void loadSettings(Context context) {
+        try {
+            sIsMenuEnabled = isEnabled(context, KEY_MENU_ENABLE);
+            sIsHomeEnabled = isEnabled(context, KEY_HOME_ENABLE);
+            
+            // Always load all if either is enabled, or just return to be safe
+            if (sIsMenuEnabled || sIsHomeEnabled) {
+                sMenuCols = getInt(context, KEY_MENU_COLS, 0);
+                sSearchCols = getInt(context, KEY_MENU_SEARCH_COLS, 0);
+                sRowHeightRaw = getInt(context, KEY_MENU_ROW_HEIGHT, 100);
+                sHideMenuText = isEnabled(context, KEY_MENU_HIDE_TEXT);
+                
+                sHomeCols = getInt(context, KEY_HOME_COLS, 0);
+                sHomeRows = getInt(context, KEY_HOME_ROWS, 0);
+                sHideHomeText = isEnabled(context, KEY_HOME_HIDE_TEXT);
+            }
+            sSettingsLoaded = true;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to load settings", e);
+        }
+    }
+
     private static void applyGridSettings(Activity activity) {
         try {
-            boolean isMenuEnabled = isEnabled(activity, KEY_MENU_ENABLE);
-            boolean isHomeEnabled = isEnabled(activity, KEY_HOME_ENABLE);
+            // 1. Load Settings
+            if (!sSettingsLoaded) {
+                loadSettings(activity);
+            }
 
-            if (!isMenuEnabled && !isHomeEnabled) return;
-            int menuCols = getInt(activity, KEY_MENU_COLS, 0);
-            int searchCols = getInt(activity, KEY_MENU_SEARCH_COLS, 0);
-            int rowHeightRaw = getInt(activity, KEY_MENU_ROW_HEIGHT, 100);
-            boolean hideMenuText = isEnabled(activity, KEY_MENU_HIDE_TEXT);
-            int homeCols = getInt(activity, KEY_HOME_COLS, 0);
-            int homeRows = getInt(activity, KEY_HOME_ROWS, 0);
-            boolean hideHomeText = isEnabled(activity, KEY_HOME_HIDE_TEXT);
-            int currentConfigHash = (menuCols + "|" + searchCols + "|" + rowHeightRaw + "|" + hideMenuText + "|"
-                                + homeCols + "|" + homeRows + "|" + hideHomeText).hashCode();
+            if (!sIsMenuEnabled && !sIsHomeEnabled) return;
+
+            // Generate Hash
+            int currentConfigHash = (sMenuCols + "|" + sSearchCols + "|" + sRowHeightRaw + "|" + sHideMenuText + "|" 
+                                + sHomeCols + "|" + sHomeRows + "|" + sHideHomeText).hashCode();
             
             if (lastAppliedConfigHash == currentConfigHash) return;
+
+            // 2. Reflection Access (Cached)
             Object deviceProfile = getField(activity, "mDeviceProfile");
             if (deviceProfile == null) return;
 
@@ -60,35 +113,53 @@ public class LauncherGridSize {
             Object allAppsProfile = getField(deviceProfile, "mAllAppsProfile");
 
             boolean dpChanged = false;
-            int gridCols = (menuCols > 0) ? menuCols : 4;
-            int headerCols = (searchCols > 0) ? searchCols : gridCols;
-            if (isHomeEnabled) {
+
+            // --- LOGIC CORRECTION (Hybrid Approach) ---
+            // Global DP priority: Search > Menu > 4. 
+            // This ensures Header/Search gets the correct number of columns.
+            int globalCols = (sSearchCols > 0) ? sSearchCols : ((sMenuCols > 0) ? sMenuCols : 4);
+            
+            // List priority: Menu > Global.
+            // This is used for RecyclerView SpanCount AND for cell width calculation.
+            int listCols = (sMenuCols > 0) ? sMenuCols : globalCols;
+
+            // --- HOMEPAGE LOGIC ---
+            if (sIsHomeEnabled) {
                 if (invariantDeviceProfile != null) {
-                    if (homeCols > 0) {
-                        setIntFieldSilently(invariantDeviceProfile, "numColumns", homeCols);
-                        setIntFieldSilently(invariantDeviceProfile, "numShownHotseatIcons", homeCols);
+                    if (sHomeCols > 0) {
+                        setIntFieldSilently(invariantDeviceProfile, "numColumns", sHomeCols);
+                        setIntFieldSilently(invariantDeviceProfile, "numShownHotseatIcons", sHomeCols);
                         dpChanged = true;
                     }
-                    if (homeRows > 0) {
-                        setIntFieldSilently(invariantDeviceProfile, "numRows", homeRows);
+                    if (sHomeRows > 0) {
+                        setIntFieldSilently(invariantDeviceProfile, "numRows", sHomeRows);
                         dpChanged = true;
                     }
                 }
                 
-                if (hideHomeText) {
+                if (sHideHomeText) {
                     setIntFieldSilently(deviceProfile, "iconTextSizePx", 0);
                     dpChanged = true;
                 }
             }
 
-            if (isMenuEnabled) {
-                if (gridCols > 0) {
-                    applyColumnsToDp(invariantDeviceProfile, deviceProfile, allAppsProfile, gridCols);
-                    recalculateCellWidth(deviceProfile, allAppsProfile, gridCols);
+            // --- MENU LOGIC ---
+            if (sIsMenuEnabled) {
+                if (globalCols > 0) {
+                    // 1. Set DP columns to GLOBAL (Search) count.
+                    // This makes the Search Header layout with 'globalCols' columns.
+                    applyColumnsToDp(invariantDeviceProfile, deviceProfile, allAppsProfile, globalCols);
+                    
+                    // 2. Set DP cell width based on LIST (Menu) count.
+                    // This is the hybrid fix: DP thinks it has 5 cols (for Search), 
+                    // but each cell is wide enough for 4 cols (for List).
+                    // This prevents the list from "flying left".
+                    recalculateCellWidth(deviceProfile, allAppsProfile, listCols);
+                    
                     dpChanged = true;
                 }
 
-                float rowHeightScale = (rowHeightRaw <= 0) ? 1.0f : rowHeightRaw / 100f;
+                float rowHeightScale = (sRowHeightRaw <= 0) ? 1.0f : sRowHeightRaw / 100f;
                 if (rowHeightScale != 1.0f) {
                     applyHeightScale(deviceProfile, "allAppsCellHeightPx", rowHeightScale);
                     setIntFieldSilently(deviceProfile, "allAppsIconDrawablePaddingPx", 0);
@@ -99,7 +170,7 @@ public class LauncherGridSize {
                     dpChanged = true;
                 }
 
-                if (hideMenuText) {
+                if (sHideMenuText) {
                     setIntFieldSilently(deviceProfile, "allAppsIconTextSizePx", 0);
                     setIntFieldSilently(deviceProfile, "allAppsIconDrawablePaddingPx", 0);
                     if (allAppsProfile != null) {
@@ -110,20 +181,23 @@ public class LauncherGridSize {
                 }
             }
 
+            // --- Trigger Update ---
             if (dpChanged) {
                 lastAppliedConfigHash = currentConfigHash;
+                
                 View appsView = getAppsView(activity);
                 
                 if (appsView != null) {
+                    // 1. Trigger Global Update (Updates Search Header + List with hybrid config)
                     triggerNativeOnDpChanged(appsView, deviceProfile);
-                    manualForceUpdateList(activity, appsView, gridCols);
-                    if (headerCols > 0 && headerCols != gridCols) {
-                        applyColumnsToDp(invariantDeviceProfile, deviceProfile, allAppsProfile, headerCols);
-                        recalculateCellWidth(deviceProfile, allAppsProfile, headerCols);
-                        updateFloatingHeader(appsView, deviceProfile);
-                        applyColumnsToDp(invariantDeviceProfile, deviceProfile, allAppsProfile, gridCols);
-                        recalculateCellWidth(deviceProfile, allAppsProfile, gridCols);
+                    
+                    // 2. Force List to use listCols (if different from global/search)
+                    // This fixes the RecyclerView grid span count mismatch.
+                    if (listCols != globalCols) {
+                        manualForceUpdateList(activity, appsView, listCols);
                     }
+                    
+                    // 3. Fix Search Bar Width
                     appsView.post(() -> fixSearchBar(appsView));
                 }
             }
@@ -132,6 +206,8 @@ public class LauncherGridSize {
             Log.e(TAG, "Failed to apply grid settings", e);
         }
     }
+
+    // --- Helpers ---
 
     private static void applyColumnsToDp(Object invDp, Object dp, Object allAppsProfile, int cols) {
         if (invDp != null) {
@@ -170,26 +246,6 @@ public class LauncherGridSize {
         }
     }
 
-    private static void updateFloatingHeader(View appsView, Object deviceProfile) {
-        try {
-            Field headerField = findField(appsView.getClass(), "mFloatingHeaderView");
-            if (headerField != null) {
-                headerField.setAccessible(true);
-                View headerView = (View) headerField.get(appsView);
-                if (headerView != null) {
-                    Method onDpMethod = findMethod(headerView.getClass(), "onDeviceProfileChanged", deviceProfile.getClass());
-                    if (onDpMethod != null) {
-                        onDpMethod.setAccessible(true);
-                        onDpMethod.invoke(headerView, deviceProfile);
-                        Log.d(TAG, "Isolated Header update success");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to update floating header", e);
-        }
-    }
-
     private static void manualForceUpdateList(Activity activity, View appsView, int cols) {
         try {
             updateAlphabeticalAppsList(appsView, cols);
@@ -198,8 +254,10 @@ public class LauncherGridSize {
             View recyclerView = (listId != 0) ? appsView.findViewById(listId) : null;
 
             if (recyclerView != null) {
+                // Set Span Count
                 Method getLayoutManager = findMethod(recyclerView.getClass(), "getLayoutManager");
                 Object layoutManager = (getLayoutManager != null) ? getLayoutManager.invoke(recyclerView) : null;
+                
                 if (layoutManager != null) {
                     Method setSpanCount = findMethod(layoutManager.getClass(), "setSpanCount", int.class);
                     if (setSpanCount != null) setSpanCount.invoke(layoutManager, cols);
@@ -212,12 +270,16 @@ public class LauncherGridSize {
                         if (invalidateCache != null) invalidateCache.invoke(spanSizeLookup);
                     }
                 }
+
+                // Notify Adapter
                 Method getAdapter = findMethod(recyclerView.getClass(), "getAdapter");
                 Object adapter = (getAdapter != null) ? getAdapter.invoke(recyclerView) : null;
                 if (adapter != null) {
                     Method notifyDataSetChanged = findMethod(adapter.getClass(), "notifyDataSetChanged");
                     if (notifyDataSetChanged != null) notifyDataSetChanged.invoke(adapter);
                 }
+
+                // Invalidate Decors
                 Method invalidateDecors = findMethod(recyclerView.getClass(), "invalidateItemDecorations");
                 if (invalidateDecors != null) invalidateDecors.invoke(recyclerView);
             }
@@ -228,10 +290,7 @@ public class LauncherGridSize {
 
     private static void updateAlphabeticalAppsList(View appsView, int cols) {
         try {
-            Field mAppsField = findField(appsView.getClass(), "mApps");
-            if (mAppsField == null) return;
-            mAppsField.setAccessible(true);
-            Object alphaAppsList = mAppsField.get(appsView);
+            Object alphaAppsList = getField(appsView, "mApps");
             if (alphaAppsList == null) return;
 
             setIntFieldSilently(alphaAppsList, "mNumAppsPerRow", cols);
@@ -250,12 +309,13 @@ public class LauncherGridSize {
         try {
             View searchContainer = null;
 
-            Field mSearchContainerField = findField(appsView.getClass(), "mSearchContainer");
-            if (mSearchContainerField != null) {
-                mSearchContainerField.setAccessible(true);
-                searchContainer = (View) mSearchContainerField.get(appsView);
+            // 1. Try finding mSearchContainer via reflection (Cached access via getField)
+            Object containerObj = getField(appsView, "mSearchContainer");
+            if (containerObj instanceof View) {
+                searchContainer = (View) containerObj;
             }
 
+            // 2. Fallback to ID lookup
             if (searchContainer == null) {
                 int searchId = appsView.getResources().getIdentifier("search_container_all_apps", "id", appsView.getContext().getPackageName());
                 if (searchId != 0) {
@@ -305,13 +365,9 @@ public class LauncherGridSize {
             if (borderSpaceObj == null) borderSpaceObj = getField(dp, "allAppsBorderSpacePx");
 
             if (borderSpaceObj != null) {
-                Field xField = findField(borderSpaceObj.getClass(), "x");
-                if (xField != null) {
-                    xField.setAccessible(true);
-                    Object value = xField.get(borderSpaceObj);
-                    if (value instanceof Integer) borderSpaceW = (Integer) value;
-                    else if (value instanceof Float) borderSpaceW = ((Float) value).intValue();
-                }
+                Object value = getField(borderSpaceObj, "x");
+                if (value instanceof Integer) borderSpaceW = (Integer) value;
+                else if (value instanceof Float) borderSpaceW = ((Float) value).intValue();
             }
 
             int totalSpace = (cols > 1) ? (cols - 1) * borderSpaceW : 0;
@@ -329,18 +385,14 @@ public class LauncherGridSize {
 
     private static void applyHeightScale(Object obj, String fieldName, float scale) {
         try {
-            Field field = findField(obj.getClass(), fieldName);
-            if (field != null) {
-                field.setAccessible(true);
-                if (field.getType() == int.class) {
-                    int current = field.getInt(obj);
-                    if (current > 0) {
-                        field.setInt(obj, Math.round(current * scale));
-                    }
-                }
+            int current = getIntField(obj, fieldName);
+            if (current > 0) {
+                setIntFieldSilently(obj, fieldName, Math.round(current * scale));
             }
         } catch (Exception ignored) {}
     }
+
+    // --- Cached Reflection Utils ---
 
     private static boolean isEnabled(Context context, String key) {
         return Settings.Secure.getInt(context.getContentResolver(), key, 0) == 1;
@@ -353,9 +405,8 @@ public class LauncherGridSize {
     private static void setIntFieldSilently(Object obj, String fieldName, int value) {
         if (obj == null) return;
         try {
-            Field field = findField(obj.getClass(), fieldName);
+            Field field = getFieldObject(obj.getClass(), fieldName);
             if (field != null) {
-                field.setAccessible(true);
                 field.setInt(obj, value);
             }
         } catch (Exception ignored) {}
@@ -364,9 +415,8 @@ public class LauncherGridSize {
     private static void setFloatFieldSilently(Object obj, String fieldName, float value) {
         if (obj == null) return;
         try {
-            Field field = findField(obj.getClass(), fieldName);
+            Field field = getFieldObject(obj.getClass(), fieldName);
             if (field != null) {
-                field.setAccessible(true);
                 field.setFloat(obj, value);
             }
         } catch (Exception ignored) {}
@@ -375,9 +425,8 @@ public class LauncherGridSize {
     private static int getIntField(Object obj, String fieldName) {
         if (obj == null) return 0;
         try {
-            Field field = findField(obj.getClass(), fieldName);
+            Field field = getFieldObject(obj.getClass(), fieldName);
             if (field != null) {
-                field.setAccessible(true);
                 return field.getInt(obj);
             }
         } catch (Exception ignored) {}
@@ -387,35 +436,71 @@ public class LauncherGridSize {
     private static Object getField(Object obj, String fieldName) {
         if (obj == null) return null;
         try {
-            Field field = findField(obj.getClass(), fieldName);
+            Field field = getFieldObject(obj.getClass(), fieldName);
             if (field != null) {
-                field.setAccessible(true);
                 return field.get(obj);
             }
         } catch (Exception ignored) {}
         return null;
     }
 
-    private static Field findField(Class<?> clazz, String fieldName) {
+    private static Field getFieldObject(Class<?> clazz, String fieldName) {
+        String key = clazz.getName() + "." + fieldName;
+        synchronized (sFieldCache) {
+            if (sFieldCache.containsKey(key)) {
+                return sFieldCache.get(key);
+            }
+        }
+
         Class<?> current = clazz;
         while (current != null) {
             try {
-                return current.getDeclaredField(fieldName);
+                Field field = current.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                synchronized (sFieldCache) {
+                    sFieldCache.put(key, field);
+                }
+                return field;
             } catch (NoSuchFieldException e) {
                 current = current.getSuperclass();
             }
+        }
+        
+        synchronized (sFieldCache) {
+            sFieldCache.put(key, null);
         }
         return null;
     }
 
     private static Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        StringBuilder keyBuilder = new StringBuilder(clazz.getName()).append(".").append(methodName);
+        for (Class<?> p : parameterTypes) {
+            keyBuilder.append("-").append(p.getName());
+        }
+        String key = keyBuilder.toString();
+
+        synchronized (sMethodCache) {
+            if (sMethodCache.containsKey(key)) {
+                return sMethodCache.get(key);
+            }
+        }
+
         Class<?> current = clazz;
         while (current != null) {
             try {
-                return current.getDeclaredMethod(methodName, parameterTypes);
+                Method method = current.getDeclaredMethod(methodName, parameterTypes);
+                method.setAccessible(true);
+                synchronized (sMethodCache) {
+                    sMethodCache.put(key, method);
+                }
+                return method;
             } catch (NoSuchMethodException e) {
                 current = current.getSuperclass();
             }
+        }
+        
+        synchronized (sMethodCache) {
+            sMethodCache.put(key, null);
         }
         return null;
     }

@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-/**
- * Менеджер хуков для NexusLauncher.
- * Инициализируется из NativePartsManager.
- */
 public class LauncherHooks {
 
     public static void init(Application app) {
@@ -19,8 +15,7 @@ public class LauncherHooks {
                 LauncherClearAll.attach(activity);
                 LauncherGridSize.attach(activity);
                 SearchWidgetHook.attach(activity);
-                LauncherFeedDisabler.attach(activity);
-                // LauncherGridDebug.dump(activity);
+                LauncherFeedDisabler.checkAndDisableFeed(activity);
             }
 
             @Override public void onActivityCreated(Activity a, Bundle b) {}

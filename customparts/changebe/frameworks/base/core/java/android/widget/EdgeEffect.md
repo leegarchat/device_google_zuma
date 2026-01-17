@@ -97,7 +97,7 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
         // [CustomNativeParts] START: IS_FINISHED HOOK
         // ============================================================================================
         if (isBounceEnabled()) {
-            float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 2.0f);
+            float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 4.0f);
             boolean physicsDone = !mSpring.isRunning() && Math.abs(mSpring.mValue) < minVal;
             boolean visualDone = Math.abs(mSmoothOffsetY) < minVal;
       
@@ -233,8 +233,8 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
             if (mSpring.mValue != 0) {
                 float stiffness = getFloatSetting(KEY_STIFFNESS, 450f);
                 float damping = getFloatSetting(KEY_DAMPING, 0.7f);
-                float minVel = getFloatSetting(KEY_PHYSICS_MIN_VEL, 20.0f);
-                float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 2.0f);
+                float minVel = getFloatSetting(KEY_PHYSICS_MIN_VEL, 80.0f);
+                float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 4.0f);
 
                 mSpring.setParams(stiffness, damping, minVel, minVal);
                 mSpring.setTargetValue(0);
@@ -277,8 +277,8 @@ import java.lang.reflect.Field; // [New] Для рефлексии RenderNode
             float flingMult = getFloatSetting(KEY_FLING, 0.6f);
             float stiffness = getFloatSetting(KEY_STIFFNESS, 450f);
             float damping = getFloatSetting(KEY_DAMPING, 0.7f);
-            float minVel = getFloatSetting(KEY_PHYSICS_MIN_VEL, 20.0f);
-            float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 2.0f);
+            float minVel = getFloatSetting(KEY_PHYSICS_MIN_VEL, 80.0f);
+            float minVal = getFloatSetting(KEY_PHYSICS_MIN_VAL, 4.0f);
 
             float velocityPx = velocity * flingMult;
             if (flingMult > 1.0f) stiffness /= flingMult;

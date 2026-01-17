@@ -15,10 +15,10 @@ import java.lang.reflect.Field;
 public class LauncherDT2S {
 
     private static final String TAG = "LauncherDT2S_ver6";
-    private static final String CLASS_WORKSPACE_PART = "Workspace"; 
+    private static final String CLASS_WORKSPACE_PART = "Workspace";
     
-    private static final String KEY_DT2S_ENABLED = "launcher_dt2s_enabled"; 
-    private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout"; 
+    private static final String KEY_DT2S_ENABLED = "launcher_dt2s_enabled";
+    private static final String KEY_DT2S_TIMEOUT = "launcher_dt2s_timeout";
 
     private static Field mDoubleTapTimeoutField;
 
