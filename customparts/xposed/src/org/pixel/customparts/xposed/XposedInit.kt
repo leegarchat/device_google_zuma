@@ -19,7 +19,6 @@ class XposedInit : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 
         if (lpparam.packageName != null) {
-            IconPackNativeEmulationHook.init(lpparam)
             EdgeEffectHook.init(lpparam)
         }
 
