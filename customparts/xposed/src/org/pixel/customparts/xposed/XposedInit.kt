@@ -19,14 +19,12 @@ class XposedInit : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 
         if (lpparam.packageName != null) {
-            IconPackNativeEmulationHook.init(lpparam)
             EdgeEffectHook.init(lpparam)
         }
 
         if (lpparam.packageName == "com.android.systemui") {
             DT2WHook.init(lpparam)
         }
-
 
         if (lpparam.packageName == "com.google.android.apps.nexuslauncher") {
             DT2SHook.init(lpparam)
