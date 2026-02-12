@@ -11,7 +11,11 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.ipsec_tunnel_migration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.ipsec_tunnel_migration.xml
 
 PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
-    system/etc/permissions/privapp_allowlist_com.google.android.ext.services.xml
+    system/etc/permissions/privapp_allowlist_com.google.android.ext.services.xml \
+	system/framework/PineInject.jar \
+    system/lib64/libpine.so \
+    system/framework/oat/arm64/PineInject.odex \
+    system/framework/oat/arm64/PineInject.vdex
 
 # sscoredump
 PRODUCT_PROPERTY_OVERRIDES += vendor.debug.ssrdump.type=sscoredump
@@ -25,7 +29,9 @@ PRODUCT_PACKAGES += android.hardware.thermal-service.pixel
 # Custom Pixel Parts
 PRODUCT_PACKAGES += \
 	init.pixelparts.rc \
-	PixelCustomPartsSystem
+	PixelCustomPartsSystem \
+	PineInject \
+    libpine
 
 # Thermal utils
 PRODUCT_PACKAGES += thermal_symlinks
