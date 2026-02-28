@@ -25,16 +25,17 @@ PRODUCT_PACKAGES += dump_modem
 
 # Thermal
 PRODUCT_PACKAGES += android.hardware.thermal-service.pixel
-
+# PRODUCT_BROKEN_VERIFY_USES_LIBRARIES += org.carconnectivity.android.digitalkey.timesync
+# RELAX_USES_LIBRARY_CHECK := true
 # Custom Pixel Parts
 PRODUCT_PACKAGES += \
 	init.pixelparts.rc \
 	PixelCustomPartsSystem \
 	PineInject \
-    libpine \
-	org.carconnectivity.android.digitalkey.timesync \
-	org.carconnectivity.android.digitalkey.timesync.xml \
-	CccDkTimeSyncService
+    libpine 
+# 	org.carconnectivity.android.digitalkey.timesync \
+# 	org.carconnectivity.android.digitalkey.timesync.xml \
+# 	CccDkTimeSyncService
 
 # Thermal utils
 PRODUCT_PACKAGES += thermal_symlinks
