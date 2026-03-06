@@ -14,6 +14,7 @@ PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
     system/etc/permissions/privapp_allowlist_com.google.android.ext.services.xml \
 	system/framework/PineInject.jar \
     system/lib64/libpine.so \
+    system/lib64/libaapt2.so \
     system/framework/oat/arm64/PineInject.odex \
     system/framework/oat/arm64/PineInject.vdex
 
