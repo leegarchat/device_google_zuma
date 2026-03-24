@@ -14,6 +14,12 @@ PRODUCT_COPY_FILES += \
 PRODUCT_VENDOR_PROPERTIES += ro.soc.manufacturer=Google
 TARGET_VENDOR_PROP += device/google/zuma/vendor.prop
 
+# Указываем путь к базовому releasekey (без расширения)
+PRODUCT_DEFAULT_DEV_CERTIFICATE := vendor/pixelparts-keys/releasekey
+PRODUCT_OTA_PUBLIC_KEYS := vendor/pixelparts-keys/releasekey
+PRODUCT_MAINLINE_SEPOLICY_DEV_CERTIFICATES := vendor/pixelparts-keys
+PRODUCT_MAINLINE_BLUETOOTH_SEPOLICY_DEV_CERTIFICATES := vendor/pixelparts-keys
+
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.vendor.testing_battery_profile=2
 

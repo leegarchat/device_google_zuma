@@ -1,17 +1,11 @@
-# Разрешить системным приложениям устанавливать (записывать) эти свойства
+
 allow system_app system_pixelparts_prop:property_service set;
-
-# Разрешить системным приложениям читать эти свойства (для обновления UI)
 get_prop(system_app, system_pixelparts_prop)
-
-# Разрешаем системному приложению (твой менеджер) создавать и редактировать файлы аддонов
 allow system_app pixelparts_data_file:dir create_dir_perms;
 allow system_app pixelparts_data_file:file create_file_perms;
-
-# Разрешаем ЛЮБОМУ приложению читать аддоны (нужно для Pine-инъекций в чужие процессы)
 allow appdomain pixelparts_data_file:dir r_dir_perms;
 allow appdomain pixelparts_data_file:file r_file_perms;
-
-# Разрешаем пользователю shell (для работы через adb push) закидывать файлы
 allow shell pixelparts_data_file:dir create_dir_perms;
 allow shell pixelparts_data_file:file create_file_perms;
+allow appdomain pixelparts_system_file:dir r_dir_perms;
+allow appdomain pixelparts_system_file:file r_file_perms;

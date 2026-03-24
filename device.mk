@@ -33,7 +33,7 @@ PRODUCT_PACKAGES += \
 	init.pixelparts.rc \
 	PixelCustomPartsSystem \
 	PineInject \
-    libpine 
+    libpine
 # 	org.carconnectivity.android.digitalkey.timesync \
 # 	org.carconnectivity.android.digitalkey.timesync.xml \
 # 	CccDkTimeSyncService

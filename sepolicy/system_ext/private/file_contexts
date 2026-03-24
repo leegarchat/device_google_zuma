@@ -4,4 +4,5 @@
 /system_ext/bin/gs_watchdogd u:object_r:gs_watchdogd_exec:s0
 /system_ext/bin/hw/vendor\.google\.edgetpu_app_service@1\.0-service u:object_r:edgetpu_app_server_exec:s0
 /system_ext/bin/hw/vendor\.google\.whitechapel\.audio\.hal\.parserservice u:object_r:hal_audio_parameter_parser_exec:s0
-/data/pixelparts(/.*)?    u:object_r:pixelparts_data_file:s0
+/data/pixelparts(/.*)? u:object_r:pixelparts_data_file:s0
+/system_ext/etc/pixelparts/addons(/.*)? u:object_r:pixelparts_system_file:s0
