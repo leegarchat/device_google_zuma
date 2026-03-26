@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="updater_server_url">https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/OTA/builds/{device}.json</string>
+    <string name="menu_changelog_url">https://raw.githubusercontent.com/leegarchat/PixelExtraParts/main/OTA/changelogs/{device}.txt</string>
+</resources>

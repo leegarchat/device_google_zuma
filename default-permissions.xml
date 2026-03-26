@@ -31,6 +31,16 @@
     </exception>
     -->
 
+    <exception package="com.google.android.settings.intelligence">
+        <!-- Calendar -->
+        <permission name="android.permission.READ_CALENDAR" fixed="true"/>
+        <!-- Location -->
+        <permission name="android.permission.ACCESS_FINE_LOCATION" fixed="false"/>
+        <permission name="android.permission.ACCESS_BACKGROUND_LOCATION" fixed="false"/>
+        <!-- Battery Widget -->
+        <permission name="android.permission.BLUETOOTH_CONNECT" fixed="false"/>
+    </exception>
+
     <exception package="com.google.android.GoogleCamera">
         <permission name="android.permission.POST_NOTIFICATIONS" fixed="false"/>
     </exception>
@@ -42,16 +52,6 @@
         <permission name="android.permission.POST_NOTIFICATIONS" fixed="false"/>
         <permission name="android.permission.BLUETOOTH_CONNECT" fixed="false"/>
         <permission name="android.permission.BLUETOOTH_SCAN" fixed="false"/>
-    </exception>
-
-	<exception package="com.google.android.settings.intelligence">
-        <!-- Calendar -->
-        <permission name="android.permission.READ_CALENDAR" fixed="true"/>
-        <!-- Location -->
-        <permission name="android.permission.ACCESS_FINE_LOCATION" fixed="false"/>
-        <permission name="android.permission.ACCESS_BACKGROUND_LOCATION" fixed="false"/>
-        <!-- Battery Widget -->
-        <permission name="android.permission.BLUETOOTH_CONNECT" fixed="false"/>
     </exception>
 
     <exception package="com.google.android.apps.cbrsnetworkmonitor">
@@ -70,13 +70,6 @@
         <permission name="android.permission.POST_NOTIFICATIONS" fixed="false"/>
         <!-- Used by Bluetooth Module to collect bluetooth info -->
         <permission name="android.permission.BLUETOOTH_CONNECT" fixed="false"/>
-    </exception>
-
-	<exception package="com.google.android.apps.pixel.relationships">
-        <permission name="android.permission.CALL_PHONE" fixed="false"/>
-        <permission name="android.permission.READ_CALL_LOG" fixed="false"/>
-        <permission name="android.permission.READ_CONTACTS" fixed="false"/>
-        <permission name="android.permission.WRITE_CONTACTS" fixed="false"/>
     </exception>
 
     <exception package="com.google.android.apps.setupwizard.searchselector">
@@ -164,9 +157,15 @@
         <!-- Notifications -->
         <permission name="android.permission.POST_NOTIFICATIONS" fixed="false"/>
     </exception>
+
+    <exception package="com.google.android.apps.pixel.relationships">
+        <permission name="android.permission.CALL_PHONE" fixed="false"/>
+        <permission name="android.permission.READ_CALL_LOG" fixed="false"/>
+        <permission name="android.permission.READ_CONTACTS" fixed="false"/>
+        <permission name="android.permission.WRITE_CONTACTS" fixed="false"/>
+    </exception>
     <exception
         package="com.google.android.apps.privacy.wildlife">
         <permission name="android.permission.READ_PHONE_STATE" fixed="false"/>
-        <permission name="android.permission.POST_NOTIFICATIONS" fixed="false"/>
     </exception>
 </exceptions>

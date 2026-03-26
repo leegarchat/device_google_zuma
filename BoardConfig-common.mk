@@ -40,6 +40,14 @@ TARGET_NO_KERNEL := true
 else
 TARGET_NO_KERNEL := false
 endif
+
+# If a prebuilt vendor_boot.img exists in TARGET_KERNEL_DIR, tell the build
+# system so that target-files copies it into IMAGES/ (Makefile:~6948).
+# add_img_to_target_files.py skips the rebuild when IMAGES/vendor_boot.img
+# already exists.  The actual build recipe is overridden in
+# device/google/build/tasks/vendor_boot_prebuilt.mk.
+BOARD_PREBUILT_VENDOR_BOOTIMAGE := $(wildcard $(TARGET_KERNEL_DIR)/vendor_boot.img)
+
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
